@@ -8,9 +8,10 @@ Common:
   Error: "An error occurred!"
   Warning: "Warning!"
   Information: "Information"
-  Yes: "Yes"
-  No: "No"
+  YesText: "Yes"
+  NoText: "No"
   Close: "Close"
+  Browse: "Browse..."
 
 Window:
   Title: "MesterMC Client Installer"
@@ -19,60 +20,92 @@ Window:
 Welcome:
   Title: "Welcome to the MesterMC Client Installer!"
   Description: "MesterMC Client 1.21.5 will be installed on your computer."
-  Action: "Click the Next button to continue or the Cancel button to exit."
+  Action: "Click the Next button to continue, or Cancel to exit."
 
 License:
   Title: "License Agreement"
-  Description: "Please read the license agreement before continuing with the installation."
-  Action: "Click 'Next' to accept the license agreement, or 'Back' to return."
+  Description: "Please read the license agreement before proceeding with the installation."
+  Action: "Click Next to accept the license agreement, or Back to return to the previous step."
   Accept: "I accept the license agreement"
   Content: |
     **License Information and Important Notices**
-    This MesterMC unofficial installer (hereinafter "Software") is released and distributed under the terms of the **MIT License**.
-    The MIT License is a highly permissive, open-source license that grants you broad freedom to use, copy, modify, and distribute the Software, including for commercial purposes.
+    This unofficial MesterMC installer (hereinafter referred to as "Software") is released and distributed under the terms of the **MIT License**.
+    The MIT License is a highly permissive open-source license that grants you broad rights to use, copy, modify, and distribute the Software, including for commercial purposes.
 
     **Important Note:**
-    The Software is provided "AS IS", without warranty of any kind, express or implied. The developer (i.e., Solymosi 'Tavstal' Zoltán) shall in no event be liable for any problems, damages, or potential data loss arising from or in connection with the use of the Software.
+    The Software is provided "AS IS", without any express or implied warranty. The developer (i.e. Solymosi 'Tavstal' Zoltán) shall not be held liable for any issues, damages, or data loss resulting from the use of this Software under any circumstances.
 
-    **Warning: Unofficial Installer!**
-    This Software is an **independent, fan-made and maintained unofficial installer** for the MesterMC game. The developer **IS NOT in any official relationship** with the MesterMC developers, operators, or owners.
-    This installer is provided for community convenience, but it **does not constitute an official MesterMC product or supported software.**
+    **Attention: Unofficial Installer!**
+    This Software is an **independent, fan-made, and maintained unofficial installer** for the MesterMC game. The developer is **NOT affiliated in any way** with the creators, operators, or owners of MesterMC.
+    This installer was created for community convenience, but **it is not an official product or supported software of MesterMC.**
 
-    **Please note:** For official terms of service, usage rules, privacy policy, and all other official information regarding the MesterMC game, please refer exclusively to the official MesterMC website: **mestermc.hu**
-    Please read the full license text available in the **LICENSE.txt** file located in the installation directory.
+    **Please note:** 
+    For official terms of service, usage policies, privacy policies, and all other official information regarding the MesterMC game, please visit the official website: **mestermc.hu**
+    The full license text can be found in the **LICENSE.txt** file located in the installation directory.
     Copyright (c) 2025 Solymosi 'Tavstal' Zoltán. All rights reserved.
 
 InstallPath:
-  Title: "Choose Destination Directory"
+  Title: "Choose Installation Directory"
   Description: "Where should MesterMC be installed?"
-  Action: "To proceed, click 'Next'. To choose a different directory, use the 'Browse' button."
-  FreeSpace: "At least %freeSpace% free space is required for installation."
-  BrowseTitle: "Choose Installation Directory"
+  Action: "Click 'Next' to continue. If you wish to select a different directory, use the 'Browse' button."
+  FreeSpace: "At least %freeSpace% of free space is required for installation."
+  BrowseTitle: "Select Installation Directory"
 
 Shortcut:
   Title: "Shortcuts"
   Description: "Which shortcuts should be created?"
-  Action: "Select which shortcuts you would like to create during the MesterMC Client installation, then click 'Next'."
-  StartMenuNote: "Optionally, you can specify a Start Menu folder where you want to create the shortcut."
-  Desktop: "Create Desktop shortcut."
-  StartMenu: "Create Start Menu shortcut."
+  Action: "Select the shortcuts you would like to create during the MesterMC Client installation, then click 'Next'."
+  StartMenuNote: "Optionally, you can specify a Start Menu folder where the shortcut should be created."
+  Desktop: "Create a Desktop shortcut."
+  StartMenu: "Create a Start Menu shortcut."
   BrowseTitle: "Choose Start Menu Folder"
 
 Review:
   Title: "Ready to Install"
   Description: "The installer is ready to install MesterMC on your computer."
-  Action: "Click 'Install' to begin the installation, or 'Back' to make changes."
+  Action: "Click 'Install' to begin the installation or 'Back' to make changes."
   Content: |
-    Installation Destination: 
+    Installation directory: 
       %installPath%
-    Start Menu Folder:
+    Start Menu folder:
       %startMenuPath%
-    Desktop Shortcut:
+    Desktop shortcut:
       %desktopShortcut%
-    Start Menu Shortcut:
+    Start Menu shortcut:
       %startMenuShortcut%
 
 Progress:
-  Title: "Installation"
+  Title: "Installing"
   Description: "Please wait while MesterMC is being installed."
-  Action: "Client installation is in progress. Please do not close the window until the installation is complete."
+  Action: "Client installation in progress. Please do not close this window until the installation is complete."
+  DirectoryExists: "The selected installation directory already exists."
+  DirectoryCreated: "The installation directory was created: %path%"
+  Download:
+    Started: "Download started..."
+    Status: "Download status: %status%"
+    Completed: "Download completed."
+    Cancelled: "Download cancelled."
+    Failed: "Download failed. Please check your internet connection and try again."
+    Error: "An error occurred during download: %error%"
+  Scripts:
+    Creating: "Creating scripts and command files..."
+    StartMenuDirCreationFailed: "Failed to create Start Menu folder: %path%"
+    ResourceNotFound: "Error: Required resource not found: %resource%"
+    FileCopied: "File %fileName% successfully copied to the installation directory."
+    FileCopyError: "Error occurred while copying file %fileName%: %error%"
+    UnsupportedOS: "Warning: Unsupported or unrecognized operating system: %os%"
+    LauncherCreated: "Script-based launcher file created: %filePath%"
+    LauncherCreationError: "Error: Failed to create script-based launcher file: %error%"
+    MakingExecutable: "Making script files executable..."
+    ExecutableMade: "Script file made executable: %filePath%"
+    ExecutableError: "Error: Failed to make script file executable: %error%"
+    ExecutableTimeout: "Error: Making script file executable failed due to timeout."
+    ExecutableException: "Error: Critical error occurred while making script file executable: %error%"
+    DesktopShortcutCreated: "Desktop shortcut created: %filePath%"
+    StartMenuShortcutCreated: "Start Menu shortcut created: %filePath%"
+
+Complete:
+  Title: "MesterMC Installation Complete"
+  Description: "The installer has finished installing MesterMC."
+  Action: "Click 'Finish' to close the installer."
+  LaunchGameCheckBox: "Launch MesterMC"
