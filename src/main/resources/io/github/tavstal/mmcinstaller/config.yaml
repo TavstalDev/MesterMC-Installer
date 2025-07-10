@@ -1,7 +1,7 @@
 # The language used in the UI and messages.
 # Supported languages: eng, hun
-lang: "eng"
-debug: false
+lang: "hun"
+debug: true
 project:
   # The name of the project.
   name: "io.github.tavstal.mmcinstaller"
@@ -52,8 +52,9 @@ install:
       [Desktop Entry]
       Name=MesterMC
       Comment=A modified Minecraft client
-      Exec=cd %dirPath% && java -jar "%jarPath%"
+      Exec=java -jar "%jarPath%"
       Icon=%dirPath%/icon.png
+      Path="%dirPath%"
       Terminal=false
       Type=Application
       Categories=Game;
