@@ -1,0 +1,179 @@
+package io.github.tavstal.mmcinstaller.controllers;
+
+import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.core.InstallerLogger;
+import io.github.tavstal.mmcinstaller.core.Translator;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
+/**
+ * Controller class for the Install Path view of the installer application.
+ * Handles user interactions and initializes the install path screen.
+ */
+public class PathSelectController implements Initializable {
+    private InstallerLogger _logger; // Logger instance for logging events.
+    private Translator _translator; // Translator instance for localization.
+    private String _defaultPath; // Default installation path based on the operating system.
+
+    public Button backButton; // Button to navigate back to the previous screen.
+    public Button nextButton; // Button to proceed to the next step.
+    public Button cancelButton; // Button to cancel the installation process.
+    public Label installPathTitle; // Label displaying the install path title.
+    public Label installPathDescription; // Label displaying the install path description.
+    public Text installPathAction; // Text displaying the install path action message.
+    public TextField directoryTextArea; // Text field for entering the installation directory.
+    public Button browseButton; // Button to open the directory chooser.
+    public Text freeSpaceText; // Text displaying the free space information.
+
+    /**
+     * Initializes the Install Path view by setting localized text for UI elements
+     * and configuring the initial state of the controls.
+     *
+     * @param location  The location used to resolve relative paths for the root object, or null if not known.
+     * @param resources The resources used to localize the root object, or null if not available.
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
+        // Translator instance for localization.
+        _translator = InstallerApplication.getTranslator();
+
+        installPathTitle.setText(_translator.Localize("InstallPath.Title"));
+        installPathDescription.setText(_translator.Localize("InstallPath.Description"));
+        installPathAction.setText(_translator.Localize("InstallPath.Action"));
+        freeSpaceText.setText(_translator.Localize("InstallPath.FreeSpace", new HashMap<>() {
+            {
+                put("freeSpace", InstallerApplication.getRequiredSpace());
+            }
+        }));
+
+        browseButton.setText(_translator.Localize("Common.Browse"));
+        backButton.setText(_translator.Localize("Common.Back"));
+        nextButton.setText(_translator.Localize("Common.Next"));
+        cancelButton.setText(_translator.Localize("Common.Cancel"));
+
+        _defaultPath = getDefaultInstallationPath().getAbsolutePath();
+
+        if (InstallerApplication.getCurrentPath() != null) {
+            directoryTextArea.setText(InstallerApplication.getCurrentPath());
+        } else {
+            directoryTextArea.setText(_defaultPath);
+            InstallerApplication.setCurrentPath(_defaultPath);
+        }
+        directoryTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            File directory = new File(newValue);
+            if (directory.exists() && directory.isDirectory()) {
+                InstallerApplication.setCurrentPath(newValue);
+            } else {
+                InstallerApplication.setCurrentPath(_defaultPath);
+            }
+        });
+    }
+
+    /**
+     * Handles the action when the "Next" button is clicked.
+     * Switches the scene to the Shortcut view.
+     */
+    @FXML
+    protected void onNextButtonClick() {
+        InstallerApplication.setActiveScene(InstallerApplication.getShortcutScene());
+        _logger.Debug("Switched to ShortcutView.fxml.");
+    }
+
+    /**
+     * Handles the action when the "Back" button is clicked.
+     * Switches the scene to the License view.
+     */
+    @FXML
+    protected void onBackButtonClick() {
+        InstallerApplication.setActiveScene(InstallerApplication.getLicenseScene());
+        _logger.Debug("Switched to LicenseView.fxml.");
+    }
+
+    /**
+     * Handles the action when the "Cancel" button is clicked.
+     * Exits the application.
+     */
+    @FXML
+    protected void onCancelButtonClick() {
+        System.exit(0);
+    }
+
+    /**
+     * Handles the action when the "Browse" button is clicked.
+     * Opens a directory chooser dialog to select the installation directory.
+     */
+    @FXML
+    public void onBrowseButtonClick() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle(_translator.Localize("InstallPath.BrowseTitle"));
+
+        // Set initial directory if the text field has a valid path
+        File initialDirectory = new File(directoryTextArea.getText());
+        if (initialDirectory.exists() && initialDirectory.isDirectory()) {
+            directoryChooser.setInitialDirectory(initialDirectory);
+        } else {
+            directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        }
+
+        // Get the current stage (window) to make the dialog modal
+        Stage stage = (Stage) browseButton.getScene().getWindow();
+
+        // Show the directory chooser dialog
+        File selectedDirectory = directoryChooser.showDialog(stage);
+
+        if (selectedDirectory != null) {
+            directoryTextArea.setText(selectedDirectory.getAbsolutePath());
+            InstallerApplication.setCurrentPath(selectedDirectory.getAbsolutePath());
+        }
+    }
+
+    /**
+     * Determines the default installation path based on the operating system.
+     * Creates the "Games" directory if it does not exist on Linux/macOS.
+     *
+     * @return A File object representing the default installation path.
+     */
+    private File getDefaultInstallationPath() {
+        String os = System.getProperty("os.name").toLowerCase();
+        String userHome = System.getProperty("user.home");
+        String appName = "MesterMC";
+
+        if (os.contains("win")) {
+            // Windows: C:\Users\[User]\AppData\Roaming\[YourAppName]
+            String appData = System.getenv("APPDATA");
+            if (appData != null && !appData.isEmpty()) {
+                return new File(appData, appName);
+            } else {
+                // Fallback if APPDATA env var is not set (unlikely)
+                return new File(userHome, appName);
+            }
+        } else if (os.contains("linux") || os.contains("mac")) {
+            // Linux: /home/[User]/Games/[YourAppName]
+            // macOS: /Users/[User]/Games/[YourAppName]
+            File gamesDir = new File(userHome, "Games");
+            if (!gamesDir.exists()) {
+                // Create the Games directory if it doesn't exist
+                if (!gamesDir.mkdirs()) {
+                    // Log an error if the directory creation fails
+                    _logger.Error("Failed to create Games directory: " + gamesDir.getAbsolutePath());
+                }
+            }
+            return new File(gamesDir, appName);
+        } else {
+            // Generic fallback for other OS types
+            return new File(userHome, appName);
+        }
+    }
+}
