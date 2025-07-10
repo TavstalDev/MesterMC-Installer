@@ -94,11 +94,11 @@ jlink {
 
 
     jpackage {
-        installerType = when {
+        /*installerType = when {
             OperatingSystem.current().isWindows -> "exe"
             OperatingSystem.current().isMacOsX -> "dmg"
             else -> "app-image" // Use app-image for Linux by default, or switch to deb/rpm
-        }
+        }*/
 
         appVersion = project.version.toString()
         vendor = vendorName
@@ -113,17 +113,6 @@ jlink {
             icon = windowsAppIcon.absolutePath
         } else if (OperatingSystem.current().isLinux) {
             icon = linuxAppIcon.absolutePath
-        }
-
-        // Optional: Linux-specific
-        if (OperatingSystem.current().isLinux) {
-            // installerType = "deb" // or "rpm"
-            //linuxShortcut = true
-        }
-
-        // Optional: Mac-specific
-        if (OperatingSystem.current().isMacOsX) {
-            // macPackageIdentifier = "io.github.tavstal.mmcinstaller"
         }
     }
 }
