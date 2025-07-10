@@ -23,23 +23,23 @@ public class YamlHelper {
     private static final Yaml _yaml = new Yaml(_dumperOptions); // YAML parser instance.
 
     private static void Log(Level level, String message) {
-        if (InstallerApplication.getCustomLogger() == null)
+        if (InstallerApplication.getLogger() == null)
             System.out.println(message);
         else
         {
             switch (level)
             {
                 case Level.INFO:
-                    InstallerApplication.getCustomLogger().Info(message);
+                    InstallerApplication.getLogger().Info(message);
                     break;
                 case Level.WARN:
-                    InstallerApplication.getCustomLogger().Warn(message);
+                    InstallerApplication.getLogger().Warn(message);
                     break;
                 case Level.ERROR:
-                    InstallerApplication.getCustomLogger().Error(message);
+                    InstallerApplication.getLogger().Error(message);
                     break;
                 default:
-                    InstallerApplication.getCustomLogger().Debug(message);
+                    InstallerApplication.getLogger().Debug(message);
             }
         }
     }
