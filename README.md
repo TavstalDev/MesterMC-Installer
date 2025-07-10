@@ -1,1 +1,105 @@
 # MesterMC Installer
+
+[![Magyar Verzió](https://img.shields.io/badge/Magyar%20Verzió-Nyelv-green?style=flat-square)](https://github.com/TavstalDev/MesterMC-Installer/blob/master/README_HUN.md)
+
+![JavaFX](https://img.shields.io/badge/JavaFX-Cross--Platform%20UI-blue?logo=javafx)
+![JDK 21+](https://img.shields.io/badge/JDK-21%2B%20Required-orange?logo=openjdk)
+![License](https://img.shields.io/github/license/TavstalDev/MesterMC-Installer)
+![GitHub issues](https://img.shields.io/github/issues/TavstalDev/MesterMC-Installer)
+
+The **MesterMC Installer** is a cross-platform solution designed to simplify the installation of the MesterMC launcher on various operating systems. While the original MesterMC installer primarily supports Windows, this installer extends compatibility to Linux and macOS, ensuring a broader user base can easily set up their game client.
+
+## ✨ Features
+
+* **Cross-Platform Compatibility:** Install MesterMC seamlessly on Windows, Linux, and macOS.
+* **User-Friendly Graphical Interface:** A clear and intuitive step-by-step wizard guides you through the installation process.
+* **Customizable Installation Path:** Choose where you want to install the MesterMC launcher.
+* **Shortcut Creation:** Opt to create convenient desktop and/or Start Menu shortcuts (Windows).
+* **License Agreement Display:** Review and accept the MesterMC license directly within the installer.
+* **Installation Progress Tracking:** Monitor the progress of your installation in real-time.
+* **Auto-Launch Option:** Launch MesterMC immediately after the installation completes.
+* **Dependency Management:** Handles necessary system interactions for a smooth setup.
+
+## 🖥️ Supported Operating Systems
+
+This installer is designed to work on:
+
+* **Windows**
+* **Linux**
+* **macOS**
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+To run the MesterMC Installer, you need to have **JDK 21 or higher** installed on your system.
+* **Oracle JDK** is highly recommended.
+* **Red Hat JDK is incompatible** with this installer.
+
+### Installation & Usage
+
+1.  **Download the Installer:**
+    * **Windows:** Download the `.zip` file. Extract it, and run the `MesterMC_Installer.exe` executable.
+    * **Linux:** Download the `.zip` file. Extract it, and run the included `.sh` script (e.g., `bash install.sh`).
+    * **macOS:** Download the `.zip` file. Extract it, and run the included `.zsh` script (e.g., `zsh install.zsh`).
+
+2.  **Follow the On-Screen Instructions:**
+    The installer will guide you through the following steps:
+    * **Welcome Screen:** Greet you and provide an overview.
+    * **License Agreement:** Present the MesterMC license for your review and acceptance.
+    * **Installation Path Selection:** Allow you to choose the desired directory for MesterMC.
+    * **Shortcut Options:** Configure desktop and/or Start Menu shortcuts (if applicable to your OS).
+    * **Review Installation:** Summarize your chosen options before proceeding.
+    * **Installation Progress:** Display the ongoing installation process.
+    * **Installation Complete:** Confirm successful installation and offer to launch MesterMC.
+
+## 🛠️ Technologies Used
+
+* **JavaFX:** For building the cross-platform graphical user interface.
+* **Apache HttpClient:** For handling HTTP requests (e.g., checking `.jar` file size).
+* **FXML:** For declarative UI design.
+* **PowerShell:** Utilized for specific system interactions, such as creating shortcuts on Windows.
+
+## 🤝 Contributing
+
+We welcome contributions to the MesterMC Installer project!
+
+This project is open-source and released under the MIT License. While not affiliated with the original MesterMC project, our goal is to enhance its accessibility.
+
+### Development Setup
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone [https://github.com/TavstalDev/MesterMC-Installer.git](https://github.com/TavstalDev/MesterMC-Installer.git)
+    cd MesterMC-Installer
+    ```
+2.  **Open in IntelliJ IDEA:** Import the project into IntelliJ IDEA. The Gradle build system will automatically download and configure the necessary packages.
+3.  **Test the Application:**
+    You can run the installer directly from your IDE to test changes or new features.
+    ```bash
+    ./gradlew run
+    ```
+4.  **Build the Application:**
+    To build the installer, use the `jpackageImage` Gradle task:
+    ```bash
+    ./gradlew jpackageImage
+    ```
+    This will generate the platform-specific installer packages.
+
+## 📸 Screenshots
+
+*(No screenshots available yet. This section will be updated soon with visual examples of the installer.)*
+
+## 📜 License
+
+This project is licensed under the **MIT License**. See the `LICENSE` file for details.
+
+## ⚠️ Disclaimer
+
+**This MesterMC Installer is a fan-made project and is NOT officially affiliated with or endorsed by the original MesterMC team or its creators.**
+
+## ❓ Support & Contact
+
+If you encounter any issues or have questions, please feel free to:
+
+* **Open an issue** on the [GitHub Issues page](https://github.com/tavstal/mmcinstaller/issues).
