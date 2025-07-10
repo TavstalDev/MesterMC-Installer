@@ -77,7 +77,16 @@ val windowsAppIcon = layout.projectDirectory.file("src/main/resources/io/github/
 
 jlink {
     imageZip.set(layout.buildDirectory.file("distributions/${project.name}-${project.version}-${javafx.platform.classifier}.zip"))
-    options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
+    options.addAll(
+        listOf(
+            "--add-modules", "java.base,java.net.http,jdk.crypto.ec",
+            "--strip-debug",
+            "--compress", "2",
+            "--no-header-files",
+            "--no-man-pages",
+            "--verbose"
+        )
+    )
 
     launcher {
         name = rootProject.name
@@ -88,7 +97,7 @@ jlink {
         installerType = when {
             OperatingSystem.current().isWindows -> "exe"
             OperatingSystem.current().isMacOsX -> "dmg"
-            else -> "deb" // Use app-image for Linux by default, or switch to deb/rpm
+            else -> "app-image" // Use app-image for Linux by default, or switch to deb/rpm
         }
 
         appVersion = project.version.toString()

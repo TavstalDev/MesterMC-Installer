@@ -54,7 +54,7 @@ install:
       Comment=A modified Minecraft client
       Exec=java -jar "%jarPath%"
       Icon=%dirPath%/icon.png
-      Path="%dirPath%"
+      Path=%dirPath%
       Terminal=false
       Type=Application
       Categories=Game;
