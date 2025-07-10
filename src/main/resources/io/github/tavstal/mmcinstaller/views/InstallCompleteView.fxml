@@ -18,7 +18,7 @@
     <!-- Background Image (Left Side) -->
     <ImageView fitHeight="315.0" fitWidth="240.0" pickOnBounds="true"
                StackPane.alignment="TOP_LEFT">
-        <Image url="@assets/banner.png"/>
+        <Image url="@../assets/banner.png"/>
     </ImageView>
 
     <!-- Main Content Area (GridPane for structured layout) -->
@@ -41,16 +41,16 @@
                 <Insets left="20.0" right="20.0" top="20.0"/>
             </padding>
             <Label fx:id="finishedTitle" style="-fx-font-size: 20px; -fx-font-weight: bold;"
-                   text="A MesterMC telepítésének befejezése" wrapText="true">
+                   text="Loading..." wrapText="true">
                 <padding>
                     <Insets bottom="5.0"/>
                 </padding>
             </Label>
 
-            <Text fx:id="finishedDescription" text="A telepitő végzett a MesterMC telepítésével." wrappingWidth="400.0"/>
-            <Text fx:id="finishedAction" text="Kattintson a 'Befejezés' gombra a kilépéshez."
+            <Text fx:id="finishedDescription" text="Loading..." wrappingWidth="400.0"/>
+            <Text fx:id="finishedAction" text="Loading..."
                   wrappingWidth="400.0"/>
-            <CheckBox fx:id="launchGameCheckBox" onAction="#onLaunchGameCheckBoxChange" mnemonicParsing="false" text="MesterMC elindítása">
+            <CheckBox fx:id="launchGameCheckBox" mnemonicParsing="false" text="Loading...">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
@@ -64,7 +64,7 @@
                 <Insets top="15.0" bottom="15.0" left="15.0" right="15.0"/>
             </padding>
             <HBox alignment="BOTTOM_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
-                <Button fx:id="finishButton" onAction="#onFinishButtonClick" mnemonicParsing="false" text="Befejezés"/>
+                <Button fx:id="finishButton" onAction="#onFinishButtonClick" mnemonicParsing="false" text="Loading..."/>
             </HBox>
         </HBox>
     </GridPane>
