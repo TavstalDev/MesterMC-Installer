@@ -1,24 +1,27 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     java
     application
-    id("org.javamodularity.moduleplugin") version "1.8.12"
-    id("org.openjfx.javafxplugin") version "0.0.13"
-    id("org.beryx.jlink") version "2.25.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("org.javamodularity.moduleplugin") version "1.8.15"
+    id("org.openjfx.javafxplugin") version "0.1.0"
+    id("org.beryx.jlink") version "3.1.1"
 }
 
 group = "io.github.tavstal"
-version = "1.0-SNAPSHOT"
+version = "1.0"
+
 
 repositories {
     mavenCentral()
 }
 
-val junitVersion = "5.10.2"
+val junitVersion = "5.13.3"
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+        sourceCompatibility = JavaVersion.VERSION_21
     }
 }
 
@@ -36,23 +39,22 @@ javafx {
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
+
 dependencies {
-    implementation("org.controlsfx:controlsfx:11.2.1")
-    implementation("net.synedra:validatorfx:0.5.0") {
-        exclude(group = "org.openjfx")
-    }
-    implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
+    implementation("org.controlsfx:controlsfx:11.2.2")
+    implementation("net.synedra:validatorfx:0.6.1")
+    implementation("org.kordamp.ikonli:ikonli-javafx:12.4.0")
 
     // HTTP Client
     implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
 
     // YAML
-    implementation("org.yaml:snakeyaml:2.0")
+    implementation("org.yaml:snakeyaml:2.4")
 
     // JNA Core Library
-    implementation("net.java.dev.jna:jna:5.14.0") // Use the latest stable version
+    implementation("net.java.dev.jna:jna:5.17.0")
     // JNA Platform Library (contains OS-specific mappings like KnownFolders)
-    implementation("net.java.dev.jna:jna-platform:5.14.0")
+    implementation("net.java.dev.jna:jna-platform:5.17.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
@@ -62,16 +64,57 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-jlink {
-    imageZip.set(layout.buildDirectory.file("/distributions/app-${javafx.platform.classifier}.zip"))
-    options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
-    launcher {
-        name = "app"
-    }
-}
+// Define variables for jpackage task (these are still useful)
+val vendorName = "Solymosi 'Tavstal' Zoltán"
+val description = "A modified Minecraft client"
 
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-    archiveBaseName.set("MesterMC-Installer")
-    archiveVersion.set("1.0")
-    archiveClassifier.set("")
+// Path to the output directory for packaged app
+val packageOutputDir = layout.buildDirectory.dir("jpackage").get().asFile
+
+// Path to your application icon (e.g., in src/main/resources)
+val linuxAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/icon.png").asFile
+val windowsAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/favicon.ico").asFile
+
+jlink {
+    imageZip.set(layout.buildDirectory.file("distributions/${project.name}-${project.version}-${javafx.platform.classifier}.zip"))
+    options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
+
+    launcher {
+        name = rootProject.name
+    }
+
+
+    jpackage {
+        installerType = when {
+            OperatingSystem.current().isWindows -> "exe"
+            OperatingSystem.current().isMacOsX -> "dmg"
+            else -> "deb" // Use app-image for Linux by default, or switch to deb/rpm
+        }
+
+        appVersion = project.version.toString()
+        vendor = vendorName
+        //description = description
+
+        // Output directory
+        this.outputDir = packageOutputDir.absolutePath
+        imageName = rootProject.name
+
+        // Icons
+        if (OperatingSystem.current().isWindows) {
+            icon = windowsAppIcon.absolutePath
+        } else if (OperatingSystem.current().isLinux) {
+            icon = linuxAppIcon.absolutePath
+        }
+
+        // Optional: Linux-specific
+        if (OperatingSystem.current().isLinux) {
+            // installerType = "deb" // or "rpm"
+            //linuxShortcut = true
+        }
+
+        // Optional: Mac-specific
+        if (OperatingSystem.current().isMacOsX) {
+            // macPackageIdentifier = "io.github.tavstal.mmcinstaller"
+        }
+    }
 }

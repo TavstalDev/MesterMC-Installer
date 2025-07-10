@@ -10,6 +10,7 @@ module io.github.tavstal.mmcinstaller {
     requires org.apache.httpcomponents.client5.httpclient5;
     requires org.apache.httpcomponents.core5.httpcore5;
     requires com.sun.jna.platform;
+    requires org.slf4j;
 
     opens io.github.tavstal.mmcinstaller to javafx.fxml;
     exports io.github.tavstal.mmcinstaller;

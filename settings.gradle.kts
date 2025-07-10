@@ -1,1 +1,1 @@
-rootProject.name = "mmcinstaller"
+rootProject.name = "MesterMC-Installer"
