@@ -10,6 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -34,7 +35,7 @@ public class InstallCompleteController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
         // Set localized text for UI elements.
@@ -54,8 +55,15 @@ public class InstallCompleteController implements Initializable {
     protected void onFinishButtonClick() {
         if (launchGameCheckBox.isSelected()) {
             _logger.Debug("Launch game checkbox is selected, launching the game...");
-            // TODO:
-            //  Auto launch game checkbox
+            try {
+                Process process = new ProcessBuilder()
+                        .command(InstallerApplication.applicationToLaunch)
+                        .start();
+                _logger.Debug("Game launched successfully.");
+            }
+            catch (IOException exception) {
+                _logger.Error("Failed to launch the game: " + exception.getMessage());
+            }
         }
         System.exit(0);
     }
