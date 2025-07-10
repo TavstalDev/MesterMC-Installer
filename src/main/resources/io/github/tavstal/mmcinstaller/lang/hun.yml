@@ -1,0 +1,80 @@
+Common:
+  Cancel: "Megszakítás"
+  Next: "Tovább"
+  Back: "Vissza"
+  Finish: "Befejezés"
+  Install: "Telepítés"
+  Uninstall: "Eltávolítás"
+  Error: "Hiba történt!"
+  Warning: "Figyelmeztetés!"
+  Information: "Információ"
+  YesText: "Igen"
+  NoText: "Nem"
+  Close: "Bezárás"
+  Browse: "Tallózás..."
+
+Window:
+  Title: "MesterMC Kliens Telepítő"
+  Description: "Ez a telepítő segít a MesterMC Kliens 1.21.5 telepítésében a számítógépére."
+
+Welcome:
+  Title: "Üdvözöllek a MesterMC Kliens telepítőben!"
+  Description: "Telepítve lesz a MesterMC Kliens 1.21.5 az ön gépén."
+  Action: "Kattintson a Tovább gombra a folytatáshoz, vagy a Megszakítás gombra a kilépéshez."
+
+License:
+  Title: "Licencszerződés"
+  Description: "Kérjük, olvassa el a licencszerződést, mielőtt folytatná a telepítést."
+  Action: "Kattintson a Tovább gombra a licencszerződés elfogadásához, vagy a Vissza gombra a visszalépéshez."
+  Accept: "Elfogadom a licencszerződést"
+  Content: |
+    **Licenc Információ és Fontos Figyelmeztetések**
+    Ez a MesterMC nem hivatalos telepítő (a továbbiakban "Szoftver") az **MIT licenc** feltételei szerint kerül kiadásra és terjesztésre.
+    Az MIT licenc egy rendkívül engedékeny, nyílt forráskódú licenc, amely széleskörű szabadságot biztosít Önnek a Szoftver használatához, másolásához, módosításához és terjesztéséhez, beleértve a kereskedelmi célú felhasználást is.
+
+    **Fontos Megjegyzés:**
+    A Szoftver "AHOGY VAN" alapon biztosított, mindenféle kifejezett vagy vélelmezett garancia nélkül. A fejlesztő (azaz Solymosi 'Tavstal' Zoltán) semmilyen körülmények között nem felelős a Szoftver használatából, vagy azzal kapcsolatosan felmerülő problémákért, károkért, vagy az esetleges adatvesztésért.
+
+    **Figyelem: Nem Hivatalos Telepítő!**
+    Ez a Szoftver egy **független, rajongó által készített és karbantartott nem hivatalos telepítő** a MesterMC játékhoz. A fejlesztő **NEM áll semmilyen hivatalos kapcsolatban** a MesterMC fejlesztőivel, üzemeltetőivel vagy tulajdonosaival.
+    Ez a telepítő a közösség számára készült kényelmi célokat szolgálja, de **nem minősül a MesterMC hivatalos termékének vagy támogatott szoftverének.**
+
+    **Kérjük, vegye figyelembe:** 
+    A MesterMC játékra vonatkozó hivatalos szerződési feltételekről, felhasználási szabályokról, adatvédelmi irányelvekről és minden egyéb hivatalos információról kizárólag a MesterMC hivatalos weboldalán tájékozódjon: **mestermc.hu**
+    Kérjük, olvassa el a teljes licencszöveget, amely a telepítési könyvtárban található **LICENSE.txt** fájlban érhető el.
+    Szerzői jog (c) 2025 Solymosi 'Tavstal' Zoltán. Minden jog fenntartva.
+
+InstallPath:
+    Title: "Válasszon célkönyvtárat"
+    Description: "Hova települjön a MesterMC?"
+    Action: "A folytatáshoz, kattintson a 'Tovább' gombra. Ha másik könyvtárat szeretne választani, használja a 'Tallózás' gombot."
+    FreeSpace: "Legalább %freeSpace% szabad hely szükséges a telepítéshez."
+    BrowseTitle: "Válasszon telepítési könyvtárat"
+
+Shortcut:
+  Title: "Parancsikonok"
+  Description: "Mely parancsikonok legyenek létrehozva?"
+  Action: "Jelölje ki, hogy melyik parancsikonokat szeretné létrehozni a MesterMC Kliens telepítése során, majd kattintson a 'Tovább' gombra."
+  StartMenuNote: "Opcionálisan megadhat egy start menü mappát, ahol a parancsikont létrehozni szeretné."
+  Desktop: "Parancsikon létrehozása az Asztalon."
+  StartMenu: "Parancsikon létrehozása a Start menüben."
+  BrowseTitle: "Válasszon Start menü mappát"
+
+Review:
+    Title: "Készen állunk a telepítésre"
+    Description: "A telepítő készen áll, a MesterMC számítógépre telepítéséhez."
+    Action: "Kattintson a 'Telepítés' gombra a telepítés megkezdéséhez, vagy a 'Vissza' gombra a módosításokhoz."
+    Content: |
+      Telepítés célkönyvtára: 
+        %installPath%
+      Start menü mappája:
+        %startMenuPath%
+      Asztali parancsikon:
+        %desktopShortcut%
+      Start menü parancsikon:
+        %startMenuShortcut%
+
+Progress:
+    Title: "Telepítés"
+    Description: "Kérem várjon, amíg a MesterMC telepítése zajlik."
+    Action: "Kliens telepítése folyamatban. Kérem, ne zárja be az ablakot, amíg a telepítés be nem fejeződik."

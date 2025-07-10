@@ -1,0 +1,78 @@
+Common:
+  Cancel: "Cancel"
+  Next: "Next"
+  Back: "Back"
+  Finish: "Finish"
+  Install: "Install"
+  Uninstall: "Uninstall"
+  Error: "An error occurred!"
+  Warning: "Warning!"
+  Information: "Information"
+  Yes: "Yes"
+  No: "No"
+  Close: "Close"
+
+Window:
+  Title: "MesterMC Client Installer"
+  Description: "This installer will help you install the MesterMC Client 1.21.5 on your computer."
+
+Welcome:
+  Title: "Welcome to the MesterMC Client Installer!"
+  Description: "MesterMC Client 1.21.5 will be installed on your computer."
+  Action: "Click the Next button to continue or the Cancel button to exit."
+
+License:
+  Title: "License Agreement"
+  Description: "Please read the license agreement before continuing with the installation."
+  Action: "Click 'Next' to accept the license agreement, or 'Back' to return."
+  Accept: "I accept the license agreement"
+  Content: |
+    **License Information and Important Notices**
+    This MesterMC unofficial installer (hereinafter "Software") is released and distributed under the terms of the **MIT License**.
+    The MIT License is a highly permissive, open-source license that grants you broad freedom to use, copy, modify, and distribute the Software, including for commercial purposes.
+
+    **Important Note:**
+    The Software is provided "AS IS", without warranty of any kind, express or implied. The developer (i.e., Solymosi 'Tavstal' Zoltán) shall in no event be liable for any problems, damages, or potential data loss arising from or in connection with the use of the Software.
+
+    **Warning: Unofficial Installer!**
+    This Software is an **independent, fan-made and maintained unofficial installer** for the MesterMC game. The developer **IS NOT in any official relationship** with the MesterMC developers, operators, or owners.
+    This installer is provided for community convenience, but it **does not constitute an official MesterMC product or supported software.**
+
+    **Please note:** For official terms of service, usage rules, privacy policy, and all other official information regarding the MesterMC game, please refer exclusively to the official MesterMC website: **mestermc.hu**
+    Please read the full license text available in the **LICENSE.txt** file located in the installation directory.
+    Copyright (c) 2025 Solymosi 'Tavstal' Zoltán. All rights reserved.
+
+InstallPath:
+  Title: "Choose Destination Directory"
+  Description: "Where should MesterMC be installed?"
+  Action: "To proceed, click 'Next'. To choose a different directory, use the 'Browse' button."
+  FreeSpace: "At least %freeSpace% free space is required for installation."
+  BrowseTitle: "Choose Installation Directory"
+
+Shortcut:
+  Title: "Shortcuts"
+  Description: "Which shortcuts should be created?"
+  Action: "Select which shortcuts you would like to create during the MesterMC Client installation, then click 'Next'."
+  StartMenuNote: "Optionally, you can specify a Start Menu folder where you want to create the shortcut."
+  Desktop: "Create Desktop shortcut."
+  StartMenu: "Create Start Menu shortcut."
+  BrowseTitle: "Choose Start Menu Folder"
+
+Review:
+  Title: "Ready to Install"
+  Description: "The installer is ready to install MesterMC on your computer."
+  Action: "Click 'Install' to begin the installation, or 'Back' to make changes."
+  Content: |
+    Installation Destination: 
+      %installPath%
+    Start Menu Folder:
+      %startMenuPath%
+    Desktop Shortcut:
+      %desktopShortcut%
+    Start Menu Shortcut:
+      %startMenuShortcut%
+
+Progress:
+  Title: "Installation"
+  Description: "Please wait while MesterMC is being installed."
+  Action: "Client installation is in progress. Please do not close the window until the installation is complete."
