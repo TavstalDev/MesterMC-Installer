@@ -2,12 +2,11 @@ package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
-import io.github.tavstal.mmcinstaller.core.Translator;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -18,7 +17,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -28,7 +26,7 @@ import java.util.ResourceBundle;
  */
 public class ShortcutController implements Initializable {
     private InstallerLogger _logger; // Logger instance for logging events.
-    private Translator _translator; // Translator instance for localization.
+    private InstallerTranslator _translator; // Translator instance for localization.
     private String _defaultPath; // Default path for the Start Menu shortcuts.
 
     public Button backButton; // Button to navigate back to the previous screen.
@@ -68,7 +66,7 @@ public class ShortcutController implements Initializable {
         nextButton.setText(_translator.Localize("Common.Next"));
         cancelButton.setText(_translator.Localize("Common.Cancel"));
 
-        _defaultPath = getDefaultStartMenuPath().getAbsolutePath();
+        _defaultPath = PathUtils.getStartMenuDirectory(InstallerApplication.getConfig().getStartMenuDefaultDirName()).toPath().toAbsolutePath().toString();
 
         if (InstallerApplication.getStartMenuPath() != null) {
             directoryTextArea.setText(InstallerApplication.getStartMenuPath());
@@ -173,38 +171,6 @@ public class ShortcutController implements Initializable {
         if (selectedDirectory != null) {
             directoryTextArea.setText(selectedDirectory.getAbsolutePath());
             InstallerApplication.setStartMenuPath(selectedDirectory.getAbsolutePath());
-        }
-    }
-
-    /**
-     * Determines the default Start Menu path based on the operating system.
-     * Creates the necessary directory if it does not exist.
-     *
-     * @return A File object representing the default Start Menu path.
-     */
-    private File getDefaultStartMenuPath() {
-        String os = System.getProperty("os.name").toLowerCase();
-        String userHome = System.getProperty("user.home");
-        String shortcutFolderName = "MesterMC"; // Folder name within Start Menu/Home for your app's shortcuts
-
-        if (os.contains("win")) {
-            String appData = System.getenv("APPDATA");
-            if (appData != null && !appData.isEmpty()) {
-                // This is the common user-specific Start Menu Programs folder on Windows
-                return new File(appData, "Microsoft" + File.separator + "Windows" +
-                        File.separator + "Start Menu" + File.separator + "Programs" +
-                        File.separator + shortcutFolderName);
-            } else {
-                return new File(userHome, shortcutFolderName); // Fallback
-            }
-        } else if (os.contains("linux")) {
-            // ~/.local/share/applications first (for .desktop files),
-            return new File(userHome, ".local" + File.separator + "share" + File.separator + "applications");
-        } else if (os.contains("mac")) {
-            // ~/Applications/[YourAppShortcutFolder]
-            return new File(userHome, "Applications");
-        } else {
-            return new File(userHome, shortcutFolderName);
         }
     }
 }
