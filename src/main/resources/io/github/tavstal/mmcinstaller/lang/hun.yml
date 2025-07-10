@@ -75,6 +75,37 @@ Review:
         %startMenuShortcut%
 
 Progress:
-    Title: "Telepítés"
-    Description: "Kérem várjon, amíg a MesterMC telepítése zajlik."
-    Action: "Kliens telepítése folyamatban. Kérem, ne zárja be az ablakot, amíg a telepítés be nem fejeződik."
+  Title: "Telepítés"
+  Description: "Kérem várjon, amíg a MesterMC telepítése zajlik."
+  Action: "Kliens telepítése folyamatban. Kérem, ne zárja be az ablakot, amíg a telepítés be nem fejeződik."
+  DirectoryExists: "A megadott telepítési könyvtár már létezik."
+  DirectoryCreated: "A megadott telepítési könyvtár létrehozva: %path%"
+  Download:
+    Started: "Letöltés megkezdődött..."
+    Status: "Letöltés állapota: %status%"
+    Completed: "Letöltés befejeződött."
+    Cancelled: "A letöltés megszakítva."
+    Failed: "A letöltés sikertelen volt. Kérem, ellenőrizze az internetkapcsolatát, és próbálja újra."
+    Error: "Hiba történt a letöltés során: %error%"
+  Scripts:
+    Creating: "Parancsfájlok és scriptek létrehozása..."
+    StartMenuDirCreationFailed: "Nem sikerült létrehozni a Start menü mappát: %path%"
+    ResourceNotFound: "Hiba: A szükséges erőforrás nem található: %resource%"
+    FileCopied: "%fileName% fájl sikeresen átmásolva a telepítési könyvtárba."
+    FileCopyError: "Hiba történt az %fileName% fájl másolása során: %error%"
+    UnsupportedOS: "Figyelem: Az operációs rendszer nem támogatott, vagy nem felismert: %os%"
+    LauncherCreated: "A script alapú indító fájl létrehozva: %filePath%"
+    LauncherCreationError: "Hiba: A script alapú indító fájl létrehozása sikertelen: %error%"
+    MakingExecutable: "A script fájlok futtathatóvá tétele..."
+    ExecutableMade: "A script fájl futtathatóvá téve: %filePath%"
+    ExecutableError: "Hiba: A script fájl futtathatóvá tétele sikertelen: %error%"
+    ExecutableTimeout: "Hiba: A script fájl futtathatóvá tétele időtúllépés miatt sikertelen."
+    ExecutableException: "Hiba: A script fájl futtathatóvá tétele során kritikus hiba történt: %error%"
+    DesktopShortcutCreated: "Asztali parancsikon létrehozva: %filePath%"
+    StartMenuShortcutCreated: "Start menü parancsikon létrehozva: %filePath%"
+
+Complete:
+  Title: "A MesterMC telepítésének befejezése"
+  Description: "A telepitő végzett a MesterMC telepítésével."
+  Action: "Kattintson a 'Befejezés' gombra a telepítő bezárásához."
+  LaunchGameCheckBox: "MesterMC elindítása"
