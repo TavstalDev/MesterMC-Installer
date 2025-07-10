@@ -4,6 +4,7 @@ import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerConfig;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.core.SceneManager;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -29,17 +30,21 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Controller class for managing the installation progress UI and logic.
+ * Handles downloading files, creating shortcuts, and updating the UI.
+ */
 public class InstallProgressController implements Initializable {
 
     private InstallerLogger _logger; // Logger instance for logging events.
     private InstallerTranslator _translator; // Translator instance for localization.
     private InstallerConfig _config; // Configuration instance for accessing settings.
-    public Label progressTitle;
-    public Label progressDescription;
-    public Text progressAction;
-    public ProgressBar progressBar;
-    public TextArea logTextArea;
-    public Button cancelButton;
+    public Label progressTitle; // Label for the progress title.
+    public Label progressDescription; // Label for the progress description.
+    public Text progressAction; // Text for the current progress action.
+    public ProgressBar progressBar; // Progress bar for visualizing download progress.
+    public TextArea logTextArea; // Text area for displaying log messages.
+    public Button cancelButton; // Button to cancel the installation process.
 
     /**
      * Initializes the controller after its root element has been completely processed.
@@ -50,7 +55,7 @@ public class InstallProgressController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Initialize the logger with the current class module.
-        _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         // Initialize the translator for localization.
         _translator = InstallerApplication.getTranslator();
         _config = InstallerApplication.getConfig();
@@ -108,13 +113,6 @@ public class InstallProgressController implements Initializable {
             logTextArea.setScrollTop(Double.MAX_VALUE);
         });
     }
-
-    // TODO
-    // Test windows and linux
-    // Add documentation
-    // Update README
-    // Clean up code
-    // Finish shortcuts
 
     /**
      * Starts the download process for the MesterMC.jar file.
@@ -292,21 +290,21 @@ public class InstallProgressController implements Initializable {
             }
         }
 
-        // Copy icon
-        File iconPath = new File(installDir, "icon.png");
+        // Copy icon .png
+        File iconImagePath = new File(installDir, "icon.png");
         try (InputStream iconStream = InstallerApplication.class.getResourceAsStream("assets/icon.png")) {
 
             if (iconStream == null) {
                 logStep(_translator.Localize("Progress.Scripts.ResourceNotFound", new HashMap<>() {
                     {
-                        put("resource", iconPath.getAbsolutePath());
+                        put("resource", iconImagePath.getAbsolutePath());
                     }
                 }));
                 return;
             }
 
             // Use Files.copy to write the InputStream to the target Path
-            Files.copy(iconStream, iconPath.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(iconStream, iconImagePath.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
             logStep(_translator.Localize("Progress.Scripts.FileCopied", new HashMap<>() {
                 {
                     put("fileName", "icon.png");
@@ -322,6 +320,36 @@ public class InstallProgressController implements Initializable {
             }));
         }
 
+        // Copy icon .ico
+        File iconIcoPath = new File(installDir, "icon.ico");
+        try (InputStream iconStream = InstallerApplication.class.getResourceAsStream("assets/favicon.ico")) {
+
+            if (iconStream == null) {
+                logStep(_translator.Localize("Progress.Scripts.ResourceNotFound", new HashMap<>() {
+                    {
+                        put("resource", iconIcoPath.getAbsolutePath());
+                    }
+                }));
+                return;
+            }
+
+            // Use Files.copy to write the InputStream to the target Path
+            Files.copy(iconStream, iconIcoPath.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+            logStep(_translator.Localize("Progress.Scripts.FileCopied", new HashMap<>() {
+                {
+                    put("fileName", "icon.ico");
+                }
+            }));
+        } catch (IOException e) {
+            _logger.Error(String.format("Failed to copy %s: %s", "icon.ico", e.getMessage()));
+            logStep(_translator.Localize("Progress.Scripts.FileCopyError", new HashMap<>() {
+                {
+                    put("fileName", "icon.ico");
+                    put("error", e.getMessage());
+                }
+            }));
+        }
+
         if (os.contains("win")) {
             // Windows script creation
             scriptFileName = _config.getBatchFileName();
@@ -332,6 +360,8 @@ public class InstallProgressController implements Initializable {
             // Write .exe
             String exeFileName = _config.getExeFileName();
             File exeFile = new File(installDir, exeFileName);
+            InstallerApplication.applicationToLaunch = exeFile.getAbsolutePath();
+            File shortcutPath = new File(installDir, "MesterMC.lnk");
             try (InputStream exeStream = InstallerApplication.class.getResourceAsStream(_config.getExeFileResourcePath())) {
 
                 if (exeStream == null) {
@@ -351,7 +381,63 @@ public class InstallProgressController implements Initializable {
                     }
                 }));
 
-                // TODO: Implement Windows shortcut creation
+                // Create windows shortcut
+                try {
+                    // Create a PowerShell script string
+                    String powershellScript = _config.getExePowerShellScript()
+                            .replaceAll("%shortcutPath%", shortcutPath.getAbsolutePath().replace("\\", "\\\\"))
+                            .replaceAll("%exePath%", exeFile.getAbsolutePath().replace("\\", "\\\\"))
+                            .replaceAll("%iconPath%", iconIcoPath.getAbsolutePath().replace("\\", "\\\\"));
+
+                    // Save the script to a temporary .ps1 file
+                    String tempDir = System.getProperty("java.io.tmpdir");
+                    String ps1FilePath = tempDir + "create_shortcut.ps1";
+                    try (FileWriter writer = new FileWriter(ps1FilePath)) {
+                        writer.write(powershellScript);
+                    }
+
+                    // Execute the PowerShell script
+                    ProcessBuilder pb = new ProcessBuilder("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", ps1FilePath);
+                    Process process = pb.start();
+
+                    // Read output/error streams (optional, for debugging)
+                    InputStream is = process.getInputStream();
+                    InputStream es = process.getErrorStream();
+
+                    // You might want to consume these streams to prevent process deadlock
+                    // (e.g., by starting separate threads to read them)
+                    // For simplicity, we'll just wait for the process to exit
+                    int exitCode = process.waitFor();
+                    System.out.println("PowerShell script exited with code: " + exitCode);
+
+                    // Clean up the temporary script file
+                    new java.io.File(ps1FilePath).delete();
+
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (InstallerApplication.shouldCreateDesktopShortcut()) {
+                    File desktopShortcutFile = new File(desktopDir, "MesterMC.lnk");
+                    _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
+                    Files.copy(shortcutPath.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    logStep(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", new HashMap<>() {
+                        {
+                            put("filePath", desktopShortcutFile.getAbsolutePath());
+                        }
+                    }));
+                }
+
+                if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+                    File startMenuFile = new File(startMenuDir, "MesterMC.lnk");
+                    _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
+                    Files.copy(shortcutPath.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    logStep(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", new HashMap<>() {
+                        {
+                            put("filePath", startMenuFile.getAbsolutePath());
+                        }
+                    }));
+                }
             } catch (IOException e) {
                 _logger.Error(String.format("Failed to copy %s: %s", exeFileName, e.getMessage()));
                 logStep(_translator.Localize("Progress.Scripts.FileCopyError", new HashMap<>() {
@@ -375,6 +461,7 @@ public class InstallProgressController implements Initializable {
                     .replaceAll("%jarPath%", jarFile.getAbsolutePath());
 
             File linuxLaunchFile = new File(installDir, desktopFileName);
+            InstallerApplication.applicationToLaunch = linuxLaunchFile.getAbsolutePath();
             try {
                 _logger.Debug("Creating .desktop file: " + linuxLaunchFile.getAbsolutePath());
                 Files.writeString(linuxLaunchFile.toPath(), desktopFileContent);
@@ -437,7 +524,7 @@ public class InstallProgressController implements Initializable {
                 makeScriptExecutable(scriptFile);
             }
 
-            InstallerApplication.setActiveScene(InstallerApplication.getInstallCompleteScene());
+            InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
         } catch (IOException e) {
             _logger.Error("Failed to write launch scripts: " + e.getMessage());
             logStep(_translator.Localize("Progress.Scripts.LauncherCreationError", new HashMap<>() {
