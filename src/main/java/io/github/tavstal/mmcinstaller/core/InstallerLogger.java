@@ -1,7 +1,6 @@
 package io.github.tavstal.mmcinstaller.core;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.controllers.WelcomeController;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +23,7 @@ public class InstallerLogger {
     public InstallerLogger(boolean debug) {
         _debug = debug;
         _module = null;
-        _logger = Logger.getLogger(InstallerApplication.getProjectName());
+        _logger = Logger.getLogger(InstallerApplication.class.getPackage().getName());
     }
 
     /**
@@ -36,7 +35,7 @@ public class InstallerLogger {
     public InstallerLogger(String module, boolean debug) {
         _debug = debug;
         _module = module;
-        _logger = Logger.getLogger(InstallerApplication.getProjectName());
+        _logger = Logger.getLogger(InstallerApplication.class.getPackage().getName());
     }
 
     /**
