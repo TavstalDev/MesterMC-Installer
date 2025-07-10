@@ -27,7 +27,7 @@ public class PathUtils {
         String os = System.getProperty("os.name").toLowerCase();
         String userHome = System.getProperty("user.home");
         File installationDir = null;
-        var logger = InstallerApplication.getCustomLogger();
+        var logger = InstallerApplication.getLogger();
 
         if (os.contains("win")) {
             // Windows: C:\Users\[User]\AppData\Roaming\[YourAppName]
@@ -80,7 +80,7 @@ public class PathUtils {
         String os = System.getProperty("os.name").toLowerCase();
         String userHome = System.getProperty("user.home");
         File targetDirectory = null;
-        var logger = InstallerApplication.getCustomLogger();
+        var logger = InstallerApplication.getLogger();
 
         if (os.contains("win")) {
             try {
@@ -134,7 +134,7 @@ public class PathUtils {
         String os = System.getProperty("os.name").toLowerCase();
         String userHome = System.getProperty("user.home");
         File desktopDirectory = null;
-        var logger = InstallerApplication.getCustomLogger();
+        var logger = InstallerApplication.getLogger();
 
         if (os.contains("win")) {
             try {
@@ -198,7 +198,7 @@ public class PathUtils {
                     }
                 }
             } catch (IOException e) {
-                InstallerApplication.getCustomLogger().Error("Error reading user-dirs.dirs: " + e.getMessage());
+                InstallerApplication.getLogger().Error("Error reading user-dirs.dirs: " + e.getMessage());
             }
         }
         return null;
