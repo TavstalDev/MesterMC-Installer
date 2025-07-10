@@ -42,10 +42,18 @@ dependencies {
         exclude(group = "org.openjfx")
     }
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
+
     // HTTP Client
-    implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
+
     // YAML
-    implementation("org.yaml:snakeyaml:1.33")
+    implementation("org.yaml:snakeyaml:2.0")
+
+    // JNA Core Library
+    implementation("net.java.dev.jna:jna:5.14.0") // Use the latest stable version
+    // JNA Platform Library (contains OS-specific mappings like KnownFolders)
+    implementation("net.java.dev.jna:jna-platform:5.14.0")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }

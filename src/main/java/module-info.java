@@ -7,9 +7,9 @@ module io.github.tavstal.mmcinstaller {
     requires org.kordamp.ikonli.javafx;
     requires java.logging;
     requires org.yaml.snakeyaml;
-    requires org.apache.httpcomponents.httpclient;
-    requires org.apache.httpcomponents.httpcore;
-    requires commons.logging;
+    requires org.apache.httpcomponents.client5.httpclient5;
+    requires org.apache.httpcomponents.core5.httpcore5;
+    requires com.sun.jna.platform;
 
     opens io.github.tavstal.mmcinstaller to javafx.fxml;
     exports io.github.tavstal.mmcinstaller;
