@@ -77,6 +77,14 @@ public class InstallProgressController implements Initializable {
         });
     }
 
+    // TODO
+    // Translate the log messages
+    // Test windows and linux
+    // Add documentation
+    // Update README
+    // Clean up code
+    // Finish shortcuts
+
     private void startDownload() {
         File dir = new File(InstallerApplication.getCurrentPath());
         File startMenuDir = new File(InstallerApplication.getStartMenuPath());

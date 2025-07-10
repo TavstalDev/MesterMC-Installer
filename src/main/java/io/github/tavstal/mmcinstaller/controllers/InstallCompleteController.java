@@ -29,6 +29,10 @@ public class InstallCompleteController implements Initializable {
         Translator _translator = InstallerApplication.getTranslator();
 
         finishButton.setText(_translator.Localize("Common.Finish"));
+
+        // TODO:
+        //  Localize the labels and texts
+        //  Auto launch game checkbox
     }
 
     @FXML
