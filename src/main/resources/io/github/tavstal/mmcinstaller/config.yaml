@@ -46,6 +46,12 @@ install:
   exe:
     file_name: "MesterMC.exe"
     resource_path: "exe/MesterMC.exe"
+    powershell: |
+      $WshShell = New-Object -ComObject WScript.Shell
+      $Shortcut = $WshShell.CreateShortcut("%shortcutPath%")
+      $Shortcut.TargetPath = "%exePath%"
+      $Shortcut.IconLocation = "%iconPath%"
+      $Shortcut.Save()
   linux_desktop:
     file_name: "MesterMC.desktop"
     content: |
