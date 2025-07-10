@@ -2,7 +2,7 @@ package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
-import io.github.tavstal.mmcinstaller.core.Translator;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -25,7 +25,7 @@ public class ReviewController implements Initializable {
     private boolean isSceneInitialized = false;
 
     private InstallerLogger _logger; // Logger instance for logging events.
-    private Translator _translator; // Translator instance for localization.
+    private InstallerTranslator _translator; // Translator instance for localization.
 
     public TextArea reviewTextArea; // Text area displaying the review content.
     public Label reviewTitle; // Label displaying the review title.
@@ -79,8 +79,8 @@ public class ReviewController implements Initializable {
             {
                 put("installPath", InstallerApplication.getCurrentPath());
                 put("startMenuPath", InstallerApplication.getStartMenuPath());
-                put("desktopShortcut", InstallerApplication.isCreateDesktopShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
-                put("startMenuShortcut", InstallerApplication.isCreateStartMenuShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
+                put("desktopShortcut", InstallerApplication.shouldCreateDesktopShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
+                put("startMenuShortcut", InstallerApplication.shouldCreateStartMenuShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
             }
         });
         reviewTextArea.setText(reviewContent);
