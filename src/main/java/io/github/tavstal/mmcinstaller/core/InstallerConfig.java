@@ -238,6 +238,19 @@ public class InstallerConfig {
     }
 
     /**
+     * Retrieves the PowerShell script content for the executable file from the configuration.
+     *
+     * @return The PowerShell script content as a String.
+     * @throws IllegalStateException if the configuration is not initialized.
+     */
+    public String getExePowerShellScript() {
+        if (!_isInitialized) {
+            throw new IllegalStateException("InstallerConfig is not initialized. Call Initialize() first.");
+        }
+        return YamlHelper.getString(_config, "install.exe.powershell");
+    }
+
+    /**
      * Retrieves the name of the Linux desktop file to be created during installation.
      *
      * @return The Linux desktop file name as a String.
