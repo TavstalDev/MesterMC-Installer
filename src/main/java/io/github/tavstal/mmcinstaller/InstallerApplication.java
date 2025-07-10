@@ -1,22 +1,37 @@
 package io.github.tavstal.mmcinstaller;
 
+import io.github.tavstal.mmcinstaller.core.InstallerConfig;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
-import io.github.tavstal.mmcinstaller.core.Translator;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class InstallerApplication extends Application {
+    private static InstallerConfig _config;
+    /**
+     * Gets the configuration instance.
+     *
+     * @return The configuration instance.
+     */
+    public static InstallerConfig getConfig() {
+        if (_config == null) {
+            _config = new InstallerConfig();
+            _config.Initialize();
+        }
+        return _config;
+    }
+
     private static InstallerLogger _logger;
     /**
      * Gets the custom logger instance.
@@ -27,24 +42,14 @@ public class InstallerApplication extends Application {
         return _logger;
     }
 
-    private static Translator _translator;
+    private static InstallerTranslator _translator;
     /**
      * Gets the translator instance.
      *
      * @return The translator instance.
      */
-    public static Translator getTranslator() {
+    public static InstallerTranslator getTranslator() {
         return _translator;
-    }
-
-    private static String _projectName;
-    /**
-     * Gets the project name.
-     *
-     * @return The project name.
-     */
-    public static String getProjectName() {
-        return _projectName;
     }
 
     private static boolean _isLicenseAccepted = false;
@@ -89,7 +94,7 @@ public class InstallerApplication extends Application {
      *
      * @return True if a desktop shortcut should be created, false otherwise.
      */
-    public static boolean isCreateDesktopShortcut() {
+    public static boolean shouldCreateDesktopShortcut() {
         return _createDesktopShortcut;
     }
     /**
@@ -125,7 +130,7 @@ public class InstallerApplication extends Application {
      *
      * @return True if a Start Menu shortcut should be created, false otherwise.
      */
-    public static boolean isCreateStartMenuShortcut() {
+    public static boolean shouldCreateStartMenuShortcut() {
         return _createStartMenuShortcut;
     }
     /**
@@ -155,9 +160,8 @@ public class InstallerApplication extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        _projectName = "io.github.tavstal.mmcinstaller";
-        _logger = new InstallerLogger(true);
-        _translator = new Translator(new String[] {"eng", "hun"});
+        _logger = new InstallerLogger(getConfig().getDebugMode());
+        _translator = new InstallerTranslator(new String[] {"eng", "hun"});
         _translator.Load();
         _stage = stage;
 
@@ -195,11 +199,34 @@ public class InstallerApplication extends Application {
         _logger.Debug("Checking .jar size.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             _logger.Debug("Sending HTTP request...");
-            HttpHead request = new HttpHead("https://mestermc.b-cdn.net/MesterMC.jar");
-            HttpResponse response = httpClient.execute(request);
-            _logger.Debug("Received response.");
-            _logger.Debug("Content-Type: " + response.getFirstHeader("Content-Type").getValue());
-            _requiredSpace = Long.parseLong(response.getFirstHeader("Content-Length").getValue());
+            HttpHead request = new HttpHead(getConfig().getJarDownloadUrl());
+
+            HttpClientResponseHandler<Void> responseHandler = response -> {
+                _logger.Debug("Received response. Status: " + response.getCode());
+
+                // We only care about headers for a HEAD request
+                Header contentTypeHeader = response.getFirstHeader("Content-Type");
+                if (contentTypeHeader != null) {
+                    _logger.Debug("Content-Type: " + contentTypeHeader.getValue());
+                } else {
+                    _logger.Debug("Content-Type header not found.");
+                }
+
+                Header contentLengthHeader = response.getFirstHeader("Content-Length");
+                if (contentLengthHeader != null) {
+                    try {
+                        _requiredSpace = Long.parseLong(contentLengthHeader.getValue());
+                        _logger.Debug("Content-Length: " + _requiredSpace + " bytes");
+                    } catch (NumberFormatException e) {
+                        _logger.Error("Content-Length header value is not a valid number: " + contentLengthHeader.getValue());
+                    }
+                } else {
+                    _logger.Error("Content-Length header not found in response.");
+                }
+                return null;
+            };
+
+            httpClient.execute(request, responseHandler);
         } catch (IOException e) {
             _logger.Error("Failed to check jar file.");
         }
@@ -233,7 +260,7 @@ public class InstallerApplication extends Application {
     public static Scene getWelcomeScene() {
         if (welcomeScene == null) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("WelcomeView.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/WelcomeView.fxml"));
                 welcomeScene = new Scene(fxmlLoader.load());
             } catch (IOException e) {
                 _logger.Error("Error loading WelcomeView.fxml: " + e.getMessage());
@@ -253,7 +280,7 @@ public class InstallerApplication extends Application {
     public static Scene getLicenseScene() {
         if (licenseScene == null) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("LicenseView.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/LicenseView.fxml"));
                 licenseScene = new Scene(fxmlLoader.load());
             } catch (IOException e) {
                 _logger.Error("Error loading LicenseView.fxml: " + e.getMessage());
@@ -273,7 +300,7 @@ public class InstallerApplication extends Application {
     public static Scene getInstallPathScene() {
         if (installPathScene == null) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("PathSelectView.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/PathSelectView.fxml"));
                 installPathScene = new Scene(fxmlLoader.load());
             } catch (IOException e) {
                 _logger.Error("Error loading PathSelectView.fxml: " + e.getMessage());
@@ -292,7 +319,7 @@ public class InstallerApplication extends Application {
     public static Scene getShortcutScene() {
         if (shortcutScene == null) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("ShortcutView.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/ShortcutView.fxml"));
                 shortcutScene = new Scene(fxmlLoader.load());
             } catch (IOException e) {
                 _logger.Error("Error loading ShortcutView.fxml: " + e.getMessage());
@@ -311,7 +338,7 @@ public class InstallerApplication extends Application {
     public static Scene getReviewScene() {
         if (reviewScene == null) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("ReviewView.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/ReviewView.fxml"));
                 reviewScene = new Scene(fxmlLoader.load());
             } catch (IOException e) {
                 _logger.Error("Error loading ReviewView.fxml: " + e.getMessage());
@@ -330,7 +357,7 @@ public class InstallerApplication extends Application {
     public static Scene getInstallProgressScene() {
         if (installProgressScene == null) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("InstallProgressView.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/InstallProgressView.fxml"));
                 installProgressScene = new Scene(fxmlLoader.load());
             } catch (IOException e) {
                 _logger.Error("Error loading InstallProgressView.fxml: " + e.getMessage());
@@ -349,7 +376,7 @@ public class InstallerApplication extends Application {
     public static Scene getInstallCompleteScene() {
         if (installCompleteScene == null) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("InstallCompleteView.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/InstallCompleteView.fxml"));
                 installCompleteScene = new Scene(fxmlLoader.load());
             } catch (IOException e) {
                 _logger.Error("Error loading InstallCompleteView.fxml: " + e.getMessage());
