@@ -2,7 +2,8 @@ package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
-import io.github.tavstal.mmcinstaller.core.Translator;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -23,7 +24,7 @@ import java.util.ResourceBundle;
  */
 public class PathSelectController implements Initializable {
     private InstallerLogger _logger; // Logger instance for logging events.
-    private Translator _translator; // Translator instance for localization.
+    private InstallerTranslator _translator; // Translator instance for localization.
     private String _defaultPath; // Default installation path based on the operating system.
 
     public Button backButton; // Button to navigate back to the previous screen.
@@ -63,7 +64,7 @@ public class PathSelectController implements Initializable {
         nextButton.setText(_translator.Localize("Common.Next"));
         cancelButton.setText(_translator.Localize("Common.Cancel"));
 
-        _defaultPath = getDefaultInstallationPath().getAbsolutePath();
+        _defaultPath = PathUtils.getDefaultInstallationPath(InstallerApplication.getConfig().getAppdataDefaultDirName()).getAbsolutePath();
 
         if (InstallerApplication.getCurrentPath() != null) {
             directoryTextArea.setText(InstallerApplication.getCurrentPath());
@@ -136,44 +137,6 @@ public class PathSelectController implements Initializable {
         if (selectedDirectory != null) {
             directoryTextArea.setText(selectedDirectory.getAbsolutePath());
             InstallerApplication.setCurrentPath(selectedDirectory.getAbsolutePath());
-        }
-    }
-
-    /**
-     * Determines the default installation path based on the operating system.
-     * Creates the "Games" directory if it does not exist on Linux/macOS.
-     *
-     * @return A File object representing the default installation path.
-     */
-    private File getDefaultInstallationPath() {
-        String os = System.getProperty("os.name").toLowerCase();
-        String userHome = System.getProperty("user.home");
-        String appName = "MesterMC";
-
-        if (os.contains("win")) {
-            // Windows: C:\Users\[User]\AppData\Roaming\[YourAppName]
-            String appData = System.getenv("APPDATA");
-            if (appData != null && !appData.isEmpty()) {
-                return new File(appData, appName);
-            } else {
-                // Fallback if APPDATA env var is not set (unlikely)
-                return new File(userHome, appName);
-            }
-        } else if (os.contains("linux") || os.contains("mac")) {
-            // Linux: /home/[User]/Games/[YourAppName]
-            // macOS: /Users/[User]/Games/[YourAppName]
-            File gamesDir = new File(userHome, "Games");
-            if (!gamesDir.exists()) {
-                // Create the Games directory if it doesn't exist
-                if (!gamesDir.mkdirs()) {
-                    // Log an error if the directory creation fails
-                    _logger.Error("Failed to create Games directory: " + gamesDir.getAbsolutePath());
-                }
-            }
-            return new File(gamesDir, appName);
-        } else {
-            // Generic fallback for other OS types
-            return new File(userHome, appName);
         }
     }
 }
