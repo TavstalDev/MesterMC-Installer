@@ -18,7 +18,7 @@ public class InstallerTranslator {
 
     public InstallerTranslator(String[] locales) {
         _locales = locales;
-        _logger = InstallerApplication.getCustomLogger();
+        _logger = InstallerApplication.getLogger();
     }
 
     public void Load() {
