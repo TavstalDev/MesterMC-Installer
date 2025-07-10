@@ -13,22 +13,25 @@ import java.util.Map;
 public class InstallerTranslator {
     private final InstallerLogger _logger; // Logger instance for logging messages.
     private final String[] _locales; // Array of supported locale identifiers.
-    private final String _defaultLocale; // Default locale identifier.
+    private String _defaultLocale; // Default locale identifier.
     private Map<String, Map<String, Object>> _localization; // Map storing localization data.
 
     public InstallerTranslator(String[] locales) {
-        _defaultLocale = InstallerApplication.getConfig().getDefaultLanguage();
         _locales = locales;
         _logger = InstallerApplication.getCustomLogger();
     }
 
     public void Load() {
+        if (_defaultLocale == null)
+            _defaultLocale = InstallerApplication.getConfig().getDefaultLanguage();
+
         _localization = new HashMap<>();
         _logger.Debug("Reading lang files...");
+        _logger.Debug("# Default locale: " + _defaultLocale);
         for (String locale : _locales) {
 
             _logger.Debug("Reading localization file for locale: " + locale);
-            var result = YamlHelper.readFromResource(String.format("/lang/%s.yml", locale), InstallerApplication.class);
+            var result = YamlHelper.readFromResource(String.format("lang/%s.yml", locale), InstallerApplication.class);
             if (result == null) {
                 _logger.Error(String.format("Failed to read localization file for locale: %s", locale));
                 continue;

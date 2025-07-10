@@ -1,7 +1,7 @@
 package io.github.tavstal.mmcinstaller.utils;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.core.InstallerLogger;
+import org.slf4j.event.Level;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -14,7 +14,6 @@ import java.util.Map;
  * Provides methods to read YAML files and retrieve values with type-specific methods.
  */
 public class YamlHelper {
-    private static final InstallerLogger _logger = InstallerApplication.getCustomLogger(); // Logger instance for logging events.
     private static final DumperOptions _dumperOptions = new DumperOptions() {
         {
             setDefaultFlowStyle(FlowStyle.BLOCK); // Forces multi-line formatting.
@@ -22,6 +21,28 @@ public class YamlHelper {
         }
     };
     private static final Yaml _yaml = new Yaml(_dumperOptions); // YAML parser instance.
+
+    private static void Log(Level level, String message) {
+        if (InstallerApplication.getCustomLogger() == null)
+            System.out.println(message);
+        else
+        {
+            switch (level)
+            {
+                case Level.INFO:
+                    InstallerApplication.getCustomLogger().Info(message);
+                    break;
+                case Level.WARN:
+                    InstallerApplication.getCustomLogger().Warn(message);
+                    break;
+                case Level.ERROR:
+                    InstallerApplication.getCustomLogger().Error(message);
+                    break;
+                default:
+                    InstallerApplication.getCustomLogger().Debug(message);
+            }
+        }
+    }
 
     /**
      * Reads a YAML file from the specified resource path and converts it into a Map.
@@ -33,33 +54,33 @@ public class YamlHelper {
     public static Map<String, Object> readFromResource(String resourcePath, Class<?> clazz) {
         InputStream inputStream;
         try {
-            _logger.Debug(String.format("Reading resource file: %s", resourcePath));
+            Log(Level.DEBUG, String.format("Reading resource file: %s%n", resourcePath));
             inputStream = clazz.getResourceAsStream(resourcePath);
         } catch (NullPointerException ex) {
-            _logger.Error(String.format("Failed to get resource file. Path: %s", resourcePath));
+            Log(Level.ERROR, String.format("Failed to get resource file. Path: %s%n", resourcePath));
             return null;
         } catch (Exception ex) {
-            _logger.Warn("Unknown error happened while reading resource file.");
-            _logger.Error(ex.getMessage());
+            Log(Level.ERROR,"Unknown error happened while reading resource file.");
+            Log(Level.ERROR,ex.getMessage());
             return null;
         }
 
-        _logger.Debug("Loading yaml file...");
+        Log(Level.DEBUG,"Loading yaml file...");
         Object yamlObject = _yaml.load(inputStream);
-        _logger.Debug("Checking if the yamlObject is a Map...");
+        Log(Level.DEBUG,"Checking if the yamlObject is a Map...");
         if (!(yamlObject instanceof Map)) {
-            _logger.Error("The yamlObject is not a Map. Aborting...");
+            System.out.println("The yamlObject is not a Map. Aborting...");
             return null;
         }
 
         try {
-            _logger.Debug("Casting yamlObject to Map<String, Object>...");
+            Log(Level.DEBUG,"Casting yamlObject to Map<String, Object>...");
             @SuppressWarnings("unchecked")
             Map<String, Object> localValue = (Map<String, Object>) yamlObject;
             return localValue;
         } catch (Exception ex) {
-            _logger.Warn("Failed to cast the yamlObject to Map<String, Object>");
-            _logger.Error(ex.getMessage());
+            Log(Level.ERROR,"Failed to cast the yamlObject to Map<String, Object>");
+            Log(Level.ERROR,ex.getMessage());
             return null;
         }
     }
@@ -80,15 +101,15 @@ public class YamlHelper {
                 if (value instanceof Map) {
                     value = ((Map<?, ?>) value).get(k);
                 } else {
-                    _logger.Warn(String.format("Failed to get the object value of the '%s' key.", key));
+                    Log(Level.WARN, String.format("Failed to get the object value of the '%s' key.%n", key));
                     return defaultValue;
                 }
             }
 
             return value;
         } catch (Exception ex) {
-            _logger.Warn(String.format("Unknown error happened while getting the object value of the '%s' key.", key));
-            _logger.Error(ex.getMessage());
+            Log(Level.ERROR, String.format("Unknown error happened while getting the object value of the '%s' key.%n", key));
+            Log(Level.ERROR,ex.getMessage());
             return defaultValue;
         }
     }
@@ -117,13 +138,13 @@ public class YamlHelper {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                _logger.Warn(String.format("The value of the '%s' key is null.", key));
+                Log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return result.toString();
         } catch (Exception ex) {
-            _logger.Warn(String.format("Unknown error happened while getting the string value of the '%s' key.", key));
-            _logger.Error(ex.getMessage());
+            Log(Level.ERROR, String.format("Unknown error happened while getting the string value of the '%s' key.%n", key));
+            Log(Level.ERROR, ex.getMessage());
             return defaultValue;
         }
     }
@@ -152,13 +173,13 @@ public class YamlHelper {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                _logger.Warn(String.format("The value of the '%s' key is null.", key));
+                Log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return Boolean.parseBoolean(result.toString());
         } catch (Exception ex) {
-            _logger.Warn(String.format("Unknown error happened while getting the boolean value of the '%s' key.", key));
-            _logger.Error(ex.getMessage());
+            Log(Level.ERROR, String.format("Unknown error happened while getting the boolean value of the '%s' key.%n", key));
+            Log(Level.ERROR,ex.getMessage());
             return defaultValue;
         }
     }
@@ -187,13 +208,13 @@ public class YamlHelper {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                _logger.Warn(String.format("The value of the '%s' key is null.", key));
+                Log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
-            _logger.Warn(String.format("Unknown error happened while getting the integer value of the '%s' key.", key));
-            _logger.Error(ex.getMessage());
+            Log(Level.ERROR, String.format("Unknown error happened while getting the integer value of the '%s' key.%n", key));
+            Log(Level.ERROR,ex.getMessage());
             return defaultValue;
         }
     }
@@ -222,13 +243,13 @@ public class YamlHelper {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                _logger.Warn(String.format("The value of the '%s' key is null.", key));
+                Log(Level.WARN,String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return Double.parseDouble(result.toString());
         } catch (Exception ex) {
-            _logger.Warn(String.format("Unknown error happened while getting the double value of the '%s' key.", key));
-            _logger.Error(ex.getMessage());
+            Log(Level.ERROR, String.format("Unknown error happened while getting the double value of the '%s' key.%n", key));
+            Log(Level.ERROR, ex.getMessage());
             return defaultValue;
         }
     }

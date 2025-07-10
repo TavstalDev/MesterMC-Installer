@@ -52,7 +52,7 @@ public class InstallerConfig {
         if (!_isInitialized) {
             throw new IllegalStateException("InstallerConfig is not initialized. Call Initialize() first.");
         }
-        return YamlHelper.getString(_config, "eng");
+        return YamlHelper.getString(_config, "lang", "eng");
     }
 
     /**
