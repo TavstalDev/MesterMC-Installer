@@ -2,16 +2,13 @@ package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
-import io.github.tavstal.mmcinstaller.core.Translator;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -38,7 +35,7 @@ public class WelcomeController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
         // Translator instance for localization.
-        Translator _translator = InstallerApplication.getTranslator();
+        InstallerTranslator _translator = InstallerApplication.getTranslator();
 
         welcomeTitle.setText(_translator.Localize("Welcome.Title"));
         welcomeDescription.setText(_translator.Localize("Welcome.Description"));
