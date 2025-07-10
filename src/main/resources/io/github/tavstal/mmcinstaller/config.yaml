@@ -1,0 +1,61 @@
+# The language used in the UI and messages.
+# Supported languages: eng, hun
+lang: "eng"
+debug: false
+project:
+  # The name of the project.
+  name: "io.github.tavstal.mmcinstaller"
+  # The version of the project.
+  version: "1.0.0"
+  # The author of the project.
+  author: "Solymosi 'Tavstal' Zoltán"
+download:
+  # The URL to download the latest version of the file.
+  link: "https://mestermc.b-cdn.net/MesterMC.jar"
+  # Expected file name of the downloaded file.
+  file_name: "MesterMC.jar"
+  # The expected SHA-256 hash of the downloaded file for integrity verification.
+  sha256: "1d5198df53ffe00b0e5b885f551da552e4544be32bb41c27ed04dccc800e0492"
+install:
+  # Default directory names for installation.
+  dirs:
+    start_menu: "MesterMC"
+    appdata: "MesterMC"
+  batch:
+    file_name: "StartMesterMC.bat"
+    content: |
+      @echo off
+      pushd "%dirPath%"
+      start "java -jar %jarPath%"
+      popd
+      exit
+  bash:
+    file_name: "StartMesterMC.sh"
+    content: |
+      #!/bin/bash
+      cd "%dirPath%" || { echo "Failed to change directory to %dirpath%."; exit 1; }
+      java -jar "%jarPath%"
+      exit 0
+  zsh:
+    file_name: "StartMesterMC.zsh"
+    content: |
+      #!/bin/zsh
+      cd "%dirPath%" || { echo "Failed to change directory to %dirpath%."; exit 1; }
+      java -jar "%jarPath%"
+      exit 0
+  exe:
+    file_name: "MesterMC.exe"
+    resource_path: "exe/MesterMC.exe"
+  linux_desktop:
+    file_name: "MesterMC.desktop"
+    content: |
+      [Desktop Entry]
+      Name=MesterMC
+      Comment=A modified Minecraft client
+      Exec=cd %dirPath% && java -jar "%jarPath%"
+      Icon=%dirPath%/icon.png
+      Terminal=false
+      Type=Application
+      Categories=Game;
+      Keywords=Minecraft;MesterMC;Launcher;Game;
+      StartupNotify=true
