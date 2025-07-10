@@ -3,6 +3,7 @@ package io.github.tavstal.mmcinstaller.controllers;
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.core.SceneManager;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -46,7 +47,7 @@ public class PathSelectController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         // Translator instance for localization.
         _translator = InstallerApplication.getTranslator();
 
@@ -88,7 +89,7 @@ public class PathSelectController implements Initializable {
      */
     @FXML
     protected void onNextButtonClick() {
-        InstallerApplication.setActiveScene(InstallerApplication.getShortcutScene());
+        InstallerApplication.setActiveScene(SceneManager.getShortcutScene());
         _logger.Debug("Switched to ShortcutView.fxml.");
     }
 
@@ -98,7 +99,7 @@ public class PathSelectController implements Initializable {
      */
     @FXML
     protected void onBackButtonClick() {
-        InstallerApplication.setActiveScene(InstallerApplication.getLicenseScene());
+        InstallerApplication.setActiveScene(SceneManager.getLicenseScene());
         _logger.Debug("Switched to LicenseView.fxml.");
     }
 

@@ -3,6 +3,7 @@ package io.github.tavstal.mmcinstaller.controllers;
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.core.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -38,7 +39,7 @@ public class LicenseController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         // Translator instance for localization.
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
@@ -72,7 +73,7 @@ public class LicenseController implements Initializable {
      */
     @FXML
     protected void onNextButtonClick() {
-        InstallerApplication.setActiveScene(InstallerApplication.getInstallPathScene());
+        InstallerApplication.setActiveScene(SceneManager.getInstallPathScene());
         _logger.Debug("Switched to PathSelectView.fxml");
     }
 
@@ -82,7 +83,7 @@ public class LicenseController implements Initializable {
      */
     @FXML
     protected void onBackButtonClick() {
-        InstallerApplication.setActiveScene(InstallerApplication.getWelcomeScene());
+        InstallerApplication.setActiveScene(SceneManager.getWelcomeScene());
         _logger.Debug("Switched to WelcomeView.fxml");
     }
 

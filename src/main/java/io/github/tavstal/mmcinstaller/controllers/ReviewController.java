@@ -3,6 +3,7 @@ package io.github.tavstal.mmcinstaller.controllers;
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.core.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -44,7 +45,7 @@ public class ReviewController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         _translator = InstallerApplication.getTranslator();
 
         updateReviewContent();
@@ -92,7 +93,7 @@ public class ReviewController implements Initializable {
      */
     @FXML
     protected void onNextButtonClick() {
-        InstallerApplication.setActiveScene(InstallerApplication.getInstallProgressScene());
+        InstallerApplication.setActiveScene(SceneManager.getInstallProgressScene());
         _logger.Debug("Switching to InstallProgressView.fxml");
     }
 
@@ -102,7 +103,7 @@ public class ReviewController implements Initializable {
      */
     @FXML
     protected void onBackButtonClick() {
-        InstallerApplication.setActiveScene(InstallerApplication.getShortcutScene());
+        InstallerApplication.setActiveScene(SceneManager.getShortcutScene());
         _logger.Debug("Switching to ShortcutView.fxml");
     }
 

@@ -3,6 +3,7 @@ package io.github.tavstal.mmcinstaller.controllers;
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.core.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -33,7 +34,7 @@ public class WelcomeController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        _logger = InstallerApplication.getCustomLogger().WithModule(this.getClass());
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         // Translator instance for localization.
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
@@ -52,7 +53,7 @@ public class WelcomeController implements Initializable {
      */
     @FXML
     protected void onNextButtonClick() {
-        InstallerApplication.setActiveScene(InstallerApplication.getLicenseScene());
+        InstallerApplication.setActiveScene(SceneManager.getLicenseScene());
         _logger.Debug("Switched to LicenseView.fxml");
     }
 
