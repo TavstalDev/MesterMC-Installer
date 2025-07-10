@@ -184,9 +184,9 @@ public class InstallerApplication extends Application {
             _logger.Error("An error occurred while loading the icon: " + e.getMessage());
         }
 
-        _stage.setMinWidth(750);
-        _stage.setWidth(750);
-        _stage.setMaxWidth(750);
+        _stage.setMinWidth(700);
+        _stage.setWidth(700);
+        _stage.setMaxWidth(700);
         _stage.setMinHeight(400);
         _stage.setHeight(400);
         _stage.setMaxHeight(400);
