@@ -3,8 +3,8 @@ package io.github.tavstal.mmcinstaller;
 import io.github.tavstal.mmcinstaller.core.InstallerConfig;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.core.SceneManager;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -18,6 +18,22 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class InstallerApplication extends Application {
+    //#region Constants
+    public final static int WIDTH = 700;
+    public final static int HEIGHT = 400;
+    //#endregion
+
+    //#region Variables
+    private static Stage _stage;
+    /**
+     * Sets the active scene for the application.
+     *
+     * @param scene The scene to set as active.
+     */
+    public static void setActiveScene(Scene scene) {
+        _stage.setScene(scene);
+    }
+
     private static InstallerConfig _config;
     /**
      * Gets the configuration instance.
@@ -34,11 +50,11 @@ public class InstallerApplication extends Application {
 
     private static InstallerLogger _logger;
     /**
-     * Gets the custom logger instance.
+     * Gets the logger instance.
      *
      * @return The logger instance.
      */
-    public static InstallerLogger getCustomLogger() {
+    public static InstallerLogger getLogger() {
         return _logger;
     }
 
@@ -51,6 +67,98 @@ public class InstallerApplication extends Application {
     public static InstallerTranslator getTranslator() {
         return _translator;
     }
+    //#endregion
+
+    /**
+     * Application entry point. Initializes the application and sets up the primary stage.
+     *
+     * @param stage The primary stage for the application.
+     * @throws IOException If an error occurs during initialization.
+     */
+    @Override
+    public void start(Stage stage) throws IOException {
+        _logger = new InstallerLogger(getConfig().getDebugMode());
+        _translator = new InstallerTranslator(new String[] {"eng", "hun"});
+        _translator.Load();
+        _stage = stage;
+
+
+        _stage.setTitle(_translator.Localize("Window.Title"));
+        _stage.setScene(SceneManager.getWelcomeScene());
+
+        try {
+            InputStream iconStream = InstallerApplication.class.getResourceAsStream("assets/icon.png");
+
+            if (iconStream != null) {
+                Image icon = new Image(iconStream);
+                stage.getIcons().add(icon);
+                stage.setIconified(true);
+                _logger.Debug("Icon 'icon.png' loaded successfully.");
+            } else {
+                _logger.Warn("Icon 'icon.png' not found in resources.");
+            }
+        } catch (Exception e) {
+            _logger.Error("An error occurred while loading the icon: " + e.getMessage());
+        }
+
+        _stage.setMinWidth(WIDTH);
+        _stage.setWidth(WIDTH);
+        _stage.setMaxWidth(WIDTH);
+        _stage.setMinHeight(HEIGHT);
+        _stage.setHeight(HEIGHT);
+        _stage.setMaxHeight(HEIGHT);
+        _stage.setResizable(false);
+
+        _stage.centerOnScreen();
+        _stage.show();
+        _logger.Debug("InstallerApplication started successfully.");
+
+        _logger.Debug("Checking .jar size.");
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            _logger.Debug("Sending HTTP request...");
+            HttpHead request = new HttpHead(getConfig().getJarDownloadUrl());
+
+            HttpClientResponseHandler<Void> responseHandler = response -> {
+                _logger.Debug("Received response. Status: " + response.getCode());
+
+                // We only care about headers for a HEAD request
+                Header contentTypeHeader = response.getFirstHeader("Content-Type");
+                if (contentTypeHeader != null) {
+                    _logger.Debug("Content-Type: " + contentTypeHeader.getValue());
+                } else {
+                    _logger.Debug("Content-Type header not found.");
+                }
+
+                Header contentLengthHeader = response.getFirstHeader("Content-Length");
+                if (contentLengthHeader != null) {
+                    try {
+                        _requiredSpace = Long.parseLong(contentLengthHeader.getValue());
+                        _logger.Debug("Content-Length: " + _requiredSpace + " bytes");
+                    } catch (NumberFormatException e) {
+                        _logger.Error("Content-Length header value is not a valid number: " + contentLengthHeader.getValue());
+                    }
+                } else {
+                    _logger.Error("Content-Length header not found in response.");
+                }
+                return null;
+            };
+
+            httpClient.execute(request, responseHandler);
+        } catch (IOException e) {
+            _logger.Error("Failed to check jar file.");
+        }
+    }
+
+    /**
+     * Main method. Launches the JavaFX application.
+     *
+     * @param args Command-line arguments.
+     */
+    public static void main(String[] args) {
+        launch();
+    }
+
+
 
     private static boolean _isLicenseAccepted = false;
     /**
@@ -152,237 +260,5 @@ public class InstallerApplication extends Application {
         return String.format("%d MB", _requiredSpace / (1024 * 1024));
     }
 
-    /**
-     * Application entry point. Initializes the application and sets up the primary stage.
-     *
-     * @param stage The primary stage for the application.
-     * @throws IOException If an error occurs during initialization.
-     */
-    @Override
-    public void start(Stage stage) throws IOException {
-        _logger = new InstallerLogger(getConfig().getDebugMode());
-        _translator = new InstallerTranslator(new String[] {"eng", "hun"});
-        _translator.Load();
-        _stage = stage;
-
-
-        _stage.setTitle(_translator.Localize("Window.Title"));
-        _stage.setScene(getWelcomeScene());
-
-        try {
-            InputStream iconStream = InstallerApplication.class.getResourceAsStream("assets/icon.png");
-
-            if (iconStream != null) {
-                Image icon = new Image(iconStream);
-                stage.getIcons().add(icon);
-                stage.setIconified(true);
-                _logger.Debug("Icon 'icon.png' loaded successfully.");
-            } else {
-                _logger.Warn("Icon 'icon.png' not found in resources.");
-            }
-        } catch (Exception e) {
-            _logger.Error("An error occurred while loading the icon: " + e.getMessage());
-        }
-
-        _stage.setMinWidth(700);
-        _stage.setWidth(700);
-        _stage.setMaxWidth(700);
-        _stage.setMinHeight(400);
-        _stage.setHeight(400);
-        _stage.setMaxHeight(400);
-        _stage.setResizable(false);
-
-        _stage.centerOnScreen();
-        _stage.show();
-        _logger.Debug("InstallerApplication started successfully.");
-
-        _logger.Debug("Checking .jar size.");
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            _logger.Debug("Sending HTTP request...");
-            HttpHead request = new HttpHead(getConfig().getJarDownloadUrl());
-
-            HttpClientResponseHandler<Void> responseHandler = response -> {
-                _logger.Debug("Received response. Status: " + response.getCode());
-
-                // We only care about headers for a HEAD request
-                Header contentTypeHeader = response.getFirstHeader("Content-Type");
-                if (contentTypeHeader != null) {
-                    _logger.Debug("Content-Type: " + contentTypeHeader.getValue());
-                } else {
-                    _logger.Debug("Content-Type header not found.");
-                }
-
-                Header contentLengthHeader = response.getFirstHeader("Content-Length");
-                if (contentLengthHeader != null) {
-                    try {
-                        _requiredSpace = Long.parseLong(contentLengthHeader.getValue());
-                        _logger.Debug("Content-Length: " + _requiredSpace + " bytes");
-                    } catch (NumberFormatException e) {
-                        _logger.Error("Content-Length header value is not a valid number: " + contentLengthHeader.getValue());
-                    }
-                } else {
-                    _logger.Error("Content-Length header not found in response.");
-                }
-                return null;
-            };
-
-            httpClient.execute(request, responseHandler);
-        } catch (IOException e) {
-            _logger.Error("Failed to check jar file.");
-        }
-    }
-
-    /**
-     * Main method. Launches the JavaFX application.
-     *
-     * @param args Command-line arguments.
-     */
-    public static void main(String[] args) {
-        launch();
-    }
-
-    private static Stage _stage;
-    /**
-     * Sets the active scene for the application.
-     *
-     * @param scene The scene to set as active.
-     */
-    public static void setActiveScene(Scene scene) {
-        _stage.setScene(scene);
-    }
-
-    private static Scene welcomeScene = null;
-    /**
-     * Retrieves the Welcome scene. Loads it from the FXML file if not already loaded.
-     *
-     * @return The Welcome scene, or null if an error occurs during loading.
-     */
-    public static Scene getWelcomeScene() {
-        if (welcomeScene == null) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/WelcomeView.fxml"));
-                welcomeScene = new Scene(fxmlLoader.load());
-            } catch (IOException e) {
-                _logger.Error("Error loading WelcomeView.fxml: " + e.getMessage());
-                return null;
-            }
-        }
-
-        return welcomeScene;
-    }
-
-    private static Scene licenseScene = null;
-    /**
-     * Retrieves the License scene. Loads it from the FXML file if not already loaded.
-     *
-     * @return The License scene, or null if an error occurs during loading.
-     */
-    public static Scene getLicenseScene() {
-        if (licenseScene == null) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/LicenseView.fxml"));
-                licenseScene = new Scene(fxmlLoader.load());
-            } catch (IOException e) {
-                _logger.Error("Error loading LicenseView.fxml: " + e.getMessage());
-                return null;
-            }
-        }
-
-        return licenseScene;
-    }
-
-    private static Scene installPathScene = null;
-    /**
-     * Retrieves the Install Path scene. Loads it from the FXML file if not already loaded.
-     *
-     * @return The Install Path scene, or null if an error occurs during loading.
-     */
-    public static Scene getInstallPathScene() {
-        if (installPathScene == null) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/PathSelectView.fxml"));
-                installPathScene = new Scene(fxmlLoader.load());
-            } catch (IOException e) {
-                _logger.Error("Error loading PathSelectView.fxml: " + e.getMessage());
-                return null;
-            }
-        }
-        return installPathScene;
-    }
-
-    private static Scene shortcutScene = null;
-    /**
-     * Retrieves the Shortcut scene. Loads it from the FXML file if not already loaded.
-     *
-     * @return The Shortcut scene, or null if an error occurs during loading.
-     */
-    public static Scene getShortcutScene() {
-        if (shortcutScene == null) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/ShortcutView.fxml"));
-                shortcutScene = new Scene(fxmlLoader.load());
-            } catch (IOException e) {
-                _logger.Error("Error loading ShortcutView.fxml: " + e.getMessage());
-                return null;
-            }
-        }
-        return shortcutScene;
-    }
-
-    private static Scene reviewScene = null;
-    /**
-     * Retrieves the Review scene. Loads it from the FXML file if not already loaded.
-     *
-     * @return The Review scene, or null if an error occurs during loading.
-     */
-    public static Scene getReviewScene() {
-        if (reviewScene == null) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/ReviewView.fxml"));
-                reviewScene = new Scene(fxmlLoader.load());
-            } catch (IOException e) {
-                _logger.Error("Error loading ReviewView.fxml: " + e.getMessage());
-                return null;
-            }
-        }
-        return reviewScene;
-    }
-
-    private static Scene installProgressScene = null;
-    /**
-     * Retrieves the Install Progress scene. Loads it from the FXML file if not already loaded.
-     *
-     * @return The Install Progress scene, or null if an error occurs during loading.
-     */
-    public static Scene getInstallProgressScene() {
-        if (installProgressScene == null) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/InstallProgressView.fxml"));
-                installProgressScene = new Scene(fxmlLoader.load());
-            } catch (IOException e) {
-                _logger.Error("Error loading InstallProgressView.fxml: " + e.getMessage());
-                return null;
-            }
-        }
-        return installProgressScene;
-    }
-
-    private static Scene installCompleteScene = null;
-    /**
-     * Retrieves the Install Complete scene. Loads it from the FXML file if not already loaded.
-     *
-     * @return The Install Complete scene, or null if an error occurs during loading.
-     */
-    public static Scene getInstallCompleteScene() {
-        if (installCompleteScene == null) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(InstallerApplication.class.getResource("views/InstallCompleteView.fxml"));
-                installCompleteScene = new Scene(fxmlLoader.load());
-            } catch (IOException e) {
-                _logger.Error("Error loading InstallCompleteView.fxml: " + e.getMessage());
-                return null;
-            }
-        }
-        return installCompleteScene;
-    }
+    public static String applicationToLaunch = null;
 }
