@@ -95,9 +95,11 @@ public class InstallerApplication extends Application {
         _stage.setHeight(HEIGHT);
         _stage.setMaxHeight(HEIGHT);
         _stage.setResizable(false);
+        _stage.setAlwaysOnTop(true);
 
         _stage.centerOnScreen();
         _stage.show();
+        _stage.toFront();
         _logger.Debug("InstallerApplication started successfully.");
 
         _logger.Debug("Checking .jar size.");
