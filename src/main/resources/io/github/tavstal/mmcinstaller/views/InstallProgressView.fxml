@@ -51,7 +51,7 @@
                 <Text fx:id="progressAction" text="Loading..."
                       wrappingWidth="570.0"/>
             </TextFlow>
-            <ProgressBar fx:id="progressBar" prefWidth="640" progress="0.5" HBox.hgrow="NEVER">
+            <ProgressBar fx:id="progressBar" prefWidth="640" HBox.hgrow="NEVER">
                 <padding>
                     <Insets top="10.0"/>
                 </padding>
