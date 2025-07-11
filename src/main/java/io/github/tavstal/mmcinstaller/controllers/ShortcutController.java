@@ -5,7 +5,6 @@ import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -118,10 +117,9 @@ public class ShortcutController implements Initializable {
      * Handles the action when the desktop shortcut checkbox state changes.
      * Updates the application's desktop shortcut creation state.
      *
-     * @param actionEvent The event triggered by the checkbox state change.
      */
     @FXML
-    public void onDesktopCheckBoxChange(ActionEvent actionEvent) {
+    public void onDesktopCheckBoxChange() {
         InstallerApplication.setCreateDesktopShortcut(desktopCheckBox.isSelected());
     }
 
@@ -129,10 +127,9 @@ public class ShortcutController implements Initializable {
      * Handles the action when the Start Menu shortcut checkbox state changes.
      * Updates the application's Start Menu shortcut creation state and enables/disables related controls.
      *
-     * @param actionEvent The event triggered by the checkbox state change.
      */
     @FXML
-    public void onStartMenuCheckBoxChange(ActionEvent actionEvent) {
+    public void onStartMenuCheckBoxChange() {
         InstallerApplication.setCreateStartMenuShortcut(startMenuCheckBox.isSelected());
         startMenuDirectoryVBox.setDisable(!startMenuCheckBox.isSelected());
         if (startMenuCheckBox.isSelected()) {
@@ -148,10 +145,9 @@ public class ShortcutController implements Initializable {
      * Handles the action when the "Browse" button is clicked.
      * Opens a directory chooser dialog to select the Start Menu directory.
      *
-     * @param actionEvent The event triggered by the button click.
      */
     @FXML
-    public void onBrowseButtonClick(ActionEvent actionEvent) {
+    public void onBrowseButtonClick() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle(_translator.Localize("Shortcut.BrowseTitle"));
 
