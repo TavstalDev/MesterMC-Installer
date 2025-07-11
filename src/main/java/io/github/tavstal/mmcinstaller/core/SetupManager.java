@@ -86,10 +86,9 @@ public class SetupManager {
                 createScriptFile(
                         ConfigLoader.get().install().batch().fileName(),
                         ConfigLoader.get().install().batch().content()
-                                .replaceAll("%dirPath%", installPath)
-                                .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
+                                .replaceAll("%dirPath%", installPath.replace("\\", "\\\\"))
+                                .replaceAll("%jarPath%", _jarFile.getAbsolutePath().replace("\\", "\\\\"))
                 );
-
                 // Setup Windows-specific configurations
                 setupWindows(icoFile);
             } else if (_os.contains("mac")) { // MAC OS
@@ -154,9 +153,9 @@ public class SetupManager {
         File shortcutPath = new File(_installDir, "MesterMC.lnk");
 
         // Copy the executable file from resources to the installation directory
-        File exeFile = copyResource(exeFileName, ConfigLoader.get().install().exe().resourcePath());
+        File exeFile = copyResource(ConfigLoader.get().install().exe().resourcePath(), exeFileName);
         if (exeFile == null) {
-            // If the executable file could not be copied, exit the method
+            _logger.Warn("Executable file not found: " + exeFileName);
             return;
         }
         // Set the application launch path to the executable file
@@ -166,9 +165,9 @@ public class SetupManager {
         try {
             // Generate the PowerShell script content
             String powershellScript = ConfigLoader.get().install().exe().powershell()
-                    .replaceAll("%shortcutPath%", shortcutPath.getAbsolutePath().replace("\\", "\\\\"))
-                    .replaceAll("%exePath%", exeFile.getAbsolutePath().replace("\\", "\\\\"))
-                    .replaceAll("%iconPath%", iconIcoPath.getAbsolutePath().replace("\\", "\\\\"));
+                    .replace("%shortcutPath%", shortcutPath.getAbsolutePath().replace("\\", "\\\\"))
+                    .replace("%exePath%", exeFile.getAbsolutePath().replace("\\", "\\\\"))
+                    .replace("%iconPath%", iconIcoPath.getAbsolutePath().replace("\\", "\\\\"));
 
             // Save the script to a temporary `.ps1` file
             File ps1File = new File(System.getProperty("java.io.tmpdir"), "create_shortcut.ps1");
@@ -223,9 +222,9 @@ public class SetupManager {
         createScriptFile(
                 ConfigLoader.get().uninstall().batch().fileName(),
                 ConfigLoader.get().uninstall().batch().content()
-                        .replaceAll("%installDir%", _installDir.getAbsolutePath())
-                        .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
-                        .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
+                        .replaceAll("%installDir%", _installDir.getAbsolutePath().replace("\\", "\\\\"))
+                        .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath().replace("\\", "\\\\"))
+                        .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath().replace("\\", "\\\\"))
         );
     }
 
@@ -461,7 +460,7 @@ public class SetupManager {
         try {
             // Write the content to the script file
             Files.writeString(scriptFile.toPath(), content);
-            _logger.Debug("Created launch script: " + scriptFile.getAbsolutePath());
+            _logger.Debug("Created script: " + scriptFile.getAbsolutePath());
             _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreated", Map.of("filePath", scriptFile.getAbsolutePath())));
 
             // If the OS is Linux or macOS, make the script executable
@@ -473,7 +472,7 @@ public class SetupManager {
             InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
         } catch (IOException e) {
             // Log an error if the script file creation fails
-            _logger.Error("Failed to write launch scripts: " + e.getMessage());
+            _logger.Error("Failed to write scripts: " + e.getMessage());
             _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreationError", Map.of("error", e.getMessage())));
         }
         return scriptFile;
