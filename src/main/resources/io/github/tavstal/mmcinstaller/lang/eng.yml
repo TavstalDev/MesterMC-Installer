@@ -93,6 +93,7 @@ Progress:
     ResourceNotFound: "Error: Required resource not found: %resource%"
     FileCopied: "File %fileName% successfully copied to the installation directory."
     FileCopyError: "Error occurred while copying file %fileName%: %error%"
+    DetectedOS: "Detected operating system: %os%"
     UnsupportedOS: "Warning: Unsupported or unrecognized operating system: %os%"
     LauncherCreated: "Script-based launcher file created: %filePath%"
     LauncherCreationError: "Error: Failed to create script-based launcher file: %error%"
@@ -103,6 +104,9 @@ Progress:
     ExecutableException: "Error: Critical error occurred while making script file executable: %error%"
     DesktopShortcutCreated: "Desktop shortcut created: %filePath%"
     StartMenuShortcutCreated: "Start Menu shortcut created: %filePath%"
+    DesktopFileCreationError: "Error: Failed to create desktop shortcut: %error%"
+    ShortcutCopyError: "Error: Failed to copy shortcut(s): %error%"
+    SetupFailed: "The installation failed. Please check the log files for details."
 
 Complete:
   Title: "MesterMC Installation Complete"
