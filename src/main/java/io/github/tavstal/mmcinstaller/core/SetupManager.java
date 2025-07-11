@@ -5,370 +5,526 @@ import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+/**
+ * The `SetupManager` class is responsible for managing the setup process of the application.
+ * It handles tasks such as creating necessary directories, copying resources, and configuring
+ * platform-specific settings (Windows, macOS, or Linux).
+ */
 public class SetupManager {
-    private final InstallerLogger _logger;
-    private final InstallerTranslator _translator;
-    private final InstallerConfig _config;
-    private final Consumer<String> _logCallback;
-    private final File jarFile;
-    private final File installDir;
-    private final File startMenuDir;
+    private final InstallerLogger _logger; // Logger instance for logging setup-related messages
+    private final InstallerTranslator _translator; // Translator instance for localizing messages
+    private final Consumer<String> _logCallback; // Callback function for logging messages to the user interface
+    private final File _jarFile; // Reference to the JAR file being installed
+    private final File _installDir; // Directory where the application will be installed
+    private final File _startMenuDir; // Directory for creating start menu shortcuts (if applicable)
+    private final String _os; // Operating system name in lowercase
 
+    /**
+     * Constructs a new `SetupManager` instance.
+     *
+     * @param jarFile The JAR file to be installed.
+     * @param installDir The directory where the application will be installed.
+     * @param startMenuDir The directory for creating start menu shortcuts (if applicable).
+     * @param logCallback A callback function for logging messages to the user interface.
+     */
     public SetupManager(File jarFile, File installDir, File startMenuDir, Consumer<String> logCallback) {
         this._logger = InstallerApplication.getLogger().WithModule(this.getClass());
         this._translator = InstallerApplication.getTranslator();
-        this._config = InstallerApplication.getConfig();
-        this.jarFile = jarFile;
-        this.installDir = installDir;
-        this.startMenuDir = startMenuDir;
+        this._jarFile = jarFile;
+        this._installDir = installDir;
+        this._startMenuDir = startMenuDir;
         this._logCallback = logCallback;
+        this._os = System.getProperty("os.name").toLowerCase();
     }
 
+    // --- Main Setup Method ---
+
+    /**
+     * Sets up the application by creating necessary directories, copying resources,
+     * and configuring platform-specific settings (Windows, macOS, or Linux).
+     * <br/>
+     * This method ensures that the installation directory is properly prepared,
+     * resources are copied, and OS-specific setup methods are invoked.
+     * <br/>
+     * Handles errors during the setup process by logging and notifying the user.
+     */
     public void setup() {
-        String os = System.getProperty("os.name").toLowerCase();
+        String installPath = _installDir.getAbsolutePath();
 
-        try
-        {
-            if (os.contains("win")) {
-
-
-            } else if (os.contains("linux")) {
-
-            } else if (os.contains("mac")) {
-
-            }
-        }
-        catch (Exception ex) {
-
-        }
-    }
-
-    private void setupWindows() {
-        // Windows script creation
-        scriptFileName = _config.getBatchFileName();
-        scriptContent = _config.getBatchFileContent()
-                .replaceAll("%dirPath%", installPath)
-                .replaceAll("%jarPath%", jarFile.getAbsolutePath());
-
-        // Write .exe
-        String exeFileName = _config.getExeFileName();
-        File exeFile = new File(installDir, exeFileName);
-        InstallerApplication.applicationToLaunch = exeFile.getAbsolutePath();
-        File shortcutPath = new File(installDir, "MesterMC.lnk");
-        try (InputStream exeStream = InstallerApplication.class.getResourceAsStream(_config.getExeFileResourcePath())) {
-
-            if (exeStream == null) {
-                _logCallback.accept(_translator.Localize("Progress.Scripts.ResourceNotFound", new HashMap<>() {
-                    {
-                        put("resource", _config.getExeFileResourcePath());
-                    }
-                }));
-                return;
-            }
-
-            // Use Files.copy to write the InputStream to the target Path
-            Files.copy(exeStream, exeFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopied", new HashMap<>() {
-                {
-                    put("fileName", exeFileName);
-                }
-            }));
-
-            // Create windows shortcut
-            try {
-                // Create a PowerShell script string
-                String powershellScript = _config.getExePowerShellScript()
-                        .replaceAll("%shortcutPath%", shortcutPath.getAbsolutePath().replace("\\", "\\\\"))
-                        .replaceAll("%exePath%", exeFile.getAbsolutePath().replace("\\", "\\\\"))
-                        .replaceAll("%iconPath%", iconIcoPath.getAbsolutePath().replace("\\", "\\\\"));
-
-                // Save the script to a temporary .ps1 file
-                String tempDir = System.getProperty("java.io.tmpdir");
-                String ps1FilePath = tempDir + "create_shortcut.ps1";
-                try (FileWriter writer = new FileWriter(ps1FilePath)) {
-                    writer.write(powershellScript);
-                }
-
-                // Execute the PowerShell script
-                ProcessBuilder pb = new ProcessBuilder("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", ps1FilePath);
-                Process process = pb.start();
-
-                // Read output/error streams (optional, for debugging)
-                InputStream is = process.getInputStream();
-                InputStream es = process.getErrorStream();
-
-                // You might want to consume these streams to prevent process deadlock
-                // (e.g., by starting separate threads to read them)
-                // For simplicity, we'll just wait for the process to exit
-                int exitCode = process.waitFor();
-                System.out.println("PowerShell script exited with code: " + exitCode);
-
-                // Clean up the temporary script file
-                new java.io.File(ps1FilePath).delete();
-
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            if (InstallerApplication.shouldCreateDesktopShortcut()) {
-                File desktopShortcutFile = new File(desktopDir, "MesterMC.lnk");
-                _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
-                Files.copy(shortcutPath.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", new HashMap<>() {
-                    {
-                        put("filePath", desktopShortcutFile.getAbsolutePath());
-                    }
-                }));
-            }
-
-            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
-                File startMenuFile = new File(startMenuDir, "MesterMC.lnk");
-                _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
-                Files.copy(shortcutPath.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", new HashMap<>() {
-                    {
-                        put("filePath", startMenuFile.getAbsolutePath());
-                    }
-                }));
-            }
-        } catch (IOException e) {
-            _logger.Error(String.format("Failed to copy %s: %s", exeFileName, e.getMessage()));
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopyError", new HashMap<>() {
-                {
-                    put("fileName", exeFileName);
-                    put("error", e.getMessage());
-                }
-            }));
-        }
-    }
-
-    private void setupLinux() {
-        scriptFileName = _config.getBashFileName();
-        scriptContent = _config.getBashFileContent()
-                .replaceAll("%dirPath%", installPath)
-                .replaceAll("%jarPath%", jarFile.getAbsolutePath());
-
-        // .desktop file creation for Linux/macOS Start Menu shortcut
-        String desktopFileName = _config.getLinuxDesktopFileName();
-        String desktopFileContent = _config.getLinuxDesktopFileContent()
-                .replaceAll("%dirPath%", installPath)
-                .replaceAll("%jarPath%", jarFile.getAbsolutePath());
-
-        File linuxLaunchFile = new File(installDir, desktopFileName);
-        InstallerApplication.applicationToLaunch = linuxLaunchFile.getAbsolutePath();
         try {
-            _logger.Debug("Creating .desktop file: " + linuxLaunchFile.getAbsolutePath());
-            Files.writeString(linuxLaunchFile.toPath(), desktopFileContent);
-
-            if (InstallerApplication.shouldCreateDesktopShortcut()) {
-                File desktopShortcutFile = new File(desktopDir, desktopFileName);
-                _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
-                Files.copy(linuxLaunchFile.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", new HashMap<>() {
-                    {
-                        put("filePath", desktopShortcutFile.getAbsolutePath());
-                    }
-                }));
-            }
-
-            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
-                File startMenuFile = new File(startMenuDir, desktopFileName);
-                _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
-                Files.copy(linuxLaunchFile.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", new HashMap<>() {
-                    {
-                        put("filePath", startMenuFile.getAbsolutePath());
-                    }
-                }));
-            }
-        }
-        catch (IOException e) {
-            _logger.Error("Failed to write .desktop file: " + e.getMessage());
-        }
-    }
-
-    private void setupMac() {
-        scriptFileName = _config.getZshFileName();
-        scriptContent = _config.getZshFileContent()
-                .replaceAll("%dirPath%", installPath)
-                .replaceAll("%jarPath%", jarFile.getAbsolutePath());
-
-        // TODO: Shortcuts
-    }
-
-    private void makeScriptExecutable(File scriptFile) {
-        try {
-            _logger.Debug("Attempting to make script executable: " + scriptFile.getAbsolutePath());
-            _logCallback.accept("Making launcher executable: " + scriptFile.getAbsolutePath());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.MakingExecutable"));
-            ProcessBuilder pb = new ProcessBuilder("chmod", "+x", scriptFile.getAbsolutePath());
-            Process p = pb.start();
-
-            // Wait for the process to complete and check exit code
-            boolean finished = p.waitFor(10, TimeUnit.SECONDS); // Wait up to 10 seconds
-
-            if (finished) {
-                int exitCode = p.exitValue();
-                if (exitCode == 0) {
-                    _logger.Info("Script made executable: " + scriptFile.getAbsolutePath());
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableMade", new HashMap<>() {
-                        {
-                            put("filePath", scriptFile.getAbsolutePath());
-                        }
-                    }));
-                } else {
-                    // Read error stream for more details
-                    String error = new String(p.getErrorStream().readAllBytes());
-                    _logger.Error("chmod failed with exit code " + exitCode + ": " + error);
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableError", new HashMap<>() {
-                        {
-                            put("filePath", scriptFile.getAbsolutePath());
-                            put("error", error);
-                        }
-                    }));
+            // Ensure the shortcut directory exists
+            if (_startMenuDir != null && !_startMenuDir.exists()) {
+                if (!_startMenuDir.mkdirs()) {
+                    // Log and notify if the start menu directory creation fails
+                    _logger.Error("Failed to create start menu directory: " + _startMenuDir.getAbsolutePath());
+                    _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuDirCreationFailed", Map.of("path", _startMenuDir.getAbsolutePath())));
+                    return;
                 }
-            } else {
-                _logger.Error("chmod process timed out.");
-                _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableTimeout"));
-                p.destroyForcibly(); // Terminate the process
             }
-        } catch (IOException | InterruptedException e) {
-            _logger.Error("Exception while making script executable: " + e.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableException", new HashMap<>() {
-                {
-                    put("error", e.getMessage());
-                }
-            }));
+
+            // Copy common resources like icons and information files
+            copyResource("assets/icon.png", "icon.png");
+            File icoFile = copyResource("assets/favicon.ico", "icon.ico");
+            copyResource("info.txt", "info.txt");
+
+            // Perform OS-specific setup
+            if (_os.contains("win")) { // WINDOWS
+                _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Windows")));
+                // Create the batch script file
+                createScriptFile(
+                        ConfigLoader.get().install().batch().fileName(),
+                        ConfigLoader.get().install().batch().content()
+                                .replaceAll("%dirPath%", installPath)
+                                .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
+                );
+
+                // Setup Windows-specific configurations
+                setupWindows(icoFile);
+            } else if (_os.contains("mac")) { // MAC OS
+                _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "MacOS")));
+                // Create the zsh script file
+                File scriptFile = createScriptFile(
+                        ConfigLoader.get().install().zsh().fileName(),
+                        ConfigLoader.get().install().zsh().content()
+                                .replaceAll("%dirPath%", installPath)
+                                .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
+                );
+
+                // Set the application launch path
+                InstallerApplication.applicationToLaunch = scriptFile.getAbsolutePath();
+
+                // Setup macOS-specific configurations
+                setupMac();
+            } else {  // LINUX
+                if (_os.contains("linux"))
+                    _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Linux")));
+                else
+                    _logCallback.accept(_translator.Localize("Progress.Scripts.UnsupportedOS", Map.of("os", _os)));
+                // Create the bash script file
+                File scriptFile = createScriptFile(
+                        ConfigLoader.get().install().bash().fileName(),
+                        ConfigLoader.get().install().bash().content()
+                                .replaceAll("%dirPath%", installPath)
+                                .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
+                );
+                // Set the application launch path
+                InstallerApplication.applicationToLaunch = scriptFile.getAbsolutePath();
+                // Setup Linux-specific configurations
+                setupLinux();
+            }
+        } catch (Exception ex) {
+            // Log and notify if the setup process fails
+            _logger.Error("Setup failed: " + ex.getMessage());
+            _logCallback.accept(ex.getMessage());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.SetupFailed"));
         }
     }
 
+    // --- OS Specific Setup Methods ---
 
-
-
-
-    private void createLaunchScripts(File jarFile, File installDir, File startMenuDir) {
-        String os = System.getProperty("os.name").toLowerCase();
-        String scriptFileName;
-        String scriptContent;
-        String installPath = installDir.getAbsolutePath();
+    /**
+     * Sets up Windows-specific configurations for the application, including creating
+     * a shortcut file (`.lnk`) and optionally copying it to the desktop and start menu.
+     * <br/>
+     * This method handles the creation of a PowerShell script to generate the shortcut,
+     * executes the script, and manages error handling and logging during the process.
+     *
+     * @param iconIcoPath The path to the `.ico` file used as the icon for the shortcut.
+     */
+    private void setupWindows(File iconIcoPath) {
+        // Get the user's desktop directory
         File desktopDir = PathUtils.getUserDesktopDirectory();
 
-        // Ensure the shortcut directory exists
-        if (!startMenuDir.exists()) {
-            if (!startMenuDir.mkdirs()) {
-                _logger.Error("Failed to create start menu directory: " + startMenuDir.getAbsolutePath());
-                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuDirCreationFailed", new HashMap<>() {
-                    {
-                        put("path", startMenuDir.getAbsolutePath());
-                    }
-                }));
-                return;
-            }
+        // Retrieve the name of the executable file from the configuration
+        String exeFileName = ConfigLoader.get().install().exe().fileName();
+
+        // Define the path for the shortcut file
+        File shortcutPath = new File(_installDir, "MesterMC.lnk");
+
+        // Copy the executable file from resources to the installation directory
+        File exeFile = copyResource(exeFileName, ConfigLoader.get().install().exe().resourcePath());
+        if (exeFile == null) {
+            // If the executable file could not be copied, exit the method
+            return;
         }
+        // Set the application launch path to the executable file
+        InstallerApplication.applicationToLaunch = exeFile.getAbsolutePath();
 
-        // Copy icon .png
-        File iconImagePath = new File(installDir, "icon.png");
-        try (InputStream iconStream = InstallerApplication.class.getResourceAsStream("assets/icon.png")) {
+        // Create the shortcut using a PowerShell script
+        try {
+            // Generate the PowerShell script content
+            String powershellScript = ConfigLoader.get().install().exe().powershell()
+                    .replaceAll("%shortcutPath%", shortcutPath.getAbsolutePath().replace("\\", "\\\\"))
+                    .replaceAll("%exePath%", exeFile.getAbsolutePath().replace("\\", "\\\\"))
+                    .replaceAll("%iconPath%", iconIcoPath.getAbsolutePath().replace("\\", "\\\\"));
 
-            if (iconStream == null) {
-                _logCallback.accept(_translator.Localize("Progress.Scripts.ResourceNotFound", new HashMap<>() {
-                    {
-                        put("resource", iconImagePath.getAbsolutePath());
-                    }
-                }));
-                return;
-            }
+            // Save the script to a temporary `.ps1` file
+            File ps1File = new File(System.getProperty("java.io.tmpdir"), "create_shortcut.ps1");
+            Files.writeString(ps1File.toPath(), powershellScript);
 
-            // Use Files.copy to write the InputStream to the target Path
-            Files.copy(iconStream, iconImagePath.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopied", new HashMap<>() {
-                {
-                    put("fileName", "icon.png");
-                }
-            }));
-        } catch (IOException e) {
-            _logger.Error(String.format("Failed to copy %s: %s", "icon.png", e.getMessage()));
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopyError", new HashMap<>() {
-                {
-                    put("fileName", "icon.png");
-                    put("error", e.getMessage());
-                }
-            }));
-        }
+            // Execute the PowerShell script
+            Process process = new ProcessBuilder("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", ps1File.getAbsolutePath()).start();
+            int exitCode = process.waitFor();
+            _logger.Debug("PowerShell script executed with exit code: " + exitCode);
 
-        // Copy icon .ico
-        File iconIcoPath = new File(installDir, "icon.ico");
-        try (InputStream iconStream = InstallerApplication.class.getResourceAsStream("assets/favicon.ico")) {
-
-            if (iconStream == null) {
-                _logCallback.accept(_translator.Localize("Progress.Scripts.ResourceNotFound", new HashMap<>() {
-                    {
-                        put("resource", iconIcoPath.getAbsolutePath());
-                    }
-                }));
-                return;
-            }
-
-            // Use Files.copy to write the InputStream to the target Path
-            Files.copy(iconStream, iconIcoPath.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopied", new HashMap<>() {
-                {
-                    put("fileName", "icon.ico");
-                }
-            }));
-        } catch (IOException e) {
-            _logger.Error(String.format("Failed to copy %s: %s", "icon.ico", e.getMessage()));
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopyError", new HashMap<>() {
-                {
-                    put("fileName", "icon.ico");
-                    put("error", e.getMessage());
-                }
-            }));
-        }
-
-
-        else {
-            _logger.Error("Unsupported OS for script creation: " + os);
-            _logCallback.accept(_translator.Localize("Progress.Scripts.UnsupportedOS", new HashMap<>() {
-                {
-                    put("os", os);
-                }
-            }));
+            // Clean up the temporary script file
+            if (!ps1File.delete())
+                _logger.Warn("Failed to delete temporary PowerShell script: " + ps1File.getAbsolutePath());
+        } catch (IOException | InterruptedException e) {
+            // Log an error if the PowerShell script execution fails
+            _logger.Error("Failed to create Windows shortcut: " + e.getMessage());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.ShortcutCreationError", Map.of("error", e.getMessage())));
             return;
         }
 
-        File scriptFile = new File(installDir, scriptFileName);
-        try {
-            Files.writeString(scriptFile.toPath(), scriptContent);
-            _logger.Debug("Created launch script: " + scriptFile.getAbsolutePath());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreated", new HashMap<>() {
-                {
-                    put("filePath", scriptFile.getAbsolutePath());
-                }
-            }));
+        // Define the desktop shortcut file
+        File desktopShortcutFile = new File(desktopDir, "MesterMC.lnk");
+        // Define the start menu shortcut file
+        File startMenuFile = new File(_startMenuDir, "MesterMC.lnk");
 
-            // For Linux/macOS, make the script executable
-            if (os.contains("linux") || os.contains("mac")) {
+        // Copy the shortcut to the desktop and start menu
+        try {
+            // Check if a desktop shortcut should be created
+            if (InstallerApplication.shouldCreateDesktopShortcut()) {
+                _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
+                // Copy the shortcut file to the desktop directory
+                Files.copy(shortcutPath.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                // Log the creation of the desktop shortcut
+                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+            }
+
+            // Check if a start menu shortcut should be created
+            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+                _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
+                // Copy the shortcut file to the start menu directory
+                Files.copy(shortcutPath.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                // Log the creation of the start menu shortcut
+                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+            }
+        } catch (IOException e) {
+            // Log an error if copying the shortcut files fails
+            _logger.Error("Failed to copy shortcut files: " + e.getMessage());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.ShortcutCopyError", Map.of("error", e.getMessage())));
+        }
+
+        // Create the uninstallation script file
+        createScriptFile(
+                ConfigLoader.get().uninstall().batch().fileName(),
+                ConfigLoader.get().uninstall().batch().content()
+                        .replaceAll("%installDir%", _installDir.getAbsolutePath())
+                        .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
+                        .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
+        );
+    }
+
+    /**
+     * Sets up Linux-specific configurations for the application, including creating
+     * a `.desktop` file and optionally creating desktop and start menu shortcuts.
+     * <br/>
+     * The `.desktop` file is used to define how the application is launched on Linux systems.
+     * This method also handles logging and error reporting during the setup process.
+     */
+    private void setupLinux() {
+        // Get the name and content of the .desktop file from the configuration
+        String desktopFileName = ConfigLoader.get().install().linuxDesktop().fileName();
+        String desktopFileContent = ConfigLoader.get().install().linuxDesktop().content()
+                .replaceAll("%dirPath%", _installDir.getAbsolutePath()) // Replace placeholder with the installation path
+                .replaceAll("%jarPath%", _jarFile.getAbsolutePath()); // Replace placeholder with the JAR file path
+        File desktopDir = PathUtils.getUserDesktopDirectory();
+
+        // Define the .desktop file in the installation directory
+        File linuxLaunchFile = new File(_installDir, desktopFileName);
+
+        // Define the desktop shortcut file
+        File desktopShortcutFile = new File(desktopDir, desktopFileName);
+        // Define the start menu shortcut file
+        File startMenuFile = new File(_startMenuDir, desktopFileName);
+        try {
+            // Log the creation of the .desktop file
+            _logger.Debug("Creating .desktop file: " + linuxLaunchFile.getAbsolutePath());
+            // Write the content to the .desktop file
+            Files.writeString(linuxLaunchFile.toPath(), desktopFileContent);
+
+            // Check if a desktop shortcut should be created
+            if (InstallerApplication.shouldCreateDesktopShortcut()) {
+                _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
+                // Copy the .desktop file to the desktop directory
+                Files.copy(linuxLaunchFile.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                // Log the creation of the desktop shortcut
+                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+            }
+
+            // Check if a start menu shortcut should be created
+            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+                _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
+                // Copy the .desktop file to the start menu directory
+                Files.copy(linuxLaunchFile.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                // Log the creation of the start menu shortcut
+                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+            }
+        } catch (IOException e) {
+            // Log an error if the .desktop file creation or shortcut creation fails
+            _logger.Error("Failed to write .desktop file: " + e.getMessage());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopFileCreationError", Map.of("error", e.getMessage())));
+        }
+
+        // Create the uninstallation script file
+        createScriptFile(
+                ConfigLoader.get().uninstall().bash().fileName(),
+                ConfigLoader.get().uninstall().bash().content()
+                        .replaceAll("%installDir%", _installDir.getAbsolutePath())
+                        .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
+                        .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
+        );
+    }
+
+    /**
+     * Sets up macOS-specific configurations for the application, including creating
+     * a macOS app bundle, `.app` directory structure, and optionally creating desktop
+     * and start menu shortcuts.
+     * <br/>
+     * This method handles the creation of the macOS app bundle, including the `Info.plist` file,
+     * launcher script, and icon file. It also ensures the launcher script is executable and
+     * manages symlinks for shortcuts.
+     * <br/>
+     * Logs and handles errors during the setup process.
+     */
+    private void setupMac() {
+        // Get the user's desktop directory
+        File desktopDir = PathUtils.getUserDesktopDirectory();
+        // Retrieve the name of the macOS app bundle from the configuration
+        String desktopFileName = ConfigLoader.get().install().macApp().fileName();
+
+        // Define the desktop shortcut file
+        File desktopShortcutFile = new File(desktopDir, desktopFileName);
+        // Define the start menu shortcut file
+        File startMenuFile = new File(_startMenuDir, desktopFileName);
+        // Copy the .icns icon file from resources
+        String iconFileName = "icon.icns";
+        File icnsFile = copyResource("assets/icon.icns", iconFileName);
+
+        try {
+            // Log the creation of the macOS app bundle
+            _logger.Debug("Creating macOS app bundle: " + desktopFileName);
+            Path installDir = _installDir.toPath();
+            Path appBundlePath = installDir.resolve(desktopFileName);
+
+            // 1. Create the main .app bundle directory
+            Files.createDirectories(appBundlePath);
+
+            // 2. Create Contents directory
+            Path contentsPath = appBundlePath.resolve("Contents");
+            Files.createDirectories(contentsPath);
+
+            // 3. Create MacOS directory
+            Path macOSPath = contentsPath.resolve("MacOS");
+            Files.createDirectories(macOSPath);
+
+            // 4. Create Resources directory
+            Path resourcesPath = contentsPath.resolve("Resources");
+            Files.createDirectories(resourcesPath);
+
+            // --- Write Info.plist ---
+            // Retrieve the Info.plist content from the configuration
+            String infoPlistContent = ConfigLoader.get().install().macApp().infoList();
+            if (icnsFile != null) {
+                // Replace the icon path placeholder with the actual icon file name
+                infoPlistContent = infoPlistContent.replaceAll("%iconPath%", iconFileName);
+            } else {
+                // Log a warning if the icon file is not found
+                _logger.Warn("No icon file found for macOS app bundle.");
+            }
+
+            // Write the Info.plist content to the Contents directory
+            Files.writeString(contentsPath.resolve("Info.plist"), infoPlistContent);
+
+            // --- Write launcher.sh ---
+            // Retrieve the launcher script content from the configuration
+            String launcherScriptContent = ConfigLoader.get().install().macApp().script()
+                    .replaceAll("%dirPath%", _installDir.getAbsolutePath())
+                    .replaceAll("%jarPath%", _jarFile.getAbsolutePath());
+
+            // Write the launcher script to the MacOS directory
+            Path launcherScriptPath = macOSPath.resolve("launcher.sh");
+            Files.writeString(launcherScriptPath, launcherScriptContent);
+
+            // --- Make launcher.sh executable ---
+            // Define the permissions for the launcher script
+            Set<PosixFilePermission> perms = new HashSet<>();
+            perms.add(PosixFilePermission.OWNER_READ);
+            perms.add(PosixFilePermission.OWNER_WRITE);
+            perms.add(PosixFilePermission.OWNER_EXECUTE);
+            perms.add(PosixFilePermission.GROUP_READ);
+            perms.add(PosixFilePermission.GROUP_EXECUTE);
+            perms.add(PosixFilePermission.OTHERS_READ);
+            perms.add(PosixFilePermission.OTHERS_EXECUTE);
+            // Set the permissions on the launcher script
+            Files.setPosixFilePermissions(launcherScriptPath, perms);
+
+            // Copy the .icns icon file into the Resources directory
+            if (icnsFile != null && icnsFile.exists()) {
+                Files.copy(icnsFile.toPath(), resourcesPath.resolve(iconFileName));
+            }
+            // Log the successful creation of the macOS app bundle
+            _logger.Debug("Created macOS app bundle at: " + appBundlePath.toAbsolutePath());
+
+            // Check if a desktop shortcut should be created
+            if (InstallerApplication.shouldCreateDesktopShortcut()) {
+                _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
+                // Create a symlink to the .app bundle
+                if (Files.exists(desktopShortcutFile.toPath()))
+                    Files.delete(desktopShortcutFile.toPath()); // Remove existing shortcut if it exists
+                Files.createSymbolicLink(appBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath());
+                // Log the creation of the desktop shortcut
+                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+            }
+
+            // Check if a start menu shortcut should be created
+            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+                _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
+                // Create a symlink to the .app bundle
+                if (Files.exists(startMenuFile.toPath()))
+                    Files.delete(startMenuFile.toPath()); // Remove existing shortcut if it exists
+                Files.createSymbolicLink(appBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath());
+                // Log the creation of the start menu shortcut
+                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+            }
+        }
+        catch (Exception ex) {
+            // Log an error if the macOS app bundle creation fails
+            _logger.Error("Failed to create macOS app bundle: " + ex.getMessage());
+        }
+
+        // Create the uninstallation script file
+        createScriptFile(
+                ConfigLoader.get().uninstall().zsh().fileName(),
+                ConfigLoader.get().uninstall().zsh().content()
+                        .replaceAll("%installDir%", _installDir.getAbsolutePath())
+                        .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
+                        .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
+        );
+    }
+
+    // --- Common Methods ---
+
+    /**
+     * Copies a resource file from the application's resources to the installation directory.
+     * If the resource is not found, logs an error and stops the operation.
+     * If the resource is successfully copied, logs the success.
+     *
+     * @param resourcePath The path to the resource file within the application's resources.
+     * @param targetFileName The name of the target file to be created in the installation directory.
+     */
+    private File copyResource(String resourcePath, String targetFileName) {
+        // Define the target file in the installation directory
+        File targetFile = new File(_installDir, targetFileName);
+        try (InputStream resourceStream = InstallerApplication.class.getResourceAsStream(resourcePath)) {
+            // Check if the resource exists
+            if (resourceStream == null) {
+                _logCallback.accept(_translator.Localize("Progress.Scripts.ResourceNotFound", Map.of("resource", targetFile.getAbsolutePath())));
+                return null;
+            }
+            // Copy the resource to the target file
+            Files.copy(resourceStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopied", Map.of("fileName", targetFileName)));
+        } catch (IOException e) {
+            // Log an error if the copy operation fails
+            _logger.Error(String.format("Failed to copy %s: %s", targetFileName, e.getMessage()));
+            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopyError", Map.of("fileName", targetFileName, "error", e.getMessage())));
+        }
+        return targetFile;
+    }
+
+    /**
+     * Creates a script file with the specified name and content in the installation directory.
+     * If the operating system is Linux or macOS, the script is made executable.
+     * After successful creation, the application switches to the "Install Complete" scene.
+     *
+     * @param fileName The name of the script file to be created.
+     * @param content The content to be written into the script file.
+     */
+    private File createScriptFile(String fileName, String content) {
+        // Define the script file in the installation directory
+        File scriptFile = new File(_installDir, fileName);
+        try {
+            // Write the content to the script file
+            Files.writeString(scriptFile.toPath(), content);
+            _logger.Debug("Created launch script: " + scriptFile.getAbsolutePath());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreated", Map.of("filePath", scriptFile.getAbsolutePath())));
+
+            // If the OS is Linux or macOS, make the script executable
+            if (_os.contains("linux") || _os.contains("mac")) {
                 makeScriptExecutable(scriptFile);
             }
 
+            // Set the active scene to "Install Complete"
             InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
         } catch (IOException e) {
+            // Log an error if the script file creation fails
             _logger.Error("Failed to write launch scripts: " + e.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreationError", new HashMap<>() {
-                {
-                    put("error", e.getMessage());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreationError", Map.of("error", e.getMessage())));
+        }
+        return scriptFile;
+    }
+
+    /**
+     * Makes a script file executable by using the `chmod` command.
+     * This method attempts to set the executable permission on the provided script file
+     * and logs the process, including any errors or timeouts.
+     *
+     * @param scriptFile The script file to make executable.
+     */
+    private void makeScriptExecutable(File scriptFile) {
+        try {
+            // Log the start of the process
+            _logger.Debug("Attempting to make script executable: " + scriptFile.getAbsolutePath());
+            _logCallback.accept("Making launcher executable: " + scriptFile.getAbsolutePath());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.MakingExecutable"));
+
+            // Create a ProcessBuilder to execute the chmod command
+            ProcessBuilder pb = new ProcessBuilder("chmod", "+x", scriptFile.getAbsolutePath());
+            Process p = pb.start();
+
+            // Wait for the process to complete, with a timeout of 10 seconds
+            boolean finished = p.waitFor(10, TimeUnit.SECONDS);
+
+            if (finished) {
+                int exitCode = p.exitValue(); // Get the exit code of the process
+                if (exitCode == 0) {
+                    // Log success if chmod executed successfully
+                    _logger.Info("Script made executable: " + scriptFile.getAbsolutePath());
+                    _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableMade", Map.of("filePath", scriptFile.getAbsolutePath())));
+                } else {
+                    // Read and log the error stream if chmod failed
+                    String error = new String(p.getErrorStream().readAllBytes());
+                    _logger.Error("chmod failed with exit code " + exitCode + ": " + error);
+                    _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableError", Map.of(
+                            "filePath", scriptFile.getAbsolutePath(),
+                            "error", error
+                    )));
                 }
-            }));
+            } else {
+                // Log a timeout error if the process did not finish within the timeout
+                _logger.Error("chmod process timed out.");
+                _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableTimeout"));
+                p.destroyForcibly(); // Forcefully terminate the process
+            }
+        } catch (IOException | InterruptedException e) {
+            // Log any exceptions that occur during the process
+            _logger.Error("Exception while making script executable: " + e.getMessage());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableException", Map.of("error", e.getMessage())));
         }
     }
 }
