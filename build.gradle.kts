@@ -45,6 +45,8 @@ dependencies {
     implementation("org.controlsfx:controlsfx:11.2.2")
     implementation("net.synedra:validatorfx:0.6.1")
     implementation("org.kordamp.ikonli:ikonli-javafx:12.4.0")
+    implementation("org.slf4j:slf4j-api:2.0.9")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.9")
 
     // HTTP Client
     implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
