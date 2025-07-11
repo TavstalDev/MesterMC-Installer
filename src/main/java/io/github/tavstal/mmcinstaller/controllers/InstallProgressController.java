@@ -100,10 +100,6 @@ public class InstallProgressController implements Initializable {
         Platform.runLater(() -> {
             if (totalBytes > 0) {
                 progressBar.setProgress((double) downloadedBytes / totalBytes);
-                _logger.Debug(String.format("Downloading... %.2f MB / %.2f MB (%.2f%%)",
-                        (double) downloadedBytes / (1024 * 1024),
-                        (double) totalBytes / (1024 * 1024),
-                        (double) downloadedBytes * 100 / totalBytes));
             } else {
                 _logger.Debug("Downloading... " + (downloadedBytes / (1024 * 1024)) + " MB (Total unknown)");
             }
