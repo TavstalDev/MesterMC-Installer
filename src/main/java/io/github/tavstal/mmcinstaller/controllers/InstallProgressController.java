@@ -99,6 +99,7 @@ public class InstallProgressController implements Initializable {
     private void updateDownloadProgress(long downloadedBytes, long totalBytes) {
         Platform.runLater(() -> {
             if (totalBytes > 0) {
+                progressBar.setProgress((double) downloadedBytes / totalBytes);
                 _logger.Debug(String.format("Downloading... %.2f MB / %.2f MB (%.2f%%)",
                         (double) downloadedBytes / (1024 * 1024),
                         (double) totalBytes / (1024 * 1024),
@@ -129,9 +130,6 @@ public class InstallProgressController implements Initializable {
         );
 
         // TODO: Check file hash
-
-        // Bind the ProgressBar's progress property to the Task's progress property.
-        progressBar.progressProperty().bind(downloadTask.progressProperty());
 
         // Handle the success of the download task.
         downloadTask.setOnSucceeded(event -> {
