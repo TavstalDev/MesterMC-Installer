@@ -1,4 +1,4 @@
-package io.github.tavstal.mmcinstaller.core;
+package io.github.tavstal.mmcinstaller.utils;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import javafx.fxml.FXMLLoader;

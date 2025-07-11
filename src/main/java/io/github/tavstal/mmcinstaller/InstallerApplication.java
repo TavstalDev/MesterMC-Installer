@@ -3,7 +3,7 @@ package io.github.tavstal.mmcinstaller;
 import io.github.tavstal.mmcinstaller.core.InstallerConfig;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
-import io.github.tavstal.mmcinstaller.core.SceneManager;
+import io.github.tavstal.mmcinstaller.utils.SceneManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;

@@ -4,7 +4,7 @@ import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.InstallerConfig;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
-import io.github.tavstal.mmcinstaller.core.SceneManager;
+import io.github.tavstal.mmcinstaller.utils.SceneManager;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
