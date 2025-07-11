@@ -23,7 +23,7 @@ public class InstallerTranslator {
 
     public void Load() {
         if (_defaultLocale == null)
-            _defaultLocale = InstallerApplication.getConfig().getDefaultLanguage();
+            _defaultLocale = ConfigLoader.get().language();
 
         _localization = new HashMap<>();
         _logger.Debug("Reading lang files...");

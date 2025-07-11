@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.core.ConfigLoader;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
@@ -65,7 +66,7 @@ public class PathSelectController implements Initializable {
         nextButton.setText(_translator.Localize("Common.Next"));
         cancelButton.setText(_translator.Localize("Common.Cancel"));
 
-        _defaultPath = PathUtils.getDefaultInstallationPath(InstallerApplication.getConfig().getAppdataDefaultDirName()).getAbsolutePath();
+        _defaultPath = PathUtils.getDefaultInstallationPath(ConfigLoader.get().install().defaultDirs().appData()).getAbsolutePath();
 
         if (InstallerApplication.getCurrentPath() != null) {
             directoryTextArea.setText(InstallerApplication.getCurrentPath());

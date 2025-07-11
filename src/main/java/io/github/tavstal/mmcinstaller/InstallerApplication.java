@@ -1,6 +1,6 @@
 package io.github.tavstal.mmcinstaller;
 
-import io.github.tavstal.mmcinstaller.core.InstallerConfig;
+import io.github.tavstal.mmcinstaller.core.ConfigLoader;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
@@ -34,20 +34,6 @@ public class InstallerApplication extends Application {
         _stage.setScene(scene);
     }
 
-    private static InstallerConfig _config;
-    /**
-     * Gets the configuration instance.
-     *
-     * @return The configuration instance.
-     */
-    public static InstallerConfig getConfig() {
-        if (_config == null) {
-            _config = new InstallerConfig();
-            _config.Initialize();
-        }
-        return _config;
-    }
-
     private static InstallerLogger _logger;
     /**
      * Gets the logger instance.
@@ -77,7 +63,8 @@ public class InstallerApplication extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        _logger = new InstallerLogger(getConfig().getDebugMode());
+        ConfigLoader.init();
+        _logger = new InstallerLogger(ConfigLoader.get().debug());
         _translator = new InstallerTranslator(new String[] {"eng", "hun"});
         _translator.Load();
         _stage = stage;
@@ -116,7 +103,7 @@ public class InstallerApplication extends Application {
         _logger.Debug("Checking .jar size.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             _logger.Debug("Sending HTTP request...");
-            HttpHead request = new HttpHead(getConfig().getJarDownloadUrl());
+            HttpHead request = new HttpHead(ConfigLoader.get().download().link());
 
             HttpClientResponseHandler<Void> responseHandler = response -> {
                 _logger.Debug("Received response. Status: " + response.getCode());

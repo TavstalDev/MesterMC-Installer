@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.core.ConfigLoader;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
@@ -66,7 +67,7 @@ public class ShortcutController implements Initializable {
         nextButton.setText(_translator.Localize("Common.Next"));
         cancelButton.setText(_translator.Localize("Common.Cancel"));
 
-        _defaultPath = PathUtils.getStartMenuDirectory(InstallerApplication.getConfig().getStartMenuDefaultDirName()).toPath().toAbsolutePath().toString();
+        _defaultPath = PathUtils.getStartMenuDirectory(ConfigLoader.get().install().defaultDirs().startMenu()).toPath().toAbsolutePath().toString();
 
         if (InstallerApplication.getStartMenuPath() != null) {
             directoryTextArea.setText(InstallerApplication.getStartMenuPath());

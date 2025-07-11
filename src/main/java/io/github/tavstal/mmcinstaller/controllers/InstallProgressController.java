@@ -25,7 +25,6 @@ public class InstallProgressController implements Initializable {
 
     private InstallerLogger _logger; // Logger instance for logging events.
     private InstallerTranslator _translator; // Translator instance for localization.
-    private InstallerConfig _config; // Configuration instance for accessing settings.
     public Label progressTitle; // Label for the progress title.
     public Label progressDescription; // Label for the progress description.
     public Text progressAction; // Text for the current progress action.
@@ -46,7 +45,6 @@ public class InstallProgressController implements Initializable {
         _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         // Initialize the translator for localization.
         _translator = InstallerApplication.getTranslator();
-        _config = InstallerApplication.getConfig();
 
         // Set localized text for UI elements.
         progressTitle.setText(_translator.Localize("Progress.Title"));
@@ -119,16 +117,18 @@ public class InstallProgressController implements Initializable {
         // Define the installation directory, start menu directory, and output file for the download.
         File dir = new File(InstallerApplication.getCurrentPath());
         File startMenuDir = new File(InstallerApplication.getStartMenuPath());
-        File outputFile = new File(InstallerApplication.getCurrentPath(), _config.getJarDownloadName());
+        File outputFile = new File(InstallerApplication.getCurrentPath(), ConfigLoader.get().download().fileName());
 
         // Create a Task for the download
         FileDownloader downloader = new FileDownloader(_logger, _translator);
         Task<Void> downloadTask = downloader.createDownloadTask(
-                _config.getJarDownloadUrl(),
+                ConfigLoader.get().download().link(),
                 outputFile,
                 this::logStep, // Pass the logStep method reference
                 this::updateDownloadProgress // New method to update UI progress
         );
+
+        // TODO: Check file hash
 
         // Bind the ProgressBar's progress property to the Task's progress property.
         progressBar.progressProperty().bind(downloadTask.progressProperty());
