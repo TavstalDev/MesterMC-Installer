@@ -56,6 +56,9 @@ public class ConfigLoader {
             String exePowerShellScript = YamlHelper.getString(rawConfigMap, "install.exe.powershell", "");
             String linuxDesktopInstallFileName = YamlHelper.getString(rawConfigMap, "install.linux_desktop.file_name", "start.desktop");
             String linuxDesktopInstallContent = YamlHelper.getString(rawConfigMap, "install.linux_desktop.content", "");
+            String macAppInstallFileName = YamlHelper.getString(rawConfigMap, "install.macos_app.file_name", "start.app");
+            String macAppInfoList = YamlHelper.getString(rawConfigMap, "install.macos_app.info_list", "");
+            String macAppScript = YamlHelper.getString(rawConfigMap, "install.macos_app.script", "");
 
             String batchUninstallFileName = YamlHelper.getString(rawConfigMap, "uninstall.batch.file_name", "uninstall.bat");
             String batchUninstallContent = YamlHelper.getString(rawConfigMap, "uninstall.batch.content", "");
@@ -108,6 +111,12 @@ public class ConfigLoader {
                             new ScriptConfig(
                                     linuxDesktopInstallFileName,
                                     linuxDesktopInstallContent
+                            ),
+                            // Mac App
+                            new MacAppConfig(
+                                macAppInstallFileName,
+                                macAppInfoList,
+                                macAppScript
                             )
                     ),
                     new UninstallConfig(
