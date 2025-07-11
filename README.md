@@ -70,7 +70,7 @@ This project is open-source and released under the MIT License. While not affili
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/TavstalDev/MesterMC-Installer.git](https://github.com/TavstalDev/MesterMC-Installer.git)
+    git clone https://github.com/TavstalDev/MesterMC-Installer.git
     cd MesterMC-Installer
     ```
 2.  **Open in IntelliJ IDEA:** Import the project into IntelliJ IDEA. The Gradle build system will automatically download and configure the necessary packages.

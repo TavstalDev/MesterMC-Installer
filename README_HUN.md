@@ -68,7 +68,7 @@ Szívesen fogadjuk a MesterMC Telepítő projekthez való hozzájárulásokat!
 
 1.  **Klónozza a Repositort:**
     ```bash
-    git clone [https://github.com/TavstalDev/MesterMC-Installer.git](https://github.com/TavstalDev/MesterMC-Installer.git)
+    git clone https://github.com/TavstalDev/MesterMC-Installer.git
     cd MesterMC-Installer
     ```
 2.  **Nyissa meg az IntelliJ IDEA-ban:** Importálja a projektet az IntelliJ IDEA-ba. A Gradle build rendszer automatikusan letölti és konfigurálja a szükséges csomagokat.
