@@ -1,0 +1,26 @@
+# MesterMC Telepítő - Kiegészítő Információk
+
+Ez a fájl a **MesterMC Installer Community Edition** programhoz tartozik, és fontos információkat tartalmaz.
+
+---
+
+**A készítőről:**
+Készítette: Solymosi 'Tavstal' Zoltán
+
+---
+
+**Fontos figyelmeztetés:**
+Ez a program nem hivatalos MesterMC termék, és nincs közvetlen kapcsolatban a MesterMC hivatalos csapatával.
+
+---
+
+**Hasznos linkek:**
+Weboldal: https://mestermc.hu
+Discord: https://discord.gg/mestermc
+GitHub (a telepítő forráskódja): https://github.com/TavstalDev/MesterMC-Installer
+
+---
+
+**MesterMC 2025**
+
+Köszönjük, hogy a telepítőt használtad, és hogy velünk tartasz!
