@@ -1,4 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 plugins {
     java
@@ -15,8 +18,6 @@ version = "1.0"
 repositories {
     mavenCentral()
 }
-
-val junitVersion = "5.13.3"
 
 java {
     toolchain {
@@ -56,24 +57,19 @@ dependencies {
     // JNA Platform Library (contains OS-specific mappings like KnownFolders)
     implementation("net.java.dev.jna:jna-platform:5.17.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.3")
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-// Define variables for jpackage task (these are still useful)
 val vendorName = "Solymosi 'Tavstal' Zoltán"
-val description = "A modified Minecraft client"
-
-// Path to the output directory for packaged app
 val packageOutputDir = layout.buildDirectory.dir("jpackage").get().asFile
-
-// Path to your application icon (e.g., in src/main/resources)
 val linuxAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/icon.png").asFile
 val windowsAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/favicon.ico").asFile
+val macAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/icon.icns").asFile
 
 jlink {
     imageZip.set(layout.buildDirectory.file("distributions/${project.name}-${project.version}-${javafx.platform.classifier}.zip"))
@@ -87,32 +83,67 @@ jlink {
             "--verbose"
         )
     )
-
     launcher {
         name = rootProject.name
     }
-
-
     jpackage {
-        /*installerType = when {
-            OperatingSystem.current().isWindows -> "exe"
-            OperatingSystem.current().isMacOsX -> "dmg"
-            else -> "app-image" // Use app-image for Linux by default, or switch to deb/rpm
-        }*/
-
         appVersion = project.version.toString()
         vendor = vendorName
-        //description = description
-
         // Output directory
-        this.outputDir = packageOutputDir.absolutePath
+        outputDir = packageOutputDir.absolutePath
         imageName = rootProject.name
-
-        // Icons
-        if (OperatingSystem.current().isWindows) {
-            icon = windowsAppIcon.absolutePath
-        } else if (OperatingSystem.current().isLinux) {
-            icon = linuxAppIcon.absolutePath
+        icon = when {
+            OperatingSystem.current().isWindows -> windowsAppIcon.absolutePath
+            OperatingSystem.current().isMacOsX -> macAppIcon.absolutePath
+            else -> linuxAppIcon.absolutePath
         }
     }
+}
+
+val createSymlinkLauncher by tasks.registering(DefaultTask::class) {
+    group = "build"
+    description = "Creates a symbolic link for the application launcher."
+    dependsOn(tasks.installDist)
+    doLast {
+        // The root directory of the installed application (from installDist)
+        val installDir = layout.buildDirectory.dir("jpackage/${application.applicationName}").get().asFile.toPath()
+        val targetLauncherFullPath = installDir.resolve("bin/${application.applicationName}")
+        val symlinkPath = installDir.resolve(application.applicationName)
+        // --- Diagnostic messages ---
+        logger.lifecycle("--- Starting createSymlinkLauncher task ---")
+        logger.lifecycle("# Installation Directory: $installDir")
+        logger.lifecycle("# Target Launcher: $targetLauncherFullPath")
+        logger.lifecycle("# Symlink Path: $symlinkPath")
+
+        // --- Validate target exists before linking ---
+        if (!Files.exists(targetLauncherFullPath)) {
+            logger.error("Error: Target launcher script not found at $targetLauncherFullPath. Cannot create symlink.")
+            throw GradleException("Target launcher not found for symlink creation.")
+        }
+
+        // --- Create the relative symbolic link ---
+        // Delete existing symlink if it exists to prevent errors on re-build
+        if (Files.exists(symlinkPath)) {
+            Files.delete(symlinkPath)
+            logger.lifecycle("Removed existing symlink: $symlinkPath")
+        }
+
+        // Create a relative symlink from the installDir to the bin/launcher
+        Files.createSymbolicLink(symlinkPath, installDir.relativize(targetLauncherFullPath))
+        logger.lifecycle("Created relative symlink: $symlinkPath -> ${installDir.relativize(targetLauncherFullPath)}")
+
+        // Make the symlink executable (important for some systems/file managers)
+        symlinkPath.toFile().setExecutable(true, false)
+        logger.lifecycle("--- Finished createSymlinkLauncher task ---")
+    }
+}
+
+val buildPackage by tasks.registering(DefaultTask::class) {
+    group = "application"
+    dependsOn(tasks.jpackageImage)
+    dependsOn(createSymlinkLauncher)
+}
+
+tasks.named(createSymlinkLauncher.name) {
+    mustRunAfter(tasks.jpackageImage)
 }
