@@ -13,10 +13,11 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.CheckBox?>
+
 <StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="io.github.tavstal.mmcinstaller.controllers.InstallCompleteController">
     <!-- Background Image (Left Side) -->
-    <ImageView fitHeight="315.0" fitWidth="240.0" pickOnBounds="true"
+    <ImageView fitHeight="315.0" fitWidth="240.0"  preserveRatio="true" pickOnBounds="true"
                StackPane.alignment="TOP_LEFT">
         <Image url="@../assets/banner.png"/>
     </ImageView>
