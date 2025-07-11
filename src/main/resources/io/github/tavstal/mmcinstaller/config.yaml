@@ -26,7 +26,7 @@ install:
     content: |
       @echo off
       pushd "%dirPath%"
-      start "java -jar %jarPath%"
+      start javaw -jar "%jarPath%"
       popd
       exit
   bash:
