@@ -18,7 +18,7 @@ download:
   sha256: "1d5198df53ffe00b0e5b885f551da552e4544be32bb41c27ed04dccc800e0492"
 install:
   # Default directory names for installation.
-  dirs:
+  default_dirs:
     start_menu: "MesterMC"
     appdata: "MesterMC"
   batch:
@@ -66,3 +66,178 @@ install:
       Categories=Game;
       Keywords=Minecraft;MesterMC;Launcher;Game;
       StartupNotify=true
+  macos_app:
+    file_name: "MesterMC.app"
+    info_list: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+        <dict>
+          <key>CFBundleExecutable</key>
+          <string>launcher.sh</string>
+          <key>CFBundleIconFile</key>
+          <string>%iconPath%</string> 
+          <key>CFBundleIdentifier</key>
+          <string>com.mestermc.launcher</string>
+          <key>CFBundleName</key>
+          <string>MesterMC</string>
+          <key>CFBundlePackageType</key>
+          <string>APPL</string>
+          <key>CFBundleShortVersionString</key>
+          <string>1.0.0</string>
+          <key>CFBundleVersion</key>
+          <string>1.0.0</string>
+          <key>LSMinimumSystemVersion</key>
+          <string>10.9.0</string>
+          <key>NSHighResolutionCapable</key>
+          <true/>
+          <key>NSPrincipalClass</key>
+          <string>NSApplication</string>
+          <key>LSApplicationCategoryType</key>
+          <string>public.app-category.games</string>
+        </dict>
+      </plist>
+    script: |
+      #!/bin/zsh
+      cd "%dirPath%" || { echo "Failed to change directory to %dirpath%."; exit 1; }
+      java -jar "%jarPath%"
+      exit 0
+uninstall:
+  batch:
+    file_name: "Uninstall.bat"
+    content: |
+      @echo off
+      echo Uninstalling MesterMC...
+
+      :: --- Remove desktop shortcut if it exists ---
+      if exist "%desktopShortcut%" (
+          echo Removing desktop shortcut: "%desktopShortcut%"
+          del /F /Q "%desktopShortcut%"
+      ) else (
+          echo Desktop shortcut not found: "%desktopShortcut%"
+      )
+
+      :: --- Remove Start Menu shortcut if it exists ---
+      if exist "%startmenuShortcut%" (
+          echo Removing Start Menu shortcut: "%startmenuShortcut%"
+          del /F /Q "%startmenuShortcut%"
+      ) else (
+          echo Start Menu shortcut not found: "%startmenuShortcut%"
+      )
+
+      :: --- Prepare for self-deletion and directory removal ---
+      :: Copy the current script to a temporary location
+      set "tempScript=%TEMP%\_mmc_uninstall_temp.bat"
+      copy "%~f0" "%tempScript%" > nul
+
+      :: Create a command that the temporary script will execute
+      :: This command waits a few seconds, then deletes the installation directory,
+      :: and finally deletes the temporary uninstall script itself.
+      echo @echo off > "%tempScript%"
+      echo ping 127.0.0.1 -n 5 > nul >> "%tempScript%" :: Wait 5 seconds for current script to exit
+      echo echo Deleting installation directory: "%installDir%" >> "%tempScript%"
+      echo rmdir /s /q "%installDir%" >> "%tempScript%"
+      echo echo Uninstallation complete. >> "%tempScript%"
+      echo echo Deleting temporary uninstaller... >> "%tempScript%"
+      echo del /F /Q "%tempScript%" >> "%tempScript%"
+
+      :: Start the temporary script in the background and exit the current one
+      :: This allows the original script's directory to be deleted.
+      start "" cmd /c "%tempScript%"
+      exit
+  bash:
+    file_name: "Uninstall.sh"
+    content: |
+      #!/bin/bash      
+      INSTALL_DIR="%installDir%"
+      DESKTOP_SHORTCUT="%desktopShortcut%"
+      STARTMENU_SHORTCUT="%startmenuShortcut%"
+        
+      echo "Uninstalling MesterMC..."
+        
+      # --- Remove desktop shortcut if it exists ---
+      if [ -f "$DESKTOP_SHORTCUT" ]; then
+        echo "Removing desktop shortcut: \"$DESKTOP_SHORTCUT\""
+        rm -f "$DESKTOP_SHORTCUT"
+      else
+        echo "Desktop shortcut not found: \"$DESKTOP_SHORTCUT\""
+      fi
+        
+      # --- Remove Start Menu shortcut if it exists ---
+      if [ -f "$STARTMENU_SHORTCUT" ]; then
+        echo "Removing Start Menu shortcut: \"$STARTMENU_SHORTCUT\""
+        rm -f "$STARTMENU_SHORTCUT"
+      else
+        echo "Start Menu shortcut not found: \"$STARTMENU_SHORTCUT\""
+      fi
+        
+      # --- Prepare for self-deletion and directory removal ---
+      echo "Preparing for directory removal and self-deletion..."
+      TEMP_SCRIPT="/tmp/mmc_uninstall_temp.sh" # Using /tmp for temporary script
+        
+      # Create a temporary script that will delete the installation directory and itself
+      cat << EOF > "$TEMP_SCRIPT"
+        #!/bin/bash
+        sleep 3 # Wait a few seconds for the current script to exit
+        echo "Deleting installation directory: \\"$INSTALL_DIR\\""
+        rm -rf "$INSTALL_DIR"
+        echo "Uninstallation complete."
+        echo "Deleting temporary uninstaller..."
+        rm -f "$TEMP_SCRIPT"
+      EOF
+        
+      chmod +x "$TEMP_SCRIPT" # Make the temporary script executable
+        
+      # Execute the temporary script in the background and exit the current one.
+      # nohup ensures the script continues running even if the terminal is closed.
+      # > /dev/null 2>&1 redirects stdout and stderr to null, keeping the terminal clean.
+      nohup "$TEMP_SCRIPT" > /dev/null 2>&1 &
+      exit 0
+  zsh:
+    file_name: "Uninstall.zsh"
+    content: |
+      #!/bin/zsh
+      INSTALL_DIR="%installDir%"
+      DESKTOP_SHORTCUT="%desktopShortcut%"
+      STARTMENU_SHORTCUT="%startmenuShortcut%"
+        
+      echo "Uninstalling MesterMC..."
+        
+      # --- Remove desktop shortcut if it exists ---
+      if [ -f "$DESKTOP_SHORTCUT" ]; then
+        echo "Removing desktop shortcut: \"$DESKTOP_SHORTCUT\""
+        rm -f "$DESKTOP_SHORTCUT"
+      else
+        echo "Desktop shortcut not found: \"$DESKTOP_SHORTCUT\""
+      fi
+        
+      # --- Remove Start Menu shortcut if it exists ---
+      if [ -f "$STARTMENU_SHORTCUT" ]; then
+        echo "Removing Start Menu shortcut: \"$STARTMENU_SHORTCUT\""
+        rm -f "$STARTMENU_SHORTCUT"
+      else
+        echo "Start Menu shortcut not found: \"$STARTMENU_SHORTCUT\""
+      fi
+        
+      # --- Prepare for self-deletion and directory removal ---
+      echo "Preparing for directory removal and self-deletion..."
+      TEMP_SCRIPT="/tmp/mmc_uninstall_temp.zsh" # Using /tmp for temporary script
+        
+      # Create a temporary script that will delete the installation directory and itself
+      cat << EOF > "$TEMP_SCRIPT"
+        #!/bin/zsh
+        sleep 3 # Wait a few seconds for the current script to exit
+        echo "Deleting installation directory: \\"$INSTALL_DIR\\""
+        rm -rf "$INSTALL_DIR"
+        echo "Uninstallation complete."
+        echo "Deleting temporary uninstaller..."
+        rm -f "$TEMP_SCRIPT"
+      EOF
+        
+      chmod +x "$TEMP_SCRIPT" # Make the temporary script executable
+        
+      # Execute the temporary script in the background and exit the current one.
+      # nohup ensures the script continues running even if the terminal is closed.
+      # > /dev/null 2>&1 redirects stdout and stderr to null, keeping the terminal clean.
+      nohup "$TEMP_SCRIPT" > /dev/null 2>&1 &
+      exit 0
