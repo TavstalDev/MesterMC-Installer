@@ -141,7 +141,8 @@ val createSymlinkLauncher by tasks.registering(DefaultTask::class) {
 val buildPackage by tasks.registering(DefaultTask::class) {
     group = "application"
     dependsOn(tasks.jpackageImage)
-    dependsOn(createSymlinkLauncher)
+    if (OperatingSystem.current().isLinux)
+        dependsOn(createSymlinkLauncher)
 }
 
 tasks.named(createSymlinkLauncher.name) {
