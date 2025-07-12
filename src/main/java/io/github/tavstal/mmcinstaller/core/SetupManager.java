@@ -327,99 +327,66 @@ public class SetupManager {
         try {
             // Log the creation of the macOS app bundle
             _logger.Debug("Creating macOS app bundle: " + desktopFileName);
-            Path installDir = _installDir.toPath();
-            Path appBundlePath = installDir.resolve(desktopFileName);
-
-            // 1. Create the main .app bundle directory
-            Files.createDirectories(appBundlePath);
-
-            // 2. Create Contents directory
-            Path contentsPath = appBundlePath.resolve("Contents");
-            Files.createDirectories(contentsPath);
-
-            // 3. Create MacOS directory
-            Path macOSPath = contentsPath.resolve("MacOS");
-            Files.createDirectories(macOSPath);
-
-            // 4. Create Resources directory
-            Path resourcesPath = contentsPath.resolve("Resources");
-            Files.createDirectories(resourcesPath);
-
-            // --- Write Info.plist ---
-            // Retrieve the Info.plist content from the configuration
-            String infoPlistContent = ConfigLoader.get().install().macApp().infoList();
-            if (icnsFile != null) {
-                // Replace the icon path placeholder with the actual icon file name
-                infoPlistContent = infoPlistContent.replaceAll("%iconPath%", iconFileName);
-            } else {
-                // Log a warning if the icon file is not found
-                _logger.Warn("No icon file found for macOS app bundle.");
-            }
-
-            // Write the Info.plist content to the Contents directory
-            Files.writeString(contentsPath.resolve("Info.plist"), infoPlistContent);
-
-            // --- Write launcher.sh ---
-            // Retrieve the launcher script content from the configuration
             String launcherScriptContent = ConfigLoader.get().install().macApp().script()
                     .replaceAll("%dirPath%", _installDir.getAbsolutePath())
                     .replaceAll("%jarPath%", _jarFile.getAbsolutePath());
+            Path launchAppBundlePath = createAppBundle(
+                    desktopFileName,
+                    iconFileName,
+                    icnsFile,
+                    launcherScriptContent
+            );
+            if (launchAppBundlePath != null) {
+                // Log the successful creation of the macOS app bundle
+                _logger.Debug("Created macOS app bundle at: " + launchAppBundlePath.toAbsolutePath());
 
-            // Write the launcher script to the MacOS directory
-            Path launcherScriptPath = macOSPath.resolve("launcher.sh");
-            Files.writeString(launcherScriptPath, launcherScriptContent);
+                // Check if a desktop shortcut should be created
+                if (InstallerApplication.shouldCreateDesktopShortcut()) {
+                    _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
+                    // Create a symlink to the .app bundle
+                    Files.copy(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+                    // Log the creation of the desktop shortcut
+                    _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+                }
 
-            // --- Make launcher.sh executable ---
-            // Define the permissions for the launcher script
-            Set<PosixFilePermission> perms = new HashSet<>();
-            perms.add(PosixFilePermission.OWNER_READ);
-            perms.add(PosixFilePermission.OWNER_WRITE);
-            perms.add(PosixFilePermission.OWNER_EXECUTE);
-            perms.add(PosixFilePermission.GROUP_READ);
-            perms.add(PosixFilePermission.GROUP_EXECUTE);
-            perms.add(PosixFilePermission.OTHERS_READ);
-            perms.add(PosixFilePermission.OTHERS_EXECUTE);
-            // Set the permissions on the launcher script
-            Files.setPosixFilePermissions(launcherScriptPath, perms);
-
-            // Copy the .icns icon file into the Resources directory
-            if (icnsFile != null && icnsFile.exists()) {
-                Files.copy(icnsFile.toPath(), resourcesPath.resolve(iconFileName));
+                // Check if a start menu shortcut should be created
+                if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+                    _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
+                    // Create a symlink to the .app bundle
+                    Files.copy(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+                    // Log the creation of the start menu shortcut
+                    _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+                }
             }
-            // Log the successful creation of the macOS app bundle
-            _logger.Debug("Created macOS app bundle at: " + appBundlePath.toAbsolutePath());
-
-            // Check if a desktop shortcut should be created
-            if (InstallerApplication.shouldCreateDesktopShortcut()) {
-                _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
-                // Create a symlink to the .app bundle
-                Files.copy(appBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-                // Log the creation of the desktop shortcut
-                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+            else {
+                // Log an error if the app bundle creation failed
+                _logger.Error("Failed to create macOS app bundle.");
+                _logCallback.accept(_translator.Localize("Progress.Scripts.MacAppBundleCreationError"));
             }
 
-            // Check if a start menu shortcut should be created
-            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
-                _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
-                // Create a symlink to the .app bundle
-                Files.copy(appBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-                // Log the creation of the start menu shortcut
-                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+            // Create Uninstaller App Bundle
+            Path uninstallAppBundlePath = createAppBundle(
+                    ConfigLoader.get().uninstall().zsh().fileName(),
+                    iconFileName,
+                    icnsFile,
+                    ConfigLoader.get().uninstall().zsh().content()
+                            .replaceAll("%installDir%", _installDir.getAbsolutePath())
+                            .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
+                            .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
+            );
+            if (uninstallAppBundlePath == null) {
+                // Log an error if the uninstaller app bundle creation failed
+                _logger.Error("Failed to create macOS uninstaller app bundle.");
+                _logCallback.accept(_translator.Localize("Progress.Scripts.MacUninstallerBundleCreationError"));
+            } else {
+                // Log the successful creation of the uninstaller app bundle
+                _logger.Debug("Created macOS uninstaller app bundle at: " + uninstallAppBundlePath.toAbsolutePath());
             }
         }
         catch (Exception ex) {
             // Log an error if the macOS app bundle creation fails
             _logger.Error("Failed to create macOS app bundle: " + ex.getMessage());
         }
-
-        // Create the uninstallation script file
-        createScriptFile(
-                ConfigLoader.get().uninstall().zsh().fileName(),
-                ConfigLoader.get().uninstall().zsh().content()
-                        .replaceAll("%installDir%", _installDir.getAbsolutePath())
-                        .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
-                        .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
-        );
     }
 
     // --- Common Methods ---
@@ -531,5 +498,85 @@ public class SetupManager {
             _logger.Error("Exception while making script executable: " + e.getMessage());
             _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableException", Map.of("error", e.getMessage())));
         }
+    }
+
+    /**
+     * Creates a macOS app bundle with the specified structure and content.
+     * <br/>
+     * This method generates the `.app` directory structure, writes the `Info.plist` file,
+     * creates a launcher script, sets its permissions, and copies the icon file to the
+     * appropriate location within the bundle.
+     * <br/>
+     * Logs errors if the app bundle creation fails.
+     *
+     * @param desktopFileName The name of the macOS app bundle directory.
+     * @param icnsFileName The name of the `.icns` icon file to be used in the app bundle.
+     * @param icnsFile The `.icns` file to be copied into the app bundle.
+     * @param scriptContent The content of the launcher script to be created in the app bundle.
+     * @return The path to the created app bundle, or `null` if the creation fails.
+     */
+    private Path createAppBundle(String desktopFileName, String icnsFileName, File icnsFile, String scriptContent) {
+        Path installDir = _installDir.toPath();
+        Path appBundlePath = installDir.resolve(desktopFileName);
+        try {
+            // 1. Create the main .app bundle directory
+            Files.createDirectories(appBundlePath);
+
+            // 2. Create Contents directory
+            Path contentsPath = appBundlePath.resolve("Contents");
+            Files.createDirectories(contentsPath);
+
+            // 3. Create MacOS directory
+            Path macOSPath = contentsPath.resolve("MacOS");
+            Files.createDirectories(macOSPath);
+
+            // 4. Create Resources directory
+            Path resourcesPath = contentsPath.resolve("Resources");
+            Files.createDirectories(resourcesPath);
+
+            // --- Write Info.plist ---
+            // Retrieve the Info.plist content from the configuration
+            String infoPlistContent = ConfigLoader.get().install().macApp().infoList();
+            if (icnsFile != null) {
+                // Replace the icon path placeholder with the actual icon file name
+                infoPlistContent = infoPlistContent.replaceAll("%iconPath%", icnsFileName);
+            } else {
+                // Log a warning if the icon file is not found
+                _logger.Warn("No icon file found for macOS app bundle.");
+            }
+
+            // Write the Info.plist content to the Contents directory
+            Files.writeString(contentsPath.resolve("Info.plist"), infoPlistContent);
+
+            // --- Write execute.sh ---
+            // Write the launcher script to the MacOS directory
+            Path launcherScriptPath = macOSPath.resolve("execute.sh");
+            Files.writeString(launcherScriptPath, scriptContent);
+
+            // --- Make launcher.sh executable ---
+            // Define the permissions for the launcher script
+            Set<PosixFilePermission> perms = new HashSet<>();
+            perms.add(PosixFilePermission.OWNER_READ);
+            perms.add(PosixFilePermission.OWNER_WRITE);
+            perms.add(PosixFilePermission.OWNER_EXECUTE);
+            perms.add(PosixFilePermission.GROUP_READ);
+            perms.add(PosixFilePermission.GROUP_EXECUTE);
+            perms.add(PosixFilePermission.OTHERS_READ);
+            perms.add(PosixFilePermission.OTHERS_EXECUTE);
+            // Set the permissions on the launcher script
+            Files.setPosixFilePermissions(launcherScriptPath, perms);
+
+            // Copy the .icns icon file into the Resources directory
+            if (icnsFile != null && icnsFile.exists()) {
+                Files.copy(icnsFile.toPath(), resourcesPath.resolve(icnsFileName));
+            }
+        }
+        catch (IOException ex) {
+            // Log an error if the app bundle creation fails
+            _logger.Error("Failed to create macOS app bundle: " + ex.getMessage());
+            _logCallback.accept(_translator.Localize("Progress.Scripts.MacAppBundleCreationError", Map.of("error", ex.getMessage())));
+            return null;
+        }
+        return appBundlePath;
     }
 }
