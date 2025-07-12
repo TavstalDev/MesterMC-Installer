@@ -106,7 +106,7 @@ public class PathUtils {
             targetDirectory = new File(userHome, ".local" + File.separator + "share" + File.separator + "applications");
         } else if (os.contains("mac")) {
             // macOS: Standard directory for .app bundles.
-            targetDirectory = new File(userHome, "Applications");
+            targetDirectory = new File("/Applications");
         } else {
             // Fallback for unknown OS.
             logger.Warn("Unrecognized OS or unable to determine standard launcher directory for " + os + ". Falling back to user home.");

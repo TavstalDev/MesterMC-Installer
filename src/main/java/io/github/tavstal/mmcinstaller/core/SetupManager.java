@@ -95,7 +95,7 @@ public class SetupManager {
             } else if (_os.contains("mac")) { // MAC OS
                 _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "MacOS")));
                 // Create the zsh script file
-                File scriptFile = createScriptFile(
+                /*File scriptFile = createScriptFile(
                         ConfigLoader.get().install().zsh().fileName(),
                         ConfigLoader.get().install().zsh().content()
                                 .replaceAll("%dirPath%", installPath)
@@ -103,7 +103,7 @@ public class SetupManager {
                 );
 
                 // Set the application launch path
-                InstallerApplication.applicationToLaunch = scriptFile.getAbsolutePath();
+                InstallerApplication.applicationToLaunch = scriptFile.getAbsolutePath();*/
 
                 // Setup macOS-specific configurations
                 setupMac();
@@ -339,6 +339,7 @@ public class SetupManager {
             if (launchAppBundlePath != null) {
                 // Log the successful creation of the macOS app bundle
                 _logger.Debug("Created macOS app bundle at: " + launchAppBundlePath.toAbsolutePath());
+                InstallerApplication.applicationToLaunch = launchAppBundlePath.toFile().getAbsolutePath();
 
                 // Check if a desktop shortcut should be created
                 if (InstallerApplication.shouldCreateDesktopShortcut()) {
