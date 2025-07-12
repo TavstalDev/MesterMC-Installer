@@ -100,6 +100,7 @@ public class InstallerApplication extends Application {
         _stage.centerOnScreen();
         _stage.show();
         _stage.toFront();
+        _stage.requestFocus();
         _logger.Debug("InstallerApplication started successfully.");
 
         _logger.Debug("Checking .jar size.");
