@@ -204,7 +204,7 @@ uninstall:
       echo "Uninstalling MesterMC..."
         
       # --- Remove desktop shortcut if it exists ---
-      if [ -f "$DESKTOP_SHORTCUT" ]; then
+      if [ -e "$DESKTOP_SHORTCUT" ]; then
         echo "Removing desktop shortcut: \"$DESKTOP_SHORTCUT\""
         rm -rf "$DESKTOP_SHORTCUT"
       else
@@ -212,7 +212,7 @@ uninstall:
       fi
         
       # --- Remove Start Menu shortcut if it exists ---
-      if [ -f "$STARTMENU_SHORTCUT" ]; then
+      if [ -e "$STARTMENU_SHORTCUT" ]; then
         echo "Removing Start Menu shortcut: \"$STARTMENU_SHORTCUT\""
         rm -rf "$STARTMENU_SHORTCUT"
       else
