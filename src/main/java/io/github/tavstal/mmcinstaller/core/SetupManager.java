@@ -212,6 +212,12 @@ public class SetupManager {
                 // Log the creation of the start menu shortcut
                 _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
             }
+
+            // Delete the original shortcut file in the installation directory
+            // This is done to avoid cluttering the installation directory with the shortcut file
+            if (shortcutPath.exists() && !shortcutPath.delete()) {
+                _logger.Warn("Failed to delete original shortcut file: " + shortcutPath.getAbsolutePath());
+            }
         } catch (IOException e) {
             // Log an error if copying the shortcut files fails
             _logger.Error("Failed to copy shortcut files: " + e.getMessage());
