@@ -133,6 +133,9 @@ public class SetupManager {
             _logCallback.accept(ex.getMessage());
             _logCallback.accept(_translator.Localize("Progress.Scripts.SetupFailed"));
         }
+
+        // Set the active scene to "Install Complete"
+        InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
     }
 
     // --- OS Specific Setup Methods ---
@@ -443,9 +446,6 @@ public class SetupManager {
             if (_os.contains("linux") || _os.contains("mac")) {
                 makeScriptExecutable(scriptFile);
             }
-
-            // Set the active scene to "Install Complete"
-            InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
         } catch (IOException e) {
             // Log an error if the script file creation fails
             _logger.Error("Failed to write scripts: " + e.getMessage());
