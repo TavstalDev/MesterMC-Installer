@@ -107,6 +107,8 @@ Progress:
     DesktopFileCreationError: "Hiba: Az asztali parancsikon létrehozása sikertelen: %error%"
     ShortcutCopyError: "Hiba: A parancsikon(ok) másolása sikertelen: %error%"
     SetupFailed: "A telepítés sikertelen volt. Kérem, ellenőrizze a naplófájlokat a részletekért."
+    MacAppBundleCreationError: "Hiba: A Mac alkalmazás csomag létrehozása sikertelen: %error%"
+    MacUninstallerBundleCreationError: "Hiba: A Mac eltávolító csomag létrehozása sikertelen: %error%"
 
 Complete:
   Title: "A MesterMC telepítésének befejezése"

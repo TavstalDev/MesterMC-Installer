@@ -107,6 +107,8 @@ Progress:
     DesktopFileCreationError: "Error: Failed to create desktop shortcut: %error%"
     ShortcutCopyError: "Error: Failed to copy shortcut(s): %error%"
     SetupFailed: "The installation failed. Please check the log files for details."
+    MacAppBundleCreationError: "Error: Failed to create Mac application bundle: %error%"
+    MacUninstallerBundleCreationError: "Error: Failed to create Mac uninstaller bundle: %error%"
 
 Complete:
   Title: "MesterMC Installation Complete"
