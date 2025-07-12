@@ -344,8 +344,9 @@ public class SetupManager {
                 // Check if a desktop shortcut should be created
                 if (InstallerApplication.shouldCreateDesktopShortcut()) {
                     _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
-                    // Create a symlink to the .app bundle
-                    Files.copy(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+                    // Create a copy of the original .app bundle
+                    //Files.copy(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+                    PathUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath());
                     // Log the creation of the desktop shortcut
                     _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
                 }
@@ -353,8 +354,9 @@ public class SetupManager {
                 // Check if a start menu shortcut should be created
                 if (InstallerApplication.shouldCreateStartMenuShortcut()) {
                     _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
-                    // Create a symlink to the .app bundle
-                    Files.copy(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+                    // Create a copy of the original .app bundle
+                    //Files.copy(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+                    PathUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath());
                     // Log the creation of the start menu shortcut
                     _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
                 }

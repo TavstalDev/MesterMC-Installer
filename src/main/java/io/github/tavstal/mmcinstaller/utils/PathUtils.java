@@ -8,7 +8,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * Utility class for handling file paths and directories across different operating systems.
@@ -202,5 +203,51 @@ public class PathUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Copies the contents of a directory from the source path to the target path.
+     * <br/>
+     * This method uses `Files.walkFileTree` to traverse the directory tree and copy
+     * all files and subdirectories from the source to the target location.
+     * <br/>
+     * If a file or directory already exists at the target location, it will be replaced.
+     *
+     * @param source The source directory to copy from.
+     * @param target The target directory to copy to.
+     * @throws IOException If an I/O error occurs during the copy process.
+     */
+    public static void copyDirectory(Path source, Path target) throws IOException {
+        Files.walkFileTree(source, new SimpleFileVisitor<>() {
+            /**
+             * Creates the corresponding directory in the target location before visiting its contents.
+             *
+             * @param dir The current directory being visited.
+             * @param attrs The attributes of the directory.
+             * @return `FileVisitResult.CONTINUE` to continue the directory traversal.
+             * @throws IOException If an error occurs while creating the directory.
+             */
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                Path targetDir = target.resolve(source.relativize(dir));
+                Files.createDirectories(targetDir);
+                return FileVisitResult.CONTINUE;
+            }
+
+            /**
+             * Copies a file from the source directory to the target directory.
+             *
+             * @param file The file being visited.
+             * @param attrs The attributes of the file.
+             * @return `FileVisitResult.CONTINUE` to continue the file traversal.
+             * @throws IOException If an error occurs while copying the file.
+             */
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Path targetFile = target.resolve(source.relativize(file));
+                Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }
