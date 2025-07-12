@@ -522,6 +522,15 @@ public class SetupManager {
         Path installDir = _installDir.toPath();
         Path appBundlePath = installDir.resolve(desktopFileName);
         try {
+            File appBundleFile = appBundlePath.toFile();
+            if (appBundleFile.exists()) {
+                // If the app bundle already exists, delete it before creating a new one
+                if (appBundleFile.isDirectory())
+                    PathUtils.deleteDirectory(appBundlePath);
+                else
+                    Files.delete(appBundlePath);
+            }
+
             // 1. Create the main .app bundle directory
             Files.createDirectories(appBundlePath);
 

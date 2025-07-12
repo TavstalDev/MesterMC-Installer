@@ -250,4 +250,45 @@ public class PathUtils {
             }
         });
     }
+
+    /**
+     * Deletes a directory and all its contents recursively.
+     * <br/>
+     * This method uses `Files.walkFileTree` to traverse the directory tree and delete
+     * all files and subdirectories before deleting the directory itself.
+     *
+     * @param path The path to the directory to be deleted.
+     * @throws IOException If an I/O error occurs during the deletion process.
+     */
+    public static void deleteDirectory(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
+            /**
+             * Deletes a file during the traversal.
+             *
+             * @param file The file to be deleted.
+             * @param attrs The attributes of the file.
+             * @return `FileVisitResult.CONTINUE` to continue the traversal.
+             * @throws IOException If an error occurs while deleting the file.
+             */
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            /**
+             * Deletes a directory after all its contents have been visited and deleted.
+             *
+             * @param dir The directory to be deleted.
+             * @param exc An exception thrown during the visit, or `null` if none.
+             * @return `FileVisitResult.CONTINUE` to continue the traversal.
+             * @throws IOException If an error occurs while deleting the directory.
+             */
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
 }
