@@ -206,7 +206,7 @@ uninstall:
       # --- Remove desktop shortcut if it exists ---
       if [ -f "$DESKTOP_SHORTCUT" ]; then
         echo "Removing desktop shortcut: \"$DESKTOP_SHORTCUT\""
-        rm -f "$DESKTOP_SHORTCUT"
+        rm -rf "$DESKTOP_SHORTCUT"
       else
         echo "Desktop shortcut not found: \"$DESKTOP_SHORTCUT\""
       fi
@@ -214,7 +214,7 @@ uninstall:
       # --- Remove Start Menu shortcut if it exists ---
       if [ -f "$STARTMENU_SHORTCUT" ]; then
         echo "Removing Start Menu shortcut: \"$STARTMENU_SHORTCUT\""
-        rm -f "$STARTMENU_SHORTCUT"
+        rm -rf "$STARTMENU_SHORTCUT"
       else
         echo "Start Menu shortcut not found: \"$STARTMENU_SHORTCUT\""
       fi
