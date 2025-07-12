@@ -194,7 +194,7 @@ uninstall:
       nohup "$TEMP_SCRIPT" > /dev/null 2>&1 &
       exit 0
   zsh:
-    file_name: "Uninstall.zsh"
+    file_name: "Uninstall.app"
     content: |
       #!/bin/zsh
       INSTALL_DIR="%installDir%"
