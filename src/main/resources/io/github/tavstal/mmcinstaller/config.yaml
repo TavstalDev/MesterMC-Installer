@@ -74,7 +74,7 @@ install:
       <plist version="1.0">
         <dict>
           <key>CFBundleExecutable</key>
-          <string>launcher.sh</string>
+          <string>execute.sh</string>
           <key>CFBundleIconFile</key>
           <string>%iconPath%</string> 
           <key>CFBundleIdentifier</key>
