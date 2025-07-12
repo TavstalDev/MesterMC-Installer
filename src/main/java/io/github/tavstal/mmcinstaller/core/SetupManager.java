@@ -100,10 +100,7 @@ public class SetupManager {
                         ConfigLoader.get().install().zsh().content()
                                 .replaceAll("%dirPath%", installPath)
                                 .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
-                );
-
-                // Set the application launch path
-                InstallerApplication.applicationToLaunch = scriptFile.getAbsolutePath();*/
+                );*/
 
                 // Setup macOS-specific configurations
                 setupMac();
