@@ -74,13 +74,14 @@ public class SetupManager {
                 }
             }
 
-            // Copy common resources like icons and information files
-            copyResource("assets/icon.png", "icon.png");
-            File icoFile = copyResource("assets/favicon.ico", "icon.ico");
+            // Copy common resources
+            // Moved icons to their own OS-specific setup methods
+            // to avoid unnecessary copying and bloating the installation directory
             copyResource("info.txt", "info.txt");
 
             // Perform OS-specific setup
             if (_os.contains("win")) { // WINDOWS
+                File icoFile = copyResource("assets/favicon.ico", "icon.ico");
                 _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Windows")));
                 // Create the batch script file
                 createScriptFile(
@@ -111,6 +112,9 @@ public class SetupManager {
                     _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Linux")));
                 else
                     _logCallback.accept(_translator.Localize("Progress.Scripts.UnsupportedOS", Map.of("os", _os)));
+
+                copyResource("assets/icon.png", "icon.png");
+
                 // Create the bash script file
                 File scriptFile = createScriptFile(
                         ConfigLoader.get().install().bash().fileName(),
@@ -389,9 +393,7 @@ public class SetupManager {
             if (InstallerApplication.shouldCreateDesktopShortcut()) {
                 _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
                 // Create a symlink to the .app bundle
-                if (Files.exists(desktopShortcutFile.toPath()))
-                    Files.delete(desktopShortcutFile.toPath()); // Remove existing shortcut if it exists
-                Files.createSymbolicLink(appBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath());
+                Files.copy(appBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
                 // Log the creation of the desktop shortcut
                 _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
             }
@@ -400,9 +402,7 @@ public class SetupManager {
             if (InstallerApplication.shouldCreateStartMenuShortcut()) {
                 _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
                 // Create a symlink to the .app bundle
-                if (Files.exists(startMenuFile.toPath()))
-                    Files.delete(startMenuFile.toPath()); // Remove existing shortcut if it exists
-                Files.createSymbolicLink(appBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath());
+                Files.copy(appBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
                 // Log the creation of the start menu shortcut
                 _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
             }
