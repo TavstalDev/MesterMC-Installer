@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import javafx.fxml.FXML;
@@ -59,12 +60,12 @@ public class InstallCompleteController implements Initializable {
             try {
                 Process process;
                 if (osName.contains("mac")) {
-                    process = new ProcessBuilder("open", InstallerApplication.applicationToLaunch)
+                    process = new ProcessBuilder("open", InstallerState.getApplicationToLaunch())
                             .inheritIO()
                             .start();
                 } else {
                     process = new ProcessBuilder()
-                            .command(InstallerApplication.applicationToLaunch)
+                            .command(InstallerState.getApplicationToLaunch())
                             .start();
                 }
                 _logger.Debug("Game launched successfully.");

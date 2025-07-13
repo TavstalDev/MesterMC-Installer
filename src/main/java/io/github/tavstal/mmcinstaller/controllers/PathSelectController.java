@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.ConfigLoader;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
@@ -57,7 +58,7 @@ public class PathSelectController implements Initializable {
         installPathAction.setText(_translator.Localize("InstallPath.Action"));
         freeSpaceText.setText(_translator.Localize("InstallPath.FreeSpace", new HashMap<>() {
             {
-                put("freeSpace", InstallerApplication.getRequiredSpace());
+                put("freeSpace", InstallerState.getRequiredSpace());
             }
         }));
 
@@ -68,18 +69,18 @@ public class PathSelectController implements Initializable {
 
         _defaultPath = PathUtils.getDefaultInstallationPath(ConfigLoader.get().install().defaultDirs().appData()).getAbsolutePath();
 
-        if (InstallerApplication.getCurrentPath() != null) {
-            directoryTextArea.setText(InstallerApplication.getCurrentPath());
+        if (InstallerState.getCurrentPath() != null) {
+            directoryTextArea.setText(InstallerState.getCurrentPath());
         } else {
             directoryTextArea.setText(_defaultPath);
-            InstallerApplication.setCurrentPath(_defaultPath);
+            InstallerState.setCurrentPath(_defaultPath);
         }
         directoryTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
             File directory = new File(newValue);
             if (directory.exists() && directory.isDirectory()) {
-                InstallerApplication.setCurrentPath(newValue);
+                InstallerState.setCurrentPath(newValue);
             } else {
-                InstallerApplication.setCurrentPath(_defaultPath);
+                InstallerState.setCurrentPath(_defaultPath);
             }
         });
     }
@@ -138,7 +139,7 @@ public class PathSelectController implements Initializable {
 
         if (selectedDirectory != null) {
             directoryTextArea.setText(selectedDirectory.getAbsolutePath());
-            InstallerApplication.setCurrentPath(selectedDirectory.getAbsolutePath());
+            InstallerState.setCurrentPath(selectedDirectory.getAbsolutePath());
         }
     }
 }

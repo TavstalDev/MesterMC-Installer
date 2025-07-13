@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
@@ -78,10 +79,10 @@ public class ReviewController implements Initializable {
     public void updateReviewContent() {
         String reviewContent = _translator.Localize("Review.Content", new HashMap<>() {
             {
-                put("installPath", InstallerApplication.getCurrentPath());
-                put("startMenuPath", InstallerApplication.getStartMenuPath());
-                put("desktopShortcut", InstallerApplication.shouldCreateDesktopShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
-                put("startMenuShortcut", InstallerApplication.shouldCreateStartMenuShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
+                put("installPath", InstallerState.getCurrentPath());
+                put("startMenuPath", InstallerState.getStartMenuPath());
+                put("desktopShortcut", InstallerState.shouldCreateDesktopShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
+                put("startMenuShortcut", InstallerState.shouldCreateStartMenuShortcut() ? InstallerApplication.getTranslator().Localize("Common.YesText") : InstallerApplication.getTranslator().Localize("Common.NoText"));
             }
         });
         reviewTextArea.setText(reviewContent);

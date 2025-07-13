@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.ConfigLoader;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
@@ -69,18 +70,18 @@ public class ShortcutController implements Initializable {
 
         _defaultPath = PathUtils.getStartMenuDirectory(ConfigLoader.get().install().defaultDirs().startMenu()).toPath().toAbsolutePath().toString();
 
-        if (InstallerApplication.getStartMenuPath() != null) {
-            directoryTextArea.setText(InstallerApplication.getStartMenuPath());
+        if (InstallerState.getStartMenuPath() != null) {
+            directoryTextArea.setText(InstallerState.getStartMenuPath());
         } else {
             directoryTextArea.setText(_defaultPath);
-            InstallerApplication.setStartMenuPath(_defaultPath);
+            InstallerState.setStartMenuPath(_defaultPath);
         }
         directoryTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
             File directory = new File(newValue);
             if (directory.exists() && directory.isDirectory()) {
-                InstallerApplication.setStartMenuPath(newValue);
+                InstallerState.setStartMenuPath(newValue);
             } else {
-                InstallerApplication.setStartMenuPath(_defaultPath);
+                InstallerState.setStartMenuPath(_defaultPath);
             }
         });
     }
@@ -121,7 +122,7 @@ public class ShortcutController implements Initializable {
      */
     @FXML
     public void onDesktopCheckBoxChange() {
-        InstallerApplication.setCreateDesktopShortcut(desktopCheckBox.isSelected());
+        InstallerState.setCreateDesktopShortcut(desktopCheckBox.isSelected());
     }
 
     /**
@@ -131,7 +132,7 @@ public class ShortcutController implements Initializable {
      */
     @FXML
     public void onStartMenuCheckBoxChange() {
-        InstallerApplication.setCreateStartMenuShortcut(startMenuCheckBox.isSelected());
+        InstallerState.setCreateStartMenuShortcut(startMenuCheckBox.isSelected());
         startMenuDirectoryVBox.setDisable(!startMenuCheckBox.isSelected());
         if (startMenuCheckBox.isSelected()) {
             directoryTextArea.setDisable(false);
@@ -168,7 +169,7 @@ public class ShortcutController implements Initializable {
 
         if (selectedDirectory != null) {
             directoryTextArea.setText(selectedDirectory.getAbsolutePath());
-            InstallerApplication.setStartMenuPath(selectedDirectory.getAbsolutePath());
+            InstallerState.setStartMenuPath(selectedDirectory.getAbsolutePath());
         }
     }
 }

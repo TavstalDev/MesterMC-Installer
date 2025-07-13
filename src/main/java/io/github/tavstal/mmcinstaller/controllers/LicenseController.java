@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
@@ -43,8 +44,8 @@ public class LicenseController implements Initializable {
         // Translator instance for localization.
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
-        acceptLicenseCheckBox.setSelected(InstallerApplication.isLicenseAccepted());
-        nextButton.setDisable(!InstallerApplication.isLicenseAccepted());
+        acceptLicenseCheckBox.setSelected(InstallerState.isLicenseAccepted());
+        nextButton.setDisable(!InstallerState.isLicenseAccepted());
 
         licenseTitle.setText(_translator.Localize("License.Title"));
         licenseDescription.setText(_translator.Localize("License.Description"));
@@ -63,7 +64,7 @@ public class LicenseController implements Initializable {
      */
     @FXML
     protected void onLicenseCheckBoxChanged() {
-        InstallerApplication.setLicenseAccepted(acceptLicenseCheckBox.isSelected());
+        InstallerState.setLicenseAccepted(acceptLicenseCheckBox.isSelected());
         nextButton.setDisable(!acceptLicenseCheckBox.isSelected());
     }
 

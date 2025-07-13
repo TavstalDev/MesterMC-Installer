@@ -95,7 +95,7 @@ public class InstallerApplication extends Application {
         _stage.setHeight(HEIGHT);
         _stage.setMaxHeight(HEIGHT);
         _stage.setResizable(false);
-        _stage.setAlwaysOnTop(true);
+        //_stage.setAlwaysOnTop(true);
 
         _stage.centerOnScreen();
         _stage.show();
@@ -122,8 +122,9 @@ public class InstallerApplication extends Application {
                 Header contentLengthHeader = response.getFirstHeader("Content-Length");
                 if (contentLengthHeader != null) {
                     try {
-                        _requiredSpace = Long.parseLong(contentLengthHeader.getValue());
-                        _logger.Debug("Content-Length: " + _requiredSpace + " bytes");
+                        long requiredSpace = Long.parseLong(contentLengthHeader.getValue());
+                        InstallerState.setRequiredSpace(requiredSpace);
+                        _logger.Debug("Content-Length: " + requiredSpace + " bytes");
                     } catch (NumberFormatException e) {
                         _logger.Error("Content-Length header value is not a valid number: " + contentLengthHeader.getValue());
                     }
@@ -147,108 +148,4 @@ public class InstallerApplication extends Application {
     public static void main(String[] args) {
         launch();
     }
-
-
-
-    private static boolean _isLicenseAccepted = false;
-    /**
-     * Checks if the license is accepted.
-     *
-     * @return True if the license is accepted, false otherwise.
-     */
-    public static boolean isLicenseAccepted() {
-        return _isLicenseAccepted;
-    }
-    /**
-     * Sets the license acceptance state.
-     *
-     * @param isLicenseAccepted True if the license is accepted, false otherwise.
-     */
-    public static void setLicenseAccepted(boolean isLicenseAccepted) {
-        _isLicenseAccepted = isLicenseAccepted;
-    }
-
-    private static String _currentPath = null;
-    /**
-     * Gets the current installation path.
-     *
-     * @return The current installation path.
-     */
-    public static String getCurrentPath() {
-        return _currentPath;
-    }
-    /**
-     * Sets the current installation path.
-     *
-     * @param currentPath The installation path to set.
-     */
-    public static void setCurrentPath(String currentPath) {
-        _currentPath = currentPath;
-    }
-
-    private static boolean _createDesktopShortcut = true;
-    /**
-     * Checks if a desktop shortcut should be created.
-     *
-     * @return True if a desktop shortcut should be created, false otherwise.
-     */
-    public static boolean shouldCreateDesktopShortcut() {
-        return _createDesktopShortcut;
-    }
-    /**
-     * Sets the desktop shortcut creation state.
-     *
-     * @param createDesktopShortcut True to create a desktop shortcut, false otherwise.
-     */
-    public static void setCreateDesktopShortcut(boolean createDesktopShortcut) {
-        _createDesktopShortcut = createDesktopShortcut;
-    }
-
-    private static String _startMenuPath = null;
-    /**
-     * Gets the Start Menu shortcut path.
-     *
-     * @return The Start Menu shortcut path.
-     */
-    public static String getStartMenuPath() {
-        return _startMenuPath;
-    }
-    /**
-     * Sets the Start Menu shortcut path.
-     *
-     * @param startMenuPath The Start Menu shortcut path to set.
-     */
-    public static void setStartMenuPath(String startMenuPath) {
-        _startMenuPath = startMenuPath;
-    }
-
-    private static boolean _createStartMenuShortcut = true;
-    /**
-     * Checks if a Start Menu shortcut should be created.
-     *
-     * @return True if a Start Menu shortcut should be created, false otherwise.
-     */
-    public static boolean shouldCreateStartMenuShortcut() {
-        return _createStartMenuShortcut;
-    }
-    /**
-     * Sets the Start Menu shortcut creation state.
-     *
-     * @param createStartMenuShortcut True to create a Start Menu shortcut, false otherwise.
-     */
-    public static void setCreateStartMenuShortcut(boolean createStartMenuShortcut) {
-        _createStartMenuShortcut = createStartMenuShortcut;
-    }
-
-    private static long _requiredSpace = 0;
-    /**
-     * Gets the required space for installation in MB.
-     *
-     * @return The required space as a formatted string.
-     */
-    public static String getRequiredSpace() {
-        return String.format("%d MB", _requiredSpace / (1024 * 1024));
-    }
-
-    public static String applicationToLaunch = null;
 }

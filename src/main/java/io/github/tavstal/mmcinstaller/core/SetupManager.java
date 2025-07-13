@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.core;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
 
@@ -120,7 +121,7 @@ public class SetupManager {
                                 .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
                 );
                 // Set the application launch path
-                InstallerApplication.applicationToLaunch = scriptFile.getAbsolutePath();
+                InstallerState.setApplicationToLaunch(scriptFile.getAbsolutePath());
                 // Setup Linux-specific configurations
                 setupLinux();
             }
@@ -163,7 +164,7 @@ public class SetupManager {
             return;
         }
         // Set the application launch path to the executable file
-        InstallerApplication.applicationToLaunch = exeFile.getAbsolutePath();
+        InstallerState.setApplicationToLaunch(exeFile.getAbsolutePath());
 
         // Create the shortcut using a PowerShell script
         try {
@@ -200,7 +201,7 @@ public class SetupManager {
         // Copy the shortcut to the desktop and start menu
         try {
             // Check if a desktop shortcut should be created
-            if (InstallerApplication.shouldCreateDesktopShortcut()) {
+            if (InstallerState.shouldCreateDesktopShortcut()) {
                 _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
                 // Copy the shortcut file to the desktop directory
                 Files.copy(shortcutPath.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -209,7 +210,7 @@ public class SetupManager {
             }
 
             // Check if a start menu shortcut should be created
-            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+            if (InstallerState.shouldCreateStartMenuShortcut()) {
                 _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
                 // Copy the shortcut file to the start menu directory
                 Files.copy(shortcutPath.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -267,7 +268,7 @@ public class SetupManager {
             Files.writeString(linuxLaunchFile.toPath(), desktopFileContent);
 
             // Check if a desktop shortcut should be created
-            if (InstallerApplication.shouldCreateDesktopShortcut()) {
+            if (InstallerState.shouldCreateDesktopShortcut()) {
                 _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
                 // Copy the .desktop file to the desktop directory
                 Files.copy(linuxLaunchFile.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -276,7 +277,7 @@ public class SetupManager {
             }
 
             // Check if a start menu shortcut should be created
-            if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+            if (InstallerState.shouldCreateStartMenuShortcut()) {
                 _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
                 // Copy the .desktop file to the start menu directory
                 Files.copy(linuxLaunchFile.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -339,10 +340,10 @@ public class SetupManager {
             if (launchAppBundlePath != null) {
                 // Log the successful creation of the macOS app bundle
                 _logger.Debug("Created macOS app bundle at: " + launchAppBundlePath.toAbsolutePath());
-                InstallerApplication.applicationToLaunch = launchAppBundlePath.toFile().getAbsolutePath();
+                InstallerState.setApplicationToLaunch(launchAppBundlePath.toFile().getAbsolutePath());
 
                 // Check if a desktop shortcut should be created
-                if (InstallerApplication.shouldCreateDesktopShortcut()) {
+                if (InstallerState.shouldCreateDesktopShortcut()) {
                     _logger.Debug("Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
                     // Create a copy of the original .app bundle
                     //Files.copy(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
@@ -352,7 +353,7 @@ public class SetupManager {
                 }
 
                 // Check if a start menu shortcut should be created
-                if (InstallerApplication.shouldCreateStartMenuShortcut()) {
+                if (InstallerState.shouldCreateStartMenuShortcut()) {
                     _logger.Debug("Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
                     // Create a copy of the original .app bundle
                     //Files.copy(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);

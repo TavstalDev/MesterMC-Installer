@@ -120,6 +120,15 @@ public class InstallerState {
     }
 
     /**
+     * Retrieves the required disk space for the installation in bytes.
+     *
+     * @return The required disk space as a long value in bytes.
+     */
+    public static long getRequiredSpaceInBytes() {
+        return requiredSpace;
+    }
+
+    /**
      * Retrieves the required disk space for the installation.
      *
      * @return The required disk space as a formatted String in MB.
