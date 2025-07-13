@@ -254,4 +254,4 @@ uninstaller: |
   installDir: "%installDir%"
   startMenuDir: "%startMenuDir%"
   desktopShortcut: "%desktopShortcut%"
-  startmenuShortcut: "%startmenuShortcut%"
+  startMenuShortcut: "%startMenuShortcut%"
