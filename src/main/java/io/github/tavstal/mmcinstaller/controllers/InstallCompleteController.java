@@ -40,10 +40,18 @@ public class InstallCompleteController implements Initializable {
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
         // Set localized text for UI elements.
-        finishedTitle.setText(_translator.Localize("Complete.Title"));
-        finishedDescription.setText(_translator.Localize("Complete.Description"));
-        finishedAction.setText(_translator.Localize("Complete.Action"));
-        launchGameCheckBox.setText(_translator.Localize("Complete.LaunchGameCheckBox"));
+        if (InstallerState.getIsUninstallModeActive()) {
+            finishedTitle.setText(_translator.Localize("CompleteUninstall.Title"));
+            finishedDescription.setText(_translator.Localize("CompleteUninstall.Description"));
+            finishedAction.setText(_translator.Localize("CompleteUninstall.Action"));
+            launchGameCheckBox.setVisible(false);
+        } else {
+            finishedTitle.setText(_translator.Localize("Complete.Title"));
+            finishedDescription.setText(_translator.Localize("Complete.Description"));
+            finishedAction.setText(_translator.Localize("Complete.Action"));
+            launchGameCheckBox.setText(_translator.Localize("Complete.LaunchGameCheckBox"));
+            launchGameCheckBox.setVisible(true);
+        }
         finishButton.setText(_translator.Localize("Common.Finish"));
     }
 

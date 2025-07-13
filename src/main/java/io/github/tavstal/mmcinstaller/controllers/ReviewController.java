@@ -50,12 +50,20 @@ public class ReviewController implements Initializable {
         _translator = InstallerApplication.getTranslator();
 
         updateReviewContent();
-        reviewTitle.setText(_translator.Localize("Review.Title"));
-        reviewDescription.setText(_translator.Localize("Review.Description"));
-        reviewAction.setText(_translator.Localize("Review.Action"));
+        if (InstallerState.getIsUninstallModeActive()) {
+            reviewTitle.setText(_translator.Localize("ReviewUninstall.Title"));
+            reviewDescription.setText(_translator.Localize("ReviewUninstall.Description"));
+            reviewAction.setText(_translator.Localize("ReviewUninstall.Action"));
+            nextButton.setText(_translator.Localize("Common.Uninstall"));
+        } else {
+            reviewTitle.setText(_translator.Localize("Review.Title"));
+            reviewDescription.setText(_translator.Localize("Review.Description"));
+            reviewAction.setText(_translator.Localize("Review.Action"));
+            nextButton.setText(_translator.Localize("Common.Install"));
+        }
+
 
         backButton.setText(_translator.Localize("Common.Back"));
-        nextButton.setText(_translator.Localize("Common.Install"));
         cancelButton.setText(_translator.Localize("Common.Cancel"));
 
         rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
@@ -77,6 +85,18 @@ public class ReviewController implements Initializable {
      * Updates the content of the review text area with localized and dynamic data.
      */
     public void updateReviewContent() {
+        if (InstallerState.getIsUninstallModeActive()) {
+            String reviewContent = _translator.Localize("Review.Content", new HashMap<>() {
+                {
+                    put("installPath", InstallerState.getCurrentPath());
+                    put("startMenuPath", InstallerState.getStartMenuPath());
+                    put("desktopShortcut", InstallerState.getShortcutPath());
+                    put("startMenuShortcut", InstallerState.getStartMenuPath());
+                }
+            });
+            reviewTextArea.setText(reviewContent);
+            return;
+        }
         String reviewContent = _translator.Localize("Review.Content", new HashMap<>() {
             {
                 put("installPath", InstallerState.getCurrentPath());
@@ -104,6 +124,11 @@ public class ReviewController implements Initializable {
      */
     @FXML
     protected void onBackButtonClick() {
+        if (InstallerState.getIsUninstallModeActive()) {
+            InstallerApplication.setActiveScene(SceneManager.getWelcomeScene());
+            _logger.Debug("Switching to WelcomeView.fxml");
+            return;
+        }
         InstallerApplication.setActiveScene(SceneManager.getShortcutScene());
         _logger.Debug("Switching to ShortcutView.fxml");
     }

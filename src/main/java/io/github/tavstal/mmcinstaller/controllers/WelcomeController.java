@@ -43,16 +43,15 @@ public class WelcomeController implements Initializable {
             welcomeTitle.setText(_translator.Localize("WelcomeUninstall.Title"));
             welcomeDescription.setText(_translator.Localize("WelcomeUninstall.Description"));
             welcomeAction.setText(_translator.Localize("WelcomeUninstall.Action"));
-            nextButton.setText(_translator.Localize("Common.Next"));
-            cancelButton.setText(_translator.Localize("Common.Cancel"));
         }
         else {
             welcomeTitle.setText(_translator.Localize("Welcome.Title"));
             welcomeDescription.setText(_translator.Localize("Welcome.Description"));
             welcomeAction.setText(_translator.Localize("Welcome.Action"));
-            nextButton.setText(_translator.Localize("Common.Next"));
-            cancelButton.setText(_translator.Localize("Common.Cancel"));
         }
+
+        nextButton.setText(_translator.Localize("Common.Next"));
+        cancelButton.setText(_translator.Localize("Common.Cancel"));
         _logger.Debug("WelcomeController initialized with localized text.");
     }
 
@@ -64,8 +63,8 @@ public class WelcomeController implements Initializable {
     @FXML
     protected void onNextButtonClick() {
         if (InstallerState.getIsUninstallModeActive()) {
-            _logger.Debug("Uninstall mode is active, switching to ProgressView.fxml.");
-            InstallerApplication.setActiveScene(SceneManager.getInstallProgressScene());
+            _logger.Debug("Uninstall mode is active, switching to ReviewView.fxml.");
+            InstallerApplication.setActiveScene(SceneManager.getReviewScene());
             return;
         }
         InstallerApplication.setActiveScene(SceneManager.getLicenseScene());
