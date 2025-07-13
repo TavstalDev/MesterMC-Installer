@@ -27,27 +27,6 @@ public class InstallerApplication extends Application {
 
     //#region Variables
     private static Stage _stage;
-    public static void changeStageSize(boolean isLanguageView) {
-        if (isLanguageView) {
-            _stage.setWidth(LANG_WIDTH);
-            _stage.setHeight(LANG_HEIGHT);
-        } else {
-            _stage.setWidth(WIDTH);
-            _stage.setHeight(HEIGHT);
-        }
-        _stage.toFront();
-        _stage.requestFocus();
-    }
-
-    /**
-     * Sets the active scene for the application.
-     *
-     * @param scene The scene to set as active.
-     */
-    public static void setActiveScene(Scene scene) {
-        _stage.setScene(scene);
-    }
-
     private static InstallerLogger _logger;
     /**
      * Gets the logger instance.
@@ -102,12 +81,7 @@ public class InstallerApplication extends Application {
             _logger.Error("An error occurred while loading the icon: " + e.getMessage());
         }
 
-        _stage.setMinWidth(LANG_WIDTH);
-        _stage.setWidth(LANG_WIDTH);
-        _stage.setMaxWidth(LANG_WIDTH);
-        _stage.setMinHeight(LANG_HEIGHT);
-        _stage.setHeight(LANG_HEIGHT);
-        _stage.setMaxHeight(LANG_HEIGHT);
+        changeStageSize(true);
         _stage.setResizable(false);
 
         _stage.centerOnScreen();
@@ -161,4 +135,55 @@ public class InstallerApplication extends Application {
     public static void main(String[] args) {
         launch();
     }
+
+    //#region Functions
+    /**
+     * Sets the active scene for the application.
+     *
+     * @param scene The scene to set as active.
+     */
+    public static void setActiveScene(Scene scene) {
+        _stage.setScene(scene);
+    }
+
+    /**
+     * Adjusts the size of the application stage based on the specified view type.
+     *
+     * @param isLanguageView If true, sets the stage size to the dimensions of the language view;
+     *                       otherwise, sets it to the default dimensions.
+     */
+    public static void changeStageSize(boolean isLanguageView) {
+        if (isLanguageView) {
+            setWidth(LANG_WIDTH);
+            setHeight(LANG_HEIGHT);
+        } else {
+            setWidth(WIDTH);
+            setHeight(HEIGHT);
+        }
+    }
+
+    /**
+     * Sets the width of the application stage to the specified value.
+     * Ensures that the minimum, current, and maximum widths are all set to the same value.
+     *
+     * @param width The width to set for the stage.
+     */
+    public static void setWidth(int width) {
+        _stage.setMinWidth(width);
+        _stage.setWidth(width);
+        _stage.setMaxWidth(width);
+    }
+
+    /**
+     * Sets the height of the application stage to the specified value.
+     * Ensures that the minimum, current, and maximum heights are all set to the same value.
+     *
+     * @param height The height to set for the stage.
+     */
+    public static void setHeight(int height) {
+        _stage.setMinHeight(height);
+        _stage.setHeight(height);
+        _stage.setMaxHeight(height);
+    }
+    //#endregion
 }
