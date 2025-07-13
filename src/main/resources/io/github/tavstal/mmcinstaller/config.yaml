@@ -1,14 +1,14 @@
 # The language used in the UI and messages.
 # Supported languages: eng, hun
 lang: "hun"
-debug: true
+debug: false
 project:
   # The name of the project.
-  name: "io.github.tavstal.mmcinstaller"
+  name: "${group}.mmcinstaller"
   # The version of the project.
-  version: "1.0.0"
+  version: "${version}"
   # The author of the project.
-  author: "Solymosi 'Tavstal' Zoltán"
+  author: "${authors}"
 download:
   # The URL to download the latest version of the file.
   link: "https://mestermc.b-cdn.net/MesterMC.jar"

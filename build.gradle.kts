@@ -77,8 +77,22 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+tasks.processResources {
+    filteringCharset = "UTF-8"
+
+    val expandProps = mapOf(
+        "version" to projectVersion,
+        "group" to projectGroup,
+        "authors" to authors,
+    )
+
+    filesMatching(listOf(
+        "config.yaml"
+    )) {
+        // The 'expand' method directly takes a Map in Kotlin DSL
+        expand(expandProps)
+    }
+
 }
 
 //#region JLink Configuration
@@ -113,6 +127,10 @@ jlink {
 //#endregion
 
 //#region Tasks
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 abstract class WriteFile : DefaultTask() {
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
