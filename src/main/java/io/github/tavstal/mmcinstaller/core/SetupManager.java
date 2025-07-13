@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * The `SetupManager` class is responsible for managing the setup process of the application.
@@ -26,28 +25,22 @@ import java.util.function.Consumer;
 public class SetupManager {
     private final InstallerLogger _logger; // Logger instance for logging setup-related messages
     private final InstallerTranslator _translator; // Translator instance for localizing messages
-    private final Consumer<String> _logCallback; // Callback function for logging messages to the user interface
     private final File _jarFile; // Reference to the JAR file being installed
     private final File _installDir; // Directory where the application will be installed
     private final File _startMenuDir; // Directory for creating start menu shortcuts (if applicable)
     private final String _os; // Operating system name in lowercase
 
-    /**
-     * Constructs a new `SetupManager` instance.
-     *
-     * @param jarFile The JAR file to be installed.
-     * @param installDir The directory where the application will be installed.
-     * @param startMenuDir The directory for creating start menu shortcuts (if applicable).
-     * @param logCallback A callback function for logging messages to the user interface.
-     */
-    public SetupManager(File jarFile, File installDir, File startMenuDir, Consumer<String> logCallback) {
+    public SetupManager(File jarFile, File installDir, File startMenuDir) {
         this._logger = InstallerApplication.getLogger().WithModule(this.getClass());
         this._translator = InstallerApplication.getTranslator();
         this._jarFile = jarFile;
         this._installDir = installDir;
         this._startMenuDir = startMenuDir;
-        this._logCallback = logCallback;
         this._os = System.getProperty("os.name").toLowerCase();
+    }
+
+    private void logStep(String message) {
+        // TODO: Implement a method to log steps in the setup process
     }
 
     // --- Main Setup Method ---
@@ -70,7 +63,7 @@ public class SetupManager {
                 if (!_startMenuDir.mkdirs()) {
                     // Log and notify if the start menu directory creation fails
                     _logger.Error("Failed to create start menu directory: " + _startMenuDir.getAbsolutePath());
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuDirCreationFailed", Map.of("path", _startMenuDir.getAbsolutePath())));
+                    logStep(_translator.Localize("Progress.Scripts.StartMenuDirCreationFailed", Map.of("path", _startMenuDir.getAbsolutePath())));
                     return;
                 }
             }
@@ -83,7 +76,7 @@ public class SetupManager {
             // Perform OS-specific setup
             if (_os.contains("win")) { // WINDOWS
                 File icoFile = copyResource("assets/favicon.ico", "icon.ico");
-                _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Windows")));
+                logStep(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Windows")));
                 // Create the batch script file
                 createScriptFile(
                         ConfigLoader.get().install().batch().fileName(),
@@ -94,7 +87,7 @@ public class SetupManager {
                 // Setup Windows-specific configurations
                 setupWindows(icoFile);
             } else if (_os.contains("mac")) { // MAC OS
-                _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "MacOS")));
+                logStep(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "MacOS")));
                 // Create the zsh script file
                 /*File scriptFile = createScriptFile(
                         ConfigLoader.get().install().zsh().fileName(),
@@ -107,9 +100,9 @@ public class SetupManager {
                 setupMac();
             } else {  // LINUX
                 if (_os.contains("linux"))
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Linux")));
+                    logStep(_translator.Localize("Progress.Scripts.DetectedOS", Map.of("os", "Linux")));
                 else
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.UnsupportedOS", Map.of("os", _os)));
+                    logStep(_translator.Localize("Progress.Scripts.UnsupportedOS", Map.of("os", _os)));
 
                 copyResource("assets/icon.png", "icon.png");
 
@@ -128,8 +121,8 @@ public class SetupManager {
         } catch (Exception ex) {
             // Log and notify if the setup process fails
             _logger.Error("Setup failed: " + ex.getMessage());
-            _logCallback.accept(ex.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.SetupFailed"));
+            logStep(ex.getMessage());
+            logStep(_translator.Localize("Progress.Scripts.SetupFailed"));
         }
 
         // Set the active scene to "Install Complete"
@@ -189,14 +182,17 @@ public class SetupManager {
         } catch (IOException | InterruptedException e) {
             // Log an error if the PowerShell script execution fails
             _logger.Error("Failed to create Windows shortcut: " + e.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.ShortcutCreationError", Map.of("error", e.getMessage())));
+            logStep(_translator.Localize("Progress.Scripts.ShortcutCreationError", Map.of("error", e.getMessage())));
             return;
         }
 
         // Define the desktop shortcut file
         File desktopShortcutFile = new File(desktopDir, "MesterMC.lnk");
+        InstallerState.setCurrentPath(desktopShortcutFile.getAbsolutePath());
+
         // Define the start menu shortcut file
         File startMenuFile = new File(_startMenuDir, "MesterMC.lnk");
+        InstallerState.setStartMenuPath(startMenuFile.getAbsolutePath());
 
         // Copy the shortcut to the desktop and start menu
         try {
@@ -206,7 +202,7 @@ public class SetupManager {
                 // Copy the shortcut file to the desktop directory
                 Files.copy(shortcutPath.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 // Log the creation of the desktop shortcut
-                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+                logStep(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
             }
 
             // Check if a start menu shortcut should be created
@@ -215,7 +211,7 @@ public class SetupManager {
                 // Copy the shortcut file to the start menu directory
                 Files.copy(shortcutPath.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 // Log the creation of the start menu shortcut
-                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+                logStep(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
             }
 
             // Delete the original shortcut file in the installation directory
@@ -226,7 +222,7 @@ public class SetupManager {
         } catch (IOException e) {
             // Log an error if copying the shortcut files fails
             _logger.Error("Failed to copy shortcut files: " + e.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.ShortcutCopyError", Map.of("error", e.getMessage())));
+            logStep(_translator.Localize("Progress.Scripts.ShortcutCopyError", Map.of("error", e.getMessage())));
         }
 
         // Create the uninstallation script file
@@ -261,8 +257,11 @@ public class SetupManager {
 
         // Define the desktop shortcut file
         File desktopShortcutFile = new File(desktopDir, desktopFileName);
+        InstallerState.setShortcutPath(desktopShortcutFile.getAbsolutePath());
         // Define the start menu shortcut file
         File startMenuFile = new File(_startMenuDir, desktopFileName);
+        InstallerState.setStartMenuShortcutPath(startMenuFile.getAbsolutePath());
+
         try {
             // Log the creation of the .desktop file
             _logger.Debug("Creating .desktop file: " + linuxLaunchFile.getAbsolutePath());
@@ -275,7 +274,7 @@ public class SetupManager {
                 // Copy the .desktop file to the desktop directory
                 Files.copy(linuxLaunchFile.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 // Log the creation of the desktop shortcut
-                _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+                logStep(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
             }
 
             // Check if a start menu shortcut should be created
@@ -284,12 +283,12 @@ public class SetupManager {
                 // Copy the .desktop file to the start menu directory
                 Files.copy(linuxLaunchFile.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 // Log the creation of the start menu shortcut
-                _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+                logStep(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
             }
         } catch (IOException e) {
             // Log an error if the .desktop file creation or shortcut creation fails
             _logger.Error("Failed to write .desktop file: " + e.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopFileCreationError", Map.of("error", e.getMessage())));
+            logStep(_translator.Localize("Progress.Scripts.DesktopFileCreationError", Map.of("error", e.getMessage())));
         }
 
         // Create the uninstallation script file
@@ -323,8 +322,10 @@ public class SetupManager {
 
         // Define the desktop shortcut file
         File desktopShortcutFile = new File(desktopDir, desktopFileName);
+        InstallerState.setShortcutPath(desktopShortcutFile.getAbsolutePath());
         // Define the start menu shortcut file
         File startMenuFile = new File(_startMenuDir, desktopFileName);
+        InstallerState.setStartMenuShortcutPath(startMenuFile.getAbsolutePath());
         // Copy the .icns icon file from resources
         String iconFileName = "icon.icns";
         File icnsFile = copyResource("assets/icon.icns", iconFileName);
@@ -353,7 +354,7 @@ public class SetupManager {
                     //Files.copy(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
                     PathUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath());
                     // Log the creation of the desktop shortcut
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
+                    logStep(_translator.Localize("Progress.Scripts.DesktopShortcutCreated", Map.of("filePath", desktopShortcutFile.getAbsolutePath())));
                 }
 
                 // Check if a start menu shortcut should be created
@@ -363,13 +364,13 @@ public class SetupManager {
                     //Files.copy(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
                     PathUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath());
                     // Log the creation of the start menu shortcut
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
+                    logStep(_translator.Localize("Progress.Scripts.StartMenuShortcutCreated", Map.of("filePath", startMenuFile.getAbsolutePath())));
                 }
             }
             else {
                 // Log an error if the app bundle creation failed
                 _logger.Error("Failed to create macOS app bundle.");
-                _logCallback.accept(_translator.Localize("Progress.Scripts.MacAppBundleCreationError"));
+                logStep(_translator.Localize("Progress.Scripts.MacAppBundleCreationError"));
             }
 
             // Create Uninstaller App Bundle
@@ -385,7 +386,7 @@ public class SetupManager {
             if (uninstallAppBundlePath == null) {
                 // Log an error if the uninstaller app bundle creation failed
                 _logger.Error("Failed to create macOS uninstaller app bundle.");
-                _logCallback.accept(_translator.Localize("Progress.Scripts.MacUninstallerBundleCreationError"));
+                logStep(_translator.Localize("Progress.Scripts.MacUninstallerBundleCreationError"));
             } else {
                 // Log the successful creation of the uninstaller app bundle
                 _logger.Debug("Created macOS uninstaller app bundle at: " + uninstallAppBundlePath.toAbsolutePath());
@@ -401,8 +402,43 @@ public class SetupManager {
 
     // --- Common Methods ---
 
+    /**
+     * Creates the uninstaller configuration file for the application.
+     * <br/>
+     * This method generates the content for the uninstaller configuration file
+     * based on the operating system and writes it to the appropriate location.
+     * <br/>
+     * On Windows, paths are escaped with double backslashes. On other operating systems,
+     * paths are used as-is. If the file creation fails, an error is logged.
+     */
     private void createUninstallerConfig() {
-
+        String content;
+        if (_os.contains("win")) {
+            // Generate the uninstaller configuration content for Windows
+            content = ConfigLoader.get().uninstallerConfig()
+                    .replace("%installDir%", InstallerState.getCurrentPath().replace("\\", "\\\\"))
+                    .replace("%startMenuDir%", InstallerState.getStartMenuPath().replace("\\", "\\\\"))
+                    .replace("%desktopShortcut%", InstallerState.getShortcutPath().replace("\\", "\\\\"))
+                    .replace("%startMenuShortcut%", InstallerState.getStartMenuShortcutPath().replace("\\", "\\\\"));
+        } else {
+            // Generate the uninstaller configuration content for other operating systems
+            content = ConfigLoader.get().uninstallerConfig()
+                    .replace("%installDir%", InstallerState.getCurrentPath())
+                    .replace("%startMenuDir%", InstallerState.getStartMenuPath())
+                    .replace("%desktopShortcut%", InstallerState.getShortcutPath())
+                    .replace("%startMenuShortcut%", InstallerState.getStartMenuShortcutPath());
+        }
+        // Get the file path for the uninstaller configuration
+        File uninstallerConfigFile = PathUtils.getUninstallerConfigFile();
+        try {
+            // Write the content to the uninstaller configuration file
+            Files.writeString(uninstallerConfigFile.toPath().toAbsolutePath(), content);
+            logStep("Uninstaller configuration file created: " + uninstallerConfigFile.getAbsolutePath());
+        } catch (Exception ex) {
+            // Log an error if the file writing fails
+            _logger.Error("Failed to write uninstaller configuration file: " + ex.getMessage());
+            logStep("Failed to write uninstaller configuration file: " + ex.getMessage());
+        }
     }
 
     /**
@@ -419,16 +455,16 @@ public class SetupManager {
         try (InputStream resourceStream = InstallerApplication.class.getResourceAsStream(resourcePath)) {
             // Check if the resource exists
             if (resourceStream == null) {
-                _logCallback.accept(_translator.Localize("Progress.Scripts.ResourceNotFound", Map.of("resource", targetFile.getAbsolutePath())));
+                logStep(_translator.Localize("Progress.Scripts.ResourceNotFound", Map.of("resource", targetFile.getAbsolutePath())));
                 return null;
             }
             // Copy the resource to the target file
             Files.copy(resourceStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopied", Map.of("fileName", targetFileName)));
+            logStep(_translator.Localize("Progress.Scripts.FileCopied", Map.of("fileName", targetFileName)));
         } catch (IOException e) {
             // Log an error if the copy operation fails
             _logger.Error(String.format("Failed to copy %s: %s", targetFileName, e.getMessage()));
-            _logCallback.accept(_translator.Localize("Progress.Scripts.FileCopyError", Map.of("fileName", targetFileName, "error", e.getMessage())));
+            logStep(_translator.Localize("Progress.Scripts.FileCopyError", Map.of("fileName", targetFileName, "error", e.getMessage())));
         }
         return targetFile;
     }
@@ -448,7 +484,7 @@ public class SetupManager {
             // Write the content to the script file
             Files.writeString(scriptFile.toPath(), content);
             _logger.Debug("Created script: " + scriptFile.getAbsolutePath());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreated", Map.of("filePath", scriptFile.getAbsolutePath())));
+            logStep(_translator.Localize("Progress.Scripts.LauncherCreated", Map.of("filePath", scriptFile.getAbsolutePath())));
 
             // If the OS is Linux or macOS, make the script executable
             if (_os.contains("linux") || _os.contains("mac")) {
@@ -457,7 +493,7 @@ public class SetupManager {
         } catch (IOException e) {
             // Log an error if the script file creation fails
             _logger.Error("Failed to write scripts: " + e.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.LauncherCreationError", Map.of("error", e.getMessage())));
+            logStep(_translator.Localize("Progress.Scripts.LauncherCreationError", Map.of("error", e.getMessage())));
         }
         return scriptFile;
     }
@@ -473,8 +509,8 @@ public class SetupManager {
         try {
             // Log the start of the process
             _logger.Debug("Attempting to make script executable: " + scriptFile.getAbsolutePath());
-            _logCallback.accept("Making launcher executable: " + scriptFile.getAbsolutePath());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.MakingExecutable"));
+            logStep("Making launcher executable: " + scriptFile.getAbsolutePath());
+            logStep(_translator.Localize("Progress.Scripts.MakingExecutable"));
 
             // Create a ProcessBuilder to execute the chmod command
             ProcessBuilder pb = new ProcessBuilder("chmod", "+x", scriptFile.getAbsolutePath());
@@ -488,12 +524,12 @@ public class SetupManager {
                 if (exitCode == 0) {
                     // Log success if chmod executed successfully
                     _logger.Info("Script made executable: " + scriptFile.getAbsolutePath());
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableMade", Map.of("filePath", scriptFile.getAbsolutePath())));
+                    logStep(_translator.Localize("Progress.Scripts.ExecutableMade", Map.of("filePath", scriptFile.getAbsolutePath())));
                 } else {
                     // Read and log the error stream if chmod failed
                     String error = new String(p.getErrorStream().readAllBytes());
                     _logger.Error("chmod failed with exit code " + exitCode + ": " + error);
-                    _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableError", Map.of(
+                    logStep(_translator.Localize("Progress.Scripts.ExecutableError", Map.of(
                             "filePath", scriptFile.getAbsolutePath(),
                             "error", error
                     )));
@@ -501,13 +537,13 @@ public class SetupManager {
             } else {
                 // Log a timeout error if the process did not finish within the timeout
                 _logger.Error("chmod process timed out.");
-                _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableTimeout"));
+                logStep(_translator.Localize("Progress.Scripts.ExecutableTimeout"));
                 p.destroyForcibly(); // Forcefully terminate the process
             }
         } catch (IOException | InterruptedException e) {
             // Log any exceptions that occur during the process
             _logger.Error("Exception while making script executable: " + e.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.ExecutableException", Map.of("error", e.getMessage())));
+            logStep(_translator.Localize("Progress.Scripts.ExecutableException", Map.of("error", e.getMessage())));
         }
     }
 
@@ -594,7 +630,7 @@ public class SetupManager {
         catch (IOException ex) {
             // Log an error if the app bundle creation fails
             _logger.Error("Failed to create macOS app bundle: " + ex.getMessage());
-            _logCallback.accept(_translator.Localize("Progress.Scripts.MacAppBundleCreationError", Map.of("error", ex.getMessage())));
+            logStep(_translator.Localize("Progress.Scripts.MacAppBundleCreationError", Map.of("error", ex.getMessage())));
             return null;
         }
         return appBundlePath;
