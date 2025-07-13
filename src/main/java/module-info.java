@@ -17,5 +17,6 @@ module io.github.tavstal.mmcinstaller {
     exports io.github.tavstal.mmcinstaller;
     exports io.github.tavstal.mmcinstaller.controllers;
     exports io.github.tavstal.mmcinstaller.core;
+    exports io.github.tavstal.mmcinstaller.config;
     opens io.github.tavstal.mmcinstaller.controllers to javafx.fxml;
 }
