@@ -4,16 +4,14 @@ import java.util.List;
 
 /**
  * Represents the main configuration for the installer.
- * <br/>
- * This record is used to store various configuration settings required for the installation process,
- * including language preferences, debug mode, and configurations for project, download, install, and uninstall operations.
  *
- * @param language The language setting for the installer.
- * @param debug A flag indicating whether debug mode is enabled.
- * @param project The configuration for the project being installed.
- * @param download The configuration for downloading resources.
- * @param install The configuration for the installation process.
- * @param uninstall The configuration for the uninstallation process.
+ * @param language           A list of language configurations.
+ * @param debug              A flag indicating whether debug mode is enabled.
+ * @param project            The project configuration.
+ * @param download           The download configuration.
+ * @param install            The install configuration.
+ * @param uninstall          The uninstall configuration.
+ * @param uninstallerConfig  The path or identifier for the uninstaller configuration.
  */
-public record InstallerMainConfig(List<LanguageConfig> language, Boolean debug, ProjectConfig project, DownloadConfig download, InstallConfig install, UninstallConfig uninstall) {
+public record InstallerMainConfig(List<LanguageConfig> language, Boolean debug, ProjectConfig project, DownloadConfig download, InstallConfig install, UninstallConfig uninstall, String uninstallerConfig) {
 }
