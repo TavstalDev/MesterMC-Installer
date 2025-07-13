@@ -25,7 +25,7 @@ public class PathUtils {
     public static File getDefaultInstallationPath(String appName) {
         String os = System.getProperty("os.name").toLowerCase();
         String userHome = System.getProperty("user.home");
-        File installationDir = null;
+        File installationDir;
         var logger = InstallerApplication.getLogger();
 
         if (os.contains("win")) {
@@ -320,5 +320,43 @@ public class PathUtils {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    /**
+     * Retrieves the path to the uninstaller configuration file based on the operating system.
+     * <br/>
+     * This method determines the appropriate location for the configuration file
+     * (`mestermc_config.yaml`) depending on the OS:
+     * <ul>
+     *   <li>Windows: Uses the `APPDATA` environment variable or falls back to the user's home directory.</li>
+     *   <li>Linux: Places the file in the `.config` directory within the user's home directory.</li>
+     *   <li>macOS: Places the file in the `Library/Application Support` directory within the user's home directory.</li>
+     *   <li>Other OS: Falls back to the user's home directory.</li>
+     * </ul>
+     *
+     * @return A `File` object representing the path to the uninstaller configuration file.
+     */
+    public static File getUninstallerConfigFile() {
+        String os = System.getProperty("os.name").toLowerCase();
+        String userHome = System.getProperty("user.home");
+        File uninstallerConfigFile;
+
+        if (os.contains("win")) {
+            String appData = System.getenv("APPDATA");
+            if (appData != null && !appData.isEmpty()) {
+                uninstallerConfigFile = new File(appData, "mestermc_config.yaml");
+            } else {
+                uninstallerConfigFile = new File(userHome, "mestermc_config.yaml");
+            }
+        } else if (os.contains("linux")) {
+            uninstallerConfigFile = new File(userHome, ".config" + File.separator + ".mestermc_config.yaml");
+        } else if (os.contains("mac")) {
+            uninstallerConfigFile = new File(userHome, "Library"+ File.separator +"Application Support"+ File.separator  + ".mestermc_config.yaml");
+        } else {
+            // Generic fallback for other OS types
+            uninstallerConfigFile = new File(userHome, "mestermc_config.yaml");
+        }
+
+        return uninstallerConfigFile;
     }
 }

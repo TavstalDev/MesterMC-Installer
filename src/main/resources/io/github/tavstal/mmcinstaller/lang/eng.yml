@@ -26,6 +26,11 @@ Welcome:
   Description: "MesterMC Client 1.21.5 will be installed on your computer."
   Action: "Click the Next button to continue, or Cancel to exit."
 
+WelcomeUninstall:
+  Title: "Welcome to the MesterMC Client Uninstaller!"
+  Description: "This will remove the MesterMC Client 1.21.5 from your computer."
+  Action: "Click the Next button to continue, or Cancel to exit."
+
 License:
   Title: "License Agreement"
   Description: "Please read the license agreement before proceeding with the installation."
@@ -70,6 +75,20 @@ Review:
   Action: "Click 'Install' to begin the installation or 'Back' to make changes."
   Content: |
     Installation directory: 
+      %installPath%
+    Start Menu folder:
+      %startMenuPath%
+    Desktop shortcut:
+      %desktopShortcut%
+    Start Menu shortcut:
+      %startMenuShortcut%
+
+ReviewUninstall:
+  Title: "Ready to Uninstall"
+  Description: "The uninstaller is ready to remove MesterMC from your computer."
+  Action: "Click 'Uninstall' to begin the uninstallation or 'Back' to make changes."
+  Content: |
+    MesterMC will be removed from the following locations:
       %installPath%
     Start Menu folder:
       %startMenuPath%
@@ -126,8 +145,19 @@ Progress:
       Please retry download, or contact support.
       Clicking 'cancel' deletes the file.
 
+
+ProgressUninstall:
+  Title: "Uninstalling"
+  Description: "Please wait while MesterMC is being uninstalled."
+  Action: "Uninstallation in progress. Please do not close this window until the uninstallation is complete."
+
 Complete:
   Title: "MesterMC Installation Complete"
   Description: "The installer has finished installing MesterMC."
   Action: "Click 'Finish' to close the installer."
   LaunchGameCheckBox: "Launch MesterMC"
+
+CompleteUninstall:
+  Title: "MesterMC Uninstallation Complete"
+  Description: "The uninstaller has finished removing MesterMC."
+  Action: "Click 'Finish' to close the uninstaller."

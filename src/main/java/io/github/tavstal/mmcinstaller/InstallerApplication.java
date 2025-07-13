@@ -3,6 +3,7 @@ package io.github.tavstal.mmcinstaller;
 import io.github.tavstal.mmcinstaller.core.ConfigLoader;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
+import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -89,6 +90,13 @@ public class InstallerApplication extends Application {
         _stage.toFront();
         _stage.requestFocus();
         _logger.Debug("InstallerApplication started successfully.");
+
+        // Check if uninstaller mode should be enabled
+        InstallerState.setIsUninstallModeActive(PathUtils.getUninstallerConfigFile().exists());
+        if (InstallerState.getIsUninstallModeActive()) {
+            _logger.Debug("Uninstaller mode is active.");
+            return; // No need to check .jar size in uninstaller mode
+        }
 
         _logger.Debug("Checking .jar size.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {

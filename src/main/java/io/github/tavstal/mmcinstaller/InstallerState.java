@@ -182,4 +182,25 @@ public class InstallerState {
     public static void setApplicationToLaunch(String appToLaunch) {
         InstallerState.applicationToLaunch = appToLaunch;
     }
+
+    // Indicates whether the uninstallation mode is active.
+    private static boolean _isUninstallModeActive = false;
+
+    /**
+     * Retrieves the current state of the uninstallation mode.
+     *
+     * @return True if the uninstallation mode is active, false otherwise.
+     */
+    public static boolean getIsUninstallModeActive() {
+        return _isUninstallModeActive;
+    }
+
+    /**
+     * Sets the state of the uninstallation mode.
+     *
+     * @param isUninstallModeActive True to activate the uninstallation mode, false to deactivate it.
+     */
+    public static void setIsUninstallModeActive(boolean isUninstallModeActive) {
+        _isUninstallModeActive = isUninstallModeActive;
+    }
 }

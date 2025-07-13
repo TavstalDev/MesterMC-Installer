@@ -246,3 +246,12 @@ uninstall:
       # > /dev/null 2>&1 redirects stdout and stderr to null, keeping the terminal clean.
       nohup "$TEMP_SCRIPT" > /dev/null 2>&1 &
       exit 0
+
+
+uninstaller: |
+  # DO NOT DELETE THIS FILE IF MESTERMC IS INSTALLED
+  # This file is used by the uninstaller to remove MesterMC from the system.
+  installDir: "%installDir%"
+  startMenuDir: "%startMenuDir%"
+  desktopShortcut: "%desktopShortcut%"
+  startmenuShortcut: "%startmenuShortcut%"

@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
@@ -38,11 +39,20 @@ public class WelcomeController implements Initializable {
         // Translator instance for localization.
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
-        welcomeTitle.setText(_translator.Localize("Welcome.Title"));
-        welcomeDescription.setText(_translator.Localize("Welcome.Description"));
-        welcomeAction.setText(_translator.Localize("Welcome.Action"));
-        nextButton.setText(_translator.Localize("Common.Next"));
-        cancelButton.setText(_translator.Localize("Common.Cancel"));
+        if (InstallerState.getIsUninstallModeActive()) {
+            welcomeTitle.setText(_translator.Localize("WelcomeUninstall.Title"));
+            welcomeDescription.setText(_translator.Localize("WelcomeUninstall.Description"));
+            welcomeAction.setText(_translator.Localize("WelcomeUninstall.Action"));
+            nextButton.setText(_translator.Localize("Common.Next"));
+            cancelButton.setText(_translator.Localize("Common.Cancel"));
+        }
+        else {
+            welcomeTitle.setText(_translator.Localize("Welcome.Title"));
+            welcomeDescription.setText(_translator.Localize("Welcome.Description"));
+            welcomeAction.setText(_translator.Localize("Welcome.Action"));
+            nextButton.setText(_translator.Localize("Common.Next"));
+            cancelButton.setText(_translator.Localize("Common.Cancel"));
+        }
         _logger.Debug("WelcomeController initialized with localized text.");
     }
 
@@ -53,6 +63,11 @@ public class WelcomeController implements Initializable {
      */
     @FXML
     protected void onNextButtonClick() {
+        if (InstallerState.getIsUninstallModeActive()) {
+            _logger.Debug("Uninstall mode is active, switching to ProgressView.fxml.");
+            InstallerApplication.setActiveScene(SceneManager.getInstallProgressScene());
+            return;
+        }
         InstallerApplication.setActiveScene(SceneManager.getLicenseScene());
         _logger.Debug("Switched to LicenseView.fxml");
     }

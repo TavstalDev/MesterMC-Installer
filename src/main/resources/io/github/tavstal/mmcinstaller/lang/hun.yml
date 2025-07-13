@@ -26,6 +26,11 @@ Welcome:
   Description: "Telepítve lesz a MesterMC Kliens 1.21.5 az ön gépén."
   Action: "Kattintson a Tovább gombra a folytatáshoz, vagy a Megszakítás gombra a kilépéshez."
 
+WelcomeUninstall:
+  Title: "Üdvözöllek a MesterMC Kliens eltávolítóban!"
+  Description: "Ez eltávolítja a MesterMC Kliens 1.21.5-öt a számítógépéről."
+  Action: "Kattintson a Tovább gombra a folytatáshoz, vagy a Megszakítás gombra a kilépéshez."
+
 License:
   Title: "Licencszerződés"
   Description: "Kérjük, olvassa el a licencszerződést, mielőtt folytatná a telepítést."
@@ -78,6 +83,20 @@ Review:
       Start menü parancsikon:
         %startMenuShortcut%
 
+ReviewUninstall:
+  Title: "Készen állunk az eltávolításra"
+  Description: "A telepítő készen áll a MesterMC számítógépről való eltávolítására."
+  Action: "Kattintson az 'Eltávolítás' gombra az eltávolítás megkezdéséhez, vagy a 'Vissza' gombra a módosításokhoz."
+  Content: |
+    Eltávolítandó telepítés célkönyvtára: 
+      %installPath%
+    Start menü mappa:
+      %startMenuPath%
+    Asztali parancsikon:
+      %desktopShortcut%
+    Start menü parancsikon:
+      %startMenuShortcut%
+
 Progress:
   Title: "Telepítés"
   Description: "Kérem várjon, amíg a MesterMC telepítése zajlik."
@@ -126,8 +145,34 @@ Progress:
       Kérjük, próbálja újra, vagy keresse a támogatást.
       A 'megszakítás' gombra kattintva törlődik a fájl.
 
+
+ProgressUninstall:
+  Title: "Eltávolítás"
+  Description: "Kérem várjon, amíg a MesterMC eltávolítása zajlik."
+  Action: "Kliens eltávolítása folyamatban. Kérem, ne zárja be az ablakot, amíg az eltávolítás be nem fejeződik."
+  DirectoryExists: "A megadott eltávolítási könyvtár már létezik."
+  DirectoryCreated: "Az eltávolítási könyvtár létrehozva: %path%"
+  Scripts:
+    Removing: "Parancsfájlok és scriptek eltávolítása..."
+    StartMenuDirRemovalFailed: "Nem sikerült eltávolítani a Start menü mappát: %path%"
+    ResourceNotFound: "Hiba: A szükséges erőforrás nem található: %resource%"
+    FileRemoved: "%fileName% fájl sikeresen eltávolítva az eltávolítási könyvtárból."
+    FileRemoveError: "Hiba történt az %fileName% fájl eltávolítása során: %error%"
+    LauncherRemoved: "A script alapú indító fájl eltávolítva: %filePath%"
+    LauncherRemovalError: "Hiba: A script alapú indító fájl eltávolítása sikertelen: %error%"
+    DesktopShortcutRemoved: "Asztali parancsikon eltávolítva: %filePath%"
+    StartMenuShortcutRemoved: "Start menü parancsikon eltávolítva: %filePath%"
+    DesktopFileRemovalError: "Hiba: Az asztali parancsikon eltávolítása sikertelen: %error%"
+    ShortcutRemoveError: "Hiba történt a parancsikon(ok) eltávolítása során: %error%"
+    SetupFailed: "Az eltávolítás sikertelen volt. Kérem, ellenőrizze a naplófájlokat a részletekért."
+
 Complete:
   Title: "A MesterMC telepítésének befejezése"
   Description: "A telepitő végzett a MesterMC telepítésével."
   Action: "Kattintson a 'Befejezés' gombra a telepítő bezárásához."
   LaunchGameCheckBox: "MesterMC elindítása"
+
+CompleteUninstall:
+  Title: "A MesterMC eltávolításának befejezése"
+  Description: "Az eltávolító végzett a MesterMC eltávolításával."
+  Action: "Kattintson a 'Befejezés' gombra az eltávolító bezárásához."

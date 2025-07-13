@@ -237,6 +237,8 @@ public class SetupManager {
                         .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath().replace("\\", "\\\\"))
                         .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath().replace("\\", "\\\\"))
         );
+
+        createUninstallerConfig();
     }
 
     /**
@@ -298,6 +300,8 @@ public class SetupManager {
                         .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
                         .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
         );
+
+        createUninstallerConfig();
     }
 
     /**
@@ -391,9 +395,15 @@ public class SetupManager {
             // Log an error if the macOS app bundle creation fails
             _logger.Error("Failed to create macOS app bundle: " + ex.getMessage());
         }
+
+        createUninstallerConfig();
     }
 
     // --- Common Methods ---
+
+    private void createUninstallerConfig() {
+
+    }
 
     /**
      * Copies a resource file from the application's resources to the installation directory.
