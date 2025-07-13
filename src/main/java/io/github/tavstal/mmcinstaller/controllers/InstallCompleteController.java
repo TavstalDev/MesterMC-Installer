@@ -58,13 +58,12 @@ public class InstallCompleteController implements Initializable {
             _logger.Debug("Launch game checkbox is selected, launching the game...");
             String osName = System.getProperty("os.name").toLowerCase();
             try {
-                Process process;
                 if (osName.contains("mac")) {
-                    process = new ProcessBuilder("open", InstallerState.getApplicationToLaunch())
+                    new ProcessBuilder("open", InstallerState.getApplicationToLaunch())
                             .inheritIO()
                             .start();
                 } else {
-                    process = new ProcessBuilder()
+                    new ProcessBuilder()
                             .command(InstallerState.getApplicationToLaunch())
                             .start();
                 }
