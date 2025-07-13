@@ -1,21 +1,22 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.*;
+import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
-import java.io.*;
+import java.io.File;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Controller class for managing the installation progress UI and logic.
@@ -53,7 +54,7 @@ public class InstallProgressController implements Initializable {
         cancelButton.setText(_translator.Localize("Common.Cancel"));
 
         // Get the current installation directory.
-        File dir = new File(InstallerApplication.getCurrentPath());
+        File dir = new File(InstallerState.getCurrentPath());
         if (dir.mkdirs()) {
             logStep(_translator.Localize("Progress.DirectoryCreated", Map.of("path", dir.getAbsolutePath())));
         } else {
@@ -112,11 +113,20 @@ public class InstallProgressController implements Initializable {
      */
     private void startDownload() {
         // Define the installation directory, start menu directory, and output file for the download.
-        File dir = new File(InstallerApplication.getCurrentPath());
-        File startMenuDir = new File(InstallerApplication.getStartMenuPath());
-        File outputFile = new File(InstallerApplication.getCurrentPath(), ConfigLoader.get().download().fileName());
+        File outputFile = new File(InstallerState.getCurrentPath(), ConfigLoader.get().download().fileName());
 
         // Create a Task for the download
+        System.out.println("Expected size: " + InstallerState.getRequiredSpaceInBytes() + " bytes");
+        System.out.println("Existing file size: " + outputFile.length() + " bytes");
+        System.out.println("Output file exists: " + outputFile.exists());
+        if (outputFile.exists() && outputFile.length() == InstallerState.getRequiredSpaceInBytes() && outputFile.length() > 0) {
+            progressBar.setProgress(1.0);
+            Platform.runLater(() -> { // Small delay to ensure UI is ready.
+                handleDownloadedFile(outputFile);
+            });
+            return; // Skip download if file already exists and is valid.
+        }
+
         FileDownloader downloader = new FileDownloader(_logger, _translator);
         Task<Void> downloadTask = downloader.createDownloadTask(
                 ConfigLoader.get().download().link(),
@@ -125,16 +135,13 @@ public class InstallProgressController implements Initializable {
                 this::updateDownloadProgress // New method to update UI progress
         );
 
-        // TODO: Check file hash
-
         // Handle the success of the download task.
         downloadTask.setOnSucceeded(event -> {
             _logger.Debug("Download task succeeded.");
             progressBar.progressProperty().unbind(); // Unbind after completion.
             progressBar.setProgress(1.0); // Ensure it shows 100%.
             logStep(_translator.Localize("Progress.Scripts.Creating"));
-            SetupManager manager = new SetupManager(outputFile, dir, startMenuDir, this::logStep);
-            manager.setup();
+            handleDownloadedFile(outputFile); // Handle the downloaded file.
         });
 
         // Handle the failure of the download task.
@@ -155,5 +162,118 @@ public class InstallProgressController implements Initializable {
 
         // Start the task in a new thread.
         new Thread(downloadTask).start();
+    }
+
+    /**
+     * Handles the downloaded file by verifying its checksum and performing setup operations.
+     * If the checksum validation fails, the file is deleted, and the application exits.
+     * If the checksum is valid or the user chooses to proceed despite a mismatch, the setup process is initiated.
+     *
+     * @param outputFile The downloaded file to be handled.
+     */
+    private void handleDownloadedFile(File outputFile) {
+        // Localized strings for error and warning messages.
+        String errorTitle = _translator.Localize("Common.Error");
+        String errorHeader = _translator.Localize("Progress.CheckSumError.Header");
+        String errorContent = _translator.Localize("Progress.CheckSumError.Content");
+        String yesButtonText = _translator.Localize("Common.Next");
+        String noButtonText = _translator.Localize("Common.Cancel");
+        String outputChecksum = "";
+        boolean checksumContinue;
+
+        try {
+            // Calculate the checksum of the downloaded file.
+            outputChecksum = PathUtils.getFileChecksum(outputFile.getAbsolutePath());
+            if (outputChecksum.isEmpty()) {
+                // Log an error if the checksum is empty and show an error alert.
+                _logger.Error("Checksum is null or empty for file: " + outputFile.getAbsolutePath());
+                checksumContinue = showAlert(errorTitle, errorHeader, errorContent, yesButtonText, noButtonText, Alert.AlertType.ERROR);
+            } else {
+                checksumContinue = true;
+            }
+        } catch (Exception ex) {
+            // Log an error if checksum calculation fails and show an error alert.
+            _logger.Error("Failed to calculate checksum: " + ex.getMessage());
+            checksumContinue = showAlert(errorTitle, errorHeader, errorContent, yesButtonText, noButtonText, Alert.AlertType.ERROR);
+        }
+
+        // If the user chooses not to continue, delete the file and exit the application.
+        if (!checksumContinue) {
+            if (outputFile.exists())
+                outputFile.delete(); // Clean up the file if checksum validation fails.
+            System.exit(0);
+            return;
+        }
+
+        // Retrieve the expected checksum from the configuration.
+        String expectedChecksum = ConfigLoader.get().download().hash();
+        if (!(expectedChecksum == null || expectedChecksum.isEmpty())) {
+            // Compare the calculated checksum with the expected checksum.
+            if (!outputChecksum.equals(expectedChecksum)) {
+                // Show a warning alert if the checksums do not match.
+                String title = _translator.Localize("Common.Warning");
+                String header = _translator.Localize("Progress.CheckSumWarning.Header");
+                String content = _translator.Localize("Progress.CheckSumWarning.Content", Map.of(
+                        "expected", expectedChecksum,
+                        "actual", outputChecksum
+                ));
+                if (!showAlert(title, header, content, yesButtonText, noButtonText, Alert.AlertType.WARNING)) {
+                    // If the user chooses not to continue, delete the file and exit the application.
+                    if (outputFile.exists())
+                        outputFile.delete(); // Clean up the file if checksum validation fails.
+                    System.exit(0);
+                    return;
+                } else {
+                    _logger.Warn("Checksum mismatch but user chose to continue.");
+                }
+            }
+        }
+
+        // Initialize the setup manager and perform the setup process.
+        File dir = new File(InstallerState.getCurrentPath());
+        File startMenuDir = new File(InstallerState.getStartMenuPath());
+        SetupManager manager = new SetupManager(outputFile, dir, startMenuDir, this::logStep);
+        manager.setup();
+    }
+
+    /**
+     * Displays a confirmation alert dialog to the user with customizable title, header, content,
+     * and button labels. Captures the user's choice and returns whether the user chose to continue.
+     *
+     * @param title          The title of the alert dialog.
+     * @param header         The header text of the alert dialog.
+     * @param content        The content text of the alert dialog.
+     * @param yesButtonText  The label for the "Yes" button.
+     * @param noButtonText   The label for the "No" button.
+     * @return true if the user selects the "Yes" button, false otherwise.
+     */
+    private boolean showAlert(String title, String header, String content, String yesButtonText, String noButtonText, Alert.AlertType alertType) {
+        // Show an alert to the user about the checksum error.
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        // Create "Yes" and "No" buttons with the provided labels.
+        ButtonType yesButton = new ButtonType(yesButtonText);
+        ButtonType noButton = new ButtonType(noButtonText);
+
+        // Set the button types for the alert dialog.
+        alert.getButtonTypes().setAll(yesButton, noButton);
+
+        // Display the alert dialog and wait for the user's response.
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Log the user's choice.
+        if (result.isPresent() && result.get() == yesButton) {
+            _logger.Debug("User chose to continue.");
+        } else {
+            _logger.Debug("User canceled the operation.");
+        }
+
+        // Determine the user's choice and return the result.
+        AtomicBoolean choiceResult = new AtomicBoolean(false);
+        result.ifPresent(choice -> choiceResult.set(choice == yesButton));
+        return choiceResult.get();
     }
 }
