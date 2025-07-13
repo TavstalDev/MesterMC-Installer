@@ -46,8 +46,17 @@ To run the MesterMC Installer, you need to have **JDK 21 or higher** installed o
 
 1.  **Download the Installer:**
     * **Windows:** Download the `.zip` file. Extract it, and run the `MesterMC_Installer.exe` executable.
-    * **Linux:** Download the `.zip` file. Extract it, and run the included `.sh` script (e.g., `bash install.sh`).
-    * **macOS:** Download the `.zip` file. Extract it, and run the included `.zsh` script (e.g., `zsh install.zsh`).
+    * **MacOS:** Download the `.app` file. Double-click on the file to run it.
+    * **Linux:** Download the `.tar.gz` or the `.AppImage` file.
+    * * **AppImage:**
+    * * * **A. via Terminal:**
+    ```bash
+    chmod +x MesterMC-Installer-x86_64.AppImage
+    ./MesterMC-Installer-x86_64.AppImage
+    ```
+    * * * **B. via File Manager:** Right-click the `.AppImage` file, select "Properties", go to the "Permissions" tab, and check "Allow executing file as program". Then double-click the file to run it.
+    * * * **C. via AppImageLauncher:** If you have AppImageLauncher installed, you can simply double-click the `.AppImage` file, and it will handle for you.
+    * * **.tar.gz:** Download the `.tar.gz` file. Extract it, and run the `bin/MesterMC-Installer` AppImage in the extracted directory.
 
 2.  **Follow the On-Screen Instructions:**
     The installer will guide you through the following steps:
@@ -65,32 +74,13 @@ To run the MesterMC Installer, you need to have **JDK 21 or higher** installed o
 * **Apache HttpClient:** For handling HTTP requests (e.g., checking `.jar` file size).
 * **FXML:** For declarative UI design.
 * **PowerShell:** Utilized for specific system interactions, such as creating shortcuts on Windows.
+* **AppImage:** For packaging the application on Linux.
 
 ## 🤝 Contributing
 
 We welcome contributions to the MesterMC Installer project!
 
-This project is open-source and released under the MIT License. While not affiliated with the original MesterMC project, our goal is to enhance its accessibility.
-
-### Development Setup
-
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/TavstalDev/MesterMC-Installer.git
-    cd MesterMC-Installer
-    ```
-2.  **Open in IntelliJ IDEA:** Import the project into IntelliJ IDEA. The Gradle build system will automatically download and configure the necessary packages.
-3.  **Test the Application:**
-    You can run the installer directly from your IDE to test changes or new features.
-    ```bash
-    ./gradlew run
-    ```
-4.  **Build the Application:**
-    To build the installer, use the `jpackageImage` Gradle task:
-    ```bash
-    ./gradlew jpackageImage
-    ```
-    This will generate the platform-specific installer packages.
+Please follow the [Getting Started Guide](https://github.com/TavstalDev/MesterMC-Installer/blob/master/docs/building/getting-started.md) to set up the project in your local environment.
 
 ## 📸 Screenshots
 
@@ -109,3 +99,6 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 If you encounter any issues or have questions, please feel free to:
 
 * **Open an issue** on the [GitHub Issues page](https://github.com/tavstal/mmcinstaller/issues).
+* **Contact me**
+* * **Discord:** @Tavstal (Preferred, but not required)
+* * **Twitter X:** [@Tavstal](https://x.com/Tavstal)

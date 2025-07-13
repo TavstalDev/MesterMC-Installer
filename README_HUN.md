@@ -40,8 +40,17 @@ A MesterMC Telepítő futtatásához **JDK 21 vagy újabb** verzió szükséges 
 
 1.  **Töltse le a Telepítőt:**
     * **Windows:** Töltse le a `.zip` fájlt. Bontsa ki, és futtassa a `MesterMC_Installer.exe` végrehajtható fájlt.
-    * **Linux:** Töltse le a `.zip` fájlt. Bontsa ki, és futtassa a mellékelt `.sh` szkriptet (pl. `bash install.sh`).
-    * **macOS:** Töltse le a `.zip` fájlt. Bontsa ki, és futtassa a mellékelt `.zsh` szkriptet (pl. `zsh install.zsh`).
+    * **MacOS:** Töltse le a ``.app`` fájlt. Dupla kattintással indítsa el a fájlt.
+    * **Linux:**  Töltse le a ``.tar.gz`` vagy a ``.AppImage`` fájlt.
+    * * **AppImage:**
+    * * * **A. Terminálból:**
+    ```bash
+    chmod +x MesterMC-Installer-x86_64.AppImage
+    ./MesterMC-Installer-x86_64.AppImage
+    ```
+    * * * **B. Fájlkezelőből:** Kattintson jobb gombbal a ``.AppImage`` fájlra, válassza a „Tulajdonságok” menüpontot, majd a „Jogosultságok” fülön jelölje be az „Engedélyezés futtatásra programként” lehetőséget. Ezután dupla kattintással indítsa el a fájlt.
+    * * * **C. AppImageLauncher használatával:** Ha telepítve van az AppImageLauncher, egyszerűen dupla kattintással futtathatja az ``.AppImage`` fájlt, amely ezt kezeli helyetted.
+    * * **.tar.gz:** Töltse le a ``.tar.gz`` fájlt. Csomagolja ki, majd futtassa a kibontott mappában a ``bin/MesterMC-Installer`` AppImage-t.
 
 2.  **Kövesse a Képernyőn Megjelenő Utasításokat:**
     A telepítő a következő lépéseken keresztül vezeti Önt:
@@ -59,30 +68,16 @@ A MesterMC Telepítő futtatásához **JDK 21 vagy újabb** verzió szükséges 
 * **Apache HttpClient:** HTTP kérések kezelésére (pl. `.jar` fájl méretének ellenőrzése).
 * **FXML:** Deklaratív felhasználói felület tervezéséhez.
 * **PowerShell:** Speciális rendszerinterakciókhoz használva, például parancsikonok létrehozásához Windows rendszeren.
+* **AppImage:** Az alkalmazás Linuxon történő csomagolásához.
 
 ## 🤝 Hozzájárulás
 
 Szívesen fogadjuk a MesterMC Telepítő projekthez való hozzájárulásokat!
 
-### Fejlesztői környezet beállítása
+> **Figyelem:** A dokumentáció illetve a kód csak angolul érhető el, de a hozzájárulásokat magyarul is szívesen fogadjuk!
+> A hibajegyeket és a 'pull kéréseket' angolul kell benyújtani, de a hozzászólásokban magyarul is kommunikálhat.
 
-1.  **Klónozza a Repositort:**
-    ```bash
-    git clone https://github.com/TavstalDev/MesterMC-Installer.git
-    cd MesterMC-Installer
-    ```
-2.  **Nyissa meg az IntelliJ IDEA-ban:** Importálja a projektet az IntelliJ IDEA-ba. A Gradle build rendszer automatikusan letölti és konfigurálja a szükséges csomagokat.
-3.  **Az Alkalmazás Tesztelése:**
-    Futtathatja a telepítőt közvetlenül az IDE-ből a változtatások vagy új funkciók teszteléséhez.
-    ```bash
-    ./gradlew run
-    ```
-4.  **Az alkalmazás fordítása:**
-    A telepítő fordításához használja a `jpackageImage` Gradle feladatot:
-    ```bash
-    ./gradlew jpackageImage
-    ```
-    Ez generálja a platformspecifikus telepítőcsomagokat.
+Kérjük, olvassa el a [Hozzájárulási útmutatót](https://github.com/TavstalDev/MesterMC-Installer/blob/master/docs/building/getting-started.md) a részletes útmutatásért, hogyan járulhat hozzá a projekthez. Minden javaslatot és hibajavítást szívesen fogadunk!
 
 ## 📸 Képernyőképek
 
@@ -101,4 +96,6 @@ Ez a projekt az **MIT Licenc** alatt van licencelve. Részletekért lásd a `LIC
 Ha bármilyen problémába ütközik, vagy kérdése van, forduljon hozzánk bizalommal:
 
 * **Nyisson egy hibajegyet** a [GitHub Issues oldalon](https://github.com/tavstal/mmcinstaller/issues).
-* **Közvetlenül vegye fel velem a kapcsolatot** (Kérjük, adja meg, hogyan szeretné felvenni velem a kapcsolatot, pl. GitHub profil, e-mail vagy egy adott platformon).
+* **Közvetlen kapcsolat**
+* * **Discord:** @Tavstal (Preferált, de nem kötelező)
+* * **Twitter X:** [@Tavstal](https://x.com/Tavstal)
