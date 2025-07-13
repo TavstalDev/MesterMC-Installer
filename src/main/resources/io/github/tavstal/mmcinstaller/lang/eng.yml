@@ -109,6 +109,18 @@ Progress:
     SetupFailed: "The installation failed. Please check the log files for details."
     MacAppBundleCreationError: "Error: Failed to create Mac application bundle: %error%"
     MacUninstallerBundleCreationError: "Error: Failed to create Mac uninstaller bundle: %error%"
+  CheckSumError:
+    Header: "The downloaded file failed validation"
+    Content: |
+      File could not be validated (corrupt/read error).
+      Please retry download, or contact support.
+      Clicking 'cancel' deletes the file.
+  CheckSumWarning:
+    Header: "The downloaded file validation issued a warning"
+    Content: |
+      File checksum does not match expected value.
+      Please retry download, or contact support.
+      Clicking 'cancel' deletes the file.
 
 Complete:
   Title: "MesterMC Installation Complete"

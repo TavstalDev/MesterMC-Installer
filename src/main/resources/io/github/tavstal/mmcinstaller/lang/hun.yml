@@ -109,6 +109,18 @@ Progress:
     SetupFailed: "A telepítés sikertelen volt. Kérem, ellenőrizze a naplófájlokat a részletekért."
     MacAppBundleCreationError: "Hiba: A Mac alkalmazás csomag létrehozása sikertelen: %error%"
     MacUninstallerBundleCreationError: "Hiba: A Mac eltávolító csomag létrehozása sikertelen: %error%"
+  CheckSumError:
+    Header: "A letöltött fájl ellenőrzése sikertelen"
+    Content: |
+      A fájl nem ellenőrizhető (sérült/olvasási hiba).
+      Kérjük, próbálja újra, vagy keresse a támogatást.
+      A 'megszakítás' gombra kattintva törlődik a fájl.
+  CheckSumWarning:
+    Header: "A letöltött fájl ellenőrzése figyelmeztetést adott"
+    Content: |
+      A fájl ellenőrzőösszege nem egyezik a várt értékkel.
+      Kérjük, próbálja újra, vagy keresse a támogatást.
+      A 'megszakítás' gombra kattintva törlődik a fájl.
 
 Complete:
   Title: "A MesterMC telepítésének befejezése"
