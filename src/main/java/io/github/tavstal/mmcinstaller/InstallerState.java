@@ -203,4 +203,46 @@ public class InstallerState {
     public static void setIsUninstallModeActive(boolean isUninstallModeActive) {
         _isUninstallModeActive = isUninstallModeActive;
     }
+
+    // Stores the path for the shortcut.
+    private static String _shortcutPath = null;
+
+    /**
+     * Retrieves the path for the shortcut.
+     *
+     * @return The shortcut path as a String.
+     */
+    public static String getShortcutPath() {
+        return _shortcutPath;
+    }
+
+    /**
+     * Sets the path for the shortcut.
+     *
+     * @param shortcutPath The shortcut path to set.
+     */
+    public static void setShortcutPath(String shortcutPath) {
+        _shortcutPath = shortcutPath;
+    }
+
+    // Stores the path for the Start Menu shortcut.
+    private static String _startMenuShortcutPath = null;
+
+    /**
+     * Retrieves the path for the Start Menu shortcut.
+     *
+     * @return The Start Menu shortcut path as a String.
+     */
+    public static String getStartMenuShortcutPath() {
+        return _startMenuShortcutPath;
+    }
+
+    /**
+     * Sets the path for the Start Menu shortcut.
+     *
+     * @param startMenuShortcutPath The Start Menu shortcut path to set.
+     */
+    public static void setStartMenuShortcutPath(String startMenuShortcutPath) {
+        _startMenuShortcutPath = startMenuShortcutPath;
+    }
 }
