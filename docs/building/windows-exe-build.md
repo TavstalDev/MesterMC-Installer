@@ -1,22 +1,3 @@
-# Install ImageMagick if you don't have it
-# On Debian/Ubuntu: sudo apt-get install imagemagick
-# On Arch Linux: sudo pacman -S imagemagick
-# On Windows (with scoop/chocolatey or direct installer): scoop install imagemagick
-
-convert.exe icon.png -define icon:auto-resize=16,24,32,48,64,256 icon.ico
-
-# Create a Resource Script File (.rc)
-```mestermc.rc
-IDI_ICON1 ICON "icon.ico"
-```
-# Compile the Resource File using windres
-
-x86_64-w64-mingw32-windres mestermc.rc -O coff -o mestermc_res.o
-
-Linux:
-x86_64-w64-mingw32-g++ mestermc_exe.cpp mestermc_res.o -o "MesterMC.exe" -static -lkernel32 -luser32 -lgdi32 -lole32 -loleaut32 -lcomctl32 -lshlwapi -lshfolder -Wl,--subsystem,windows
-
-
 # Building the Windows Executable with a Custom Icon
 
 This guide outlines how to create a `MesterMC.exe` file that launches your JavaFX application, complete with a custom icon. This process involves generating an icon file, creating a resource script, and then compiling a small C++ stub that links to these resources and launches your Java JAR.
@@ -50,9 +31,14 @@ First, ensure you have **ImageMagick** installed. It's a powerful tool for conve
 * **Generate `icon.ico` from `icon.png`:**
   This command converts your `icon.png` into a high-quality `.ico` file, embedding multiple common icon sizes (16, 24, 32, 48, 64, and 256 pixels).
 
-    ```bash
-    convert.exe icon.png -define icon:auto-resize=16,24,32,48,64,256 icon.ico
-    ```
+```
+# Windows
+convert.exe icon.png -define icon:auto-resize=16,24,32,48,64,256 icon.ico
+```
+```
+# Linux
+convert icon.png -define icon:auto-resize=16,24,32,48,64,256 icon.ico
+```
 
 ---
 
@@ -75,10 +61,17 @@ Use `windres` (the Windows Resource Compiler) to compile your `.rc` file into an
 
 * **Compile `mestermc.rc` to `mestermc_res.o`:**
 
-    ```bash
-    windres mestermc.rc -O coff -o mestermc_res.o
-    ```
-    * **Note:** If you're cross-compiling from Linux, use the appropriate prefixed `windres` command from your MinGW-w64 toolchain (e.g., `x86_64-w64-mingw32-windres`). On Windows, `windres` should be directly available if you've installed MinGW/MSYS2.
+```
+# Windows
+x86_64-w64-mingw32-windres mestermc.rc -O coff -o mestermc_res.o
+```
+
+```
+# Linux
+x86_64-w64-mingw32-g++ mestermc_exe.cpp mestermc_res.o -o "MesterMC.exe" -static -lkernel32 -luser32 -lgdi32 -lole32 -loleaut32 -lcomctl32 -lshlwapi -lshfolder -Wl,--subsystem,windows
+```
+
+* **Note:** If you're cross-compiling from Linux, use the appropriate prefixed `windres` command from your MinGW-w64 toolchain (e.g., `x86_64-w64-mingw32-windres`). On Windows, `windres` should be directly available if you've installed MinGW/MSYS2.
 
 ---
 
