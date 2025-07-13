@@ -5,6 +5,7 @@ import io.github.tavstal.mmcinstaller.core.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
+import io.github.tavstal.mmcinstaller.utils.YamlHelper;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -14,9 +15,10 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Map;
 
 public class InstallerApplication extends Application {
     //#region Constants
@@ -92,10 +94,25 @@ public class InstallerApplication extends Application {
         _logger.Debug("InstallerApplication started successfully.");
 
         // Check if uninstaller mode should be enabled
-        InstallerState.setIsUninstallModeActive(PathUtils.getUninstallerConfigFile().exists());
+        var uninstallConfigFile = PathUtils.getUninstallerConfigFile();
+        InstallerState.setIsUninstallModeActive(uninstallConfigFile.exists());
         if (InstallerState.getIsUninstallModeActive()) {
-            _logger.Debug("Uninstaller mode is active.");
-            return; // No need to check .jar size in uninstaller mode
+
+            try (FileReader reader = new FileReader(uninstallConfigFile)) {
+                Yaml yaml = new Yaml();
+                Map<String, Object> fileMap = yaml.load(reader);
+                InstallerState.setCurrentPath(YamlHelper.getString(fileMap, "installDir"));
+                InstallerState.setStartMenuPath(YamlHelper.getString(fileMap, "startMenuDir"));
+                InstallerState.setShortcutPath(YamlHelper.getString(fileMap, "desktopShortcut"));
+                InstallerState.setStartMenuPath(YamlHelper.getString(fileMap, "startMenuShortcut"));
+
+                _logger.Debug("Uninstaller mode is active.");
+                return; // No need to check .jar size in uninstaller mode
+            }
+            catch (Exception ex) {
+                _logger.Error("Failed to read uninstaller configuration file: " + ex.getMessage());
+                InstallerState.setIsUninstallModeActive(false);
+            }
         }
 
         _logger.Debug("Checking .jar size.");
