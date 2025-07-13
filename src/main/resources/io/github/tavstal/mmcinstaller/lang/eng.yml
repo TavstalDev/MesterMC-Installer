@@ -132,6 +132,7 @@ Progress:
     SetupFailed: "The installation failed. Please check the log files for details."
     MacAppBundleCreationError: "Error: Failed to create Mac application bundle: %error%"
     MacUninstallerBundleCreationError: "Error: Failed to create Mac uninstaller bundle: %error%"
+    UninstallerConfigFailed: "Error: Failed to create uninstaller configuration file: %error%"
   CheckSumError:
     Header: "The downloaded file failed validation"
     Content: |

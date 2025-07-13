@@ -132,6 +132,7 @@ Progress:
     SetupFailed: "A telepítés sikertelen volt. Kérem, ellenőrizze a naplófájlokat a részletekért."
     MacAppBundleCreationError: "Hiba: A Mac alkalmazás csomag létrehozása sikertelen: %error%"
     MacUninstallerBundleCreationError: "Hiba: A Mac eltávolító csomag létrehozása sikertelen: %error%"
+    UninstallerConfigFailed: "Hiba: Az eltávolító konfigurációs fájl létrehozása sikertelen: %error%"
   CheckSumError:
     Header: "A letöltött fájl ellenőrzése sikertelen"
     Content: |
@@ -150,21 +151,6 @@ ProgressUninstall:
   Title: "Eltávolítás"
   Description: "Kérem várjon, amíg a MesterMC eltávolítása zajlik."
   Action: "Kliens eltávolítása folyamatban. Kérem, ne zárja be az ablakot, amíg az eltávolítás be nem fejeződik."
-  DirectoryExists: "A megadott eltávolítási könyvtár már létezik."
-  DirectoryCreated: "Az eltávolítási könyvtár létrehozva: %path%"
-  Scripts:
-    Removing: "Parancsfájlok és scriptek eltávolítása..."
-    StartMenuDirRemovalFailed: "Nem sikerült eltávolítani a Start menü mappát: %path%"
-    ResourceNotFound: "Hiba: A szükséges erőforrás nem található: %resource%"
-    FileRemoved: "%fileName% fájl sikeresen eltávolítva az eltávolítási könyvtárból."
-    FileRemoveError: "Hiba történt az %fileName% fájl eltávolítása során: %error%"
-    LauncherRemoved: "A script alapú indító fájl eltávolítva: %filePath%"
-    LauncherRemovalError: "Hiba: A script alapú indító fájl eltávolítása sikertelen: %error%"
-    DesktopShortcutRemoved: "Asztali parancsikon eltávolítva: %filePath%"
-    StartMenuShortcutRemoved: "Start menü parancsikon eltávolítva: %filePath%"
-    DesktopFileRemovalError: "Hiba: Az asztali parancsikon eltávolítása sikertelen: %error%"
-    ShortcutRemoveError: "Hiba történt a parancsikon(ok) eltávolítása során: %error%"
-    SetupFailed: "Az eltávolítás sikertelen volt. Kérem, ellenőrizze a naplófájlokat a részletekért."
 
 Complete:
   Title: "A MesterMC telepítésének befejezése"
