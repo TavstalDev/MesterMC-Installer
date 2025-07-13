@@ -17,6 +17,10 @@ Window:
   Title: "MesterMC Client Installer"
   Description: "This installer will help you install the MesterMC Client 1.21.5 on your computer."
 
+Language:
+  Title: "Please select a language."
+  Action: "Choose a language..."
+
 Welcome:
   Title: "Welcome to the MesterMC Client Installer!"
   Description: "MesterMC Client 1.21.5 will be installed on your computer."

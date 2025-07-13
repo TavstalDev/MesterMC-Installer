@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="io.github.tavstal.mmcinstaller.controllers.LanguageController"
+>
+
+    <!-- Top Section -->
+    <HBox>
+        <padding>
+            <Insets top="15.0" left="15.0"  right="15.0" bottom="15"/>
+        </padding>
+        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true">
+            <Image url="@../assets/logo.png"/>
+        </ImageView>
+        <Label fx:id="selectLabel" text="Please select a language.">
+            <padding>
+                <Insets left="15.0" />
+            </padding>
+        </Label>
+    </HBox>
+
+    <!-- Main Content Area -->
+    <VBox prefHeight="80.0" alignment="CENTER_RIGHT">
+        <padding>
+            <Insets left="15.0"  right="15.0"/>
+        </padding>
+        <ComboBox fx:id="languageComboBox" onAction="#onLanguageChange" prefWidth="300.0" promptText="Choose a language..."/>
+        <Region VBox.vgrow="ALWAYS" />
+    </VBox>
+
+    <!-- Bottom Section -->
+    <HBox alignment="BOTTOM_RIGHT" spacing="10.0">
+        <padding>
+            <Insets top="15.0" bottom="15.0" left="15.0" right="15.0"/>
+        </padding>
+        <HBox alignment="BOTTOM_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
+            <Button fx:id="nextButton" onAction="#onNextButtonClick" mnemonicParsing="false" text="Loading..." disable="true" />
+            <Button fx:id="cancelButton" onAction="#onCancelButtonClick" mnemonicParsing="false" text="Loading..."/>
+        </HBox>
+    </HBox>
+</VBox>

@@ -1,6 +1,7 @@
 package io.github.tavstal.mmcinstaller.core;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.utils.YamlHelper;
 
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import java.util.Map;
 public class InstallerTranslator {
     private final InstallerLogger _logger; // Logger instance for logging messages.
     private final String[] _locales; // Array of supported locale identifiers.
-    private String _defaultLocale; // Default locale identifier.
     private Map<String, Map<String, Object>> _localization; // Map storing localization data.
 
     public InstallerTranslator(String[] locales) {
@@ -22,12 +22,8 @@ public class InstallerTranslator {
     }
 
     public void Load() {
-        if (_defaultLocale == null)
-            _defaultLocale = ConfigLoader.get().language();
-
         _localization = new HashMap<>();
         _logger.Debug("Reading lang files...");
-        _logger.Debug("# Default locale: " + _defaultLocale);
         for (String locale : _locales) {
 
             _logger.Debug("Reading localization file for locale: " + locale);
@@ -51,7 +47,7 @@ public class InstallerTranslator {
     public String Localize(String key) {
         try {
             String[] keys = key.split("\\.");
-            Object value = _localization.get(_defaultLocale);
+            Object value = _localization.get(InstallerState.getLanguage());
             for (String k : keys) {
                 if (value instanceof Map) {
                     value = ((Map<?, ?>) value).get(k);
@@ -79,7 +75,7 @@ public class InstallerTranslator {
     public String Localize(String key, Map<String, Object> args) {
         try {
             String[] keys = key.split("\\.");
-            Object value = _localization.get(_defaultLocale);
+            Object value = _localization.get(InstallerState.getLanguage());
             for (String k : keys) {
                 if (value instanceof Map) {
                     value = ((Map<?, ?>) value).get(k);
@@ -121,7 +117,7 @@ public class InstallerTranslator {
             String[] keys = key.split("\\.");
             Object value = _localization.get(locale);
             if (value == null)
-                value = _localization.get(_defaultLocale);
+                value = _localization.get(InstallerState.getLanguage());
             for (String k : keys) {
                 if (value instanceof Map) {
                     value = ((Map<?, ?>) value).get(k);
@@ -152,7 +148,7 @@ public class InstallerTranslator {
             String[] keys = key.split("\\.");
             Object value = _localization.get(locale);
             if (value == null)
-                value = _localization.get(_defaultLocale);
+                value = _localization.get(InstallerState.getLanguage());
             for (String k : keys) {
                 if (value instanceof Map) {
                     value = ((Map<?, ?>) value).get(k);

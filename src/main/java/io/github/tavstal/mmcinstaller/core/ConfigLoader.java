@@ -4,6 +4,8 @@ import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.config.*;
 import io.github.tavstal.mmcinstaller.utils.YamlHelper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,7 +34,19 @@ public class ConfigLoader {
 
         try {
             // Parse configuration values from the YAML file.
-            String lang = YamlHelper.getString(rawConfigMap, "lang", "eng");
+            Object langObj = YamlHelper.getObject(rawConfigMap, "languages", null);
+            List<LanguageConfig> languages = new ArrayList<>();
+            if (langObj instanceof List) {
+                for (Object langItem : (List<?>) langObj) {
+                    if (langItem instanceof Map) {
+                        Map<String, Object> langMap = (Map<String, Object>) langItem;
+                        String code = YamlHelper.getString(langMap, "key", "");
+                        String name = YamlHelper.getString(langMap, "name", "");
+                        String localization = YamlHelper.getString(langMap, "localization", "");
+                        languages.add(new LanguageConfig(code, name, localization));
+                    }
+                }
+            }
             boolean debug = YamlHelper.getBoolean(rawConfigMap, "debug", false);
 
             String projectName = YamlHelper.getString(rawConfigMap, "project.name", "");
@@ -69,7 +83,7 @@ public class ConfigLoader {
 
             // Create the main configuration instance.
             _instance = new InstallerMainConfig(
-                    lang,
+                    languages,
                     debug,
                     new ProjectConfig(
                             projectName,

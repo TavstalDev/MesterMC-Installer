@@ -19,12 +19,26 @@ import java.io.InputStream;
 
 public class InstallerApplication extends Application {
     //#region Constants
+    public final static  int LANG_WIDTH = 400;
+    public final static int LANG_HEIGHT = 200;
     public final static int WIDTH = 700;
     public final static int HEIGHT = 400;
     //#endregion
 
     //#region Variables
     private static Stage _stage;
+    public static void changeStageSize(boolean isLanguageView) {
+        if (isLanguageView) {
+            _stage.setWidth(LANG_WIDTH);
+            _stage.setHeight(LANG_HEIGHT);
+        } else {
+            _stage.setWidth(WIDTH);
+            _stage.setHeight(HEIGHT);
+        }
+        _stage.toFront();
+        _stage.requestFocus();
+    }
+
     /**
      * Sets the active scene for the application.
      *
@@ -71,7 +85,7 @@ public class InstallerApplication extends Application {
 
 
         _stage.setTitle(_translator.Localize("Window.Title"));
-        _stage.setScene(SceneManager.getWelcomeScene());
+        _stage.setScene(SceneManager.getLanguageViewScene());
 
         try {
             InputStream iconStream = InstallerApplication.class.getResourceAsStream("assets/icon.png");
@@ -88,14 +102,13 @@ public class InstallerApplication extends Application {
             _logger.Error("An error occurred while loading the icon: " + e.getMessage());
         }
 
-        _stage.setMinWidth(WIDTH);
-        _stage.setWidth(WIDTH);
-        _stage.setMaxWidth(WIDTH);
-        _stage.setMinHeight(HEIGHT);
-        _stage.setHeight(HEIGHT);
-        _stage.setMaxHeight(HEIGHT);
+        _stage.setMinWidth(LANG_WIDTH);
+        _stage.setWidth(LANG_WIDTH);
+        _stage.setMaxWidth(LANG_WIDTH);
+        _stage.setMinHeight(LANG_HEIGHT);
+        _stage.setHeight(LANG_HEIGHT);
+        _stage.setMaxHeight(LANG_HEIGHT);
         _stage.setResizable(false);
-        //_stage.setAlwaysOnTop(true);
 
         _stage.centerOnScreen();
         _stage.show();

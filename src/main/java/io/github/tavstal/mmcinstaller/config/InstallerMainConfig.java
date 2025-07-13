@@ -1,5 +1,7 @@
 package io.github.tavstal.mmcinstaller.config;
 
+import java.util.List;
+
 /**
  * Represents the main configuration for the installer.
  * <br/>
@@ -13,5 +15,5 @@ package io.github.tavstal.mmcinstaller.config;
  * @param install The configuration for the installation process.
  * @param uninstall The configuration for the uninstallation process.
  */
-public record InstallerMainConfig(String language, Boolean debug, ProjectConfig project, DownloadConfig download, InstallConfig install, UninstallConfig uninstall) {
+public record InstallerMainConfig(List<LanguageConfig> language, Boolean debug, ProjectConfig project, DownloadConfig download, InstallConfig install, UninstallConfig uninstall) {
 }

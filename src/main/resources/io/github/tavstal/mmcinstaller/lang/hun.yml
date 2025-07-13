@@ -17,6 +17,10 @@ Window:
   Title: "MesterMC Kliens Telepítő"
   Description: "Ez a telepítő segít a MesterMC Kliens 1.21.5 telepítésében a számítógépére."
 
+Language:
+  Title: "Válasszon nyelvet"
+  Action: "Nyelv kiválasztása..."
+
 Welcome:
   Title: "Üdvözöllek a MesterMC Kliens telepítőben!"
   Description: "Telepítve lesz a MesterMC Kliens 1.21.5 az ön gépén."

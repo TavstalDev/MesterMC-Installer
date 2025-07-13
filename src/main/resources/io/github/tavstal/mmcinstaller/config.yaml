@@ -1,6 +1,11 @@
 # The language used in the UI and messages.
-# Supported languages: eng, hun
-lang: "hun"
+languages:
+  - key: "eng"
+    name: "English"
+    localization: ""
+  - key: "hun"
+    name: "Hungarian"
+    localization: "Magyar"
 debug: false
 project:
   # The name of the project.

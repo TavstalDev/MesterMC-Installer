@@ -40,6 +40,16 @@ public class SceneManager {
     }
 
     /**
+     * Retrieves the JavaFX scene for the Language view.
+     * Loads the scene from the "views/LanguageView.fxml" file if not already cached.
+     *
+     * @return The JavaFX Scene for the Language view.
+     */
+    public static Scene getLanguageViewScene() {
+        return getScene("LanguageView", "views/LanguageView.fxml");
+    }
+
+    /**
      * Retrieves the JavaFX scene for the Welcome view.
      * Loads the scene from the "views/WelcomeView.fxml" file if not already cached.
      *

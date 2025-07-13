@@ -29,6 +29,25 @@ public class InstallerState {
     // Stores the application to be launched after installation.
     private static String applicationToLaunch = null;
 
+    // Stores the selected language for the installer.
+    private static String language = "hun";
+    /**
+     * Retrieves the currently selected language for the installer.
+     *
+     * @return The selected language as a String.
+     */
+    public static String getLanguage() {
+        return language;
+    }
+    /**
+     * Sets the language for the installer.
+     *
+     * @param language The language to set, represented as a String.
+     */
+    public static void setLanguage(String language) {
+        InstallerState.language = language;
+    }
+
     /**
      * Checks if the license agreement has been accepted.
      *
