@@ -4,6 +4,7 @@ import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.InstallerState;
 import io.github.tavstal.mmcinstaller.core.*;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
+import io.github.tavstal.mmcinstaller.utils.SceneManager;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -12,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
@@ -48,21 +50,30 @@ public class InstallProgressController implements Initializable {
         _translator = InstallerApplication.getTranslator();
 
         // Set localized text for UI elements.
-        progressTitle.setText(_translator.Localize("Progress.Title"));
-        progressDescription.setText(_translator.Localize("Progress.Description"));
-        progressAction.setText(_translator.Localize("Progress.Action"));
         cancelButton.setText(_translator.Localize("Common.Cancel"));
+        if (InstallerState.getIsUninstallModeActive()) {
+            progressTitle.setText(_translator.Localize("ProgressUninstall.Title"));
+            progressDescription.setText(_translator.Localize("ProgressUninstall.Description"));
+            progressAction.setText(_translator.Localize("ProgressUninstall.Action"));
 
-        // Get the current installation directory.
-        File dir = new File(InstallerState.getCurrentPath());
-        if (dir.mkdirs()) {
-            logStep(_translator.Localize("Progress.DirectoryCreated", Map.of("path", dir.getAbsolutePath())));
-        } else {
-            logStep(_translator.Localize("Progress.DirectoryExists", Map.of("path", dir.getAbsolutePath())));
+            startUninstall();
         }
+        else {
+            progressTitle.setText(_translator.Localize("Progress.Title"));
+            progressDescription.setText(_translator.Localize("Progress.Description"));
+            progressAction.setText(_translator.Localize("Progress.Action"));
 
-        // Start the download process.
-        startDownload();
+            // Get the current installation directory.
+            File dir = new File(InstallerState.getCurrentPath());
+            if (dir.mkdirs()) {
+                logStep(_translator.Localize("Progress.DirectoryCreated", Map.of("path", dir.getAbsolutePath())));
+            } else {
+                logStep(_translator.Localize("Progress.DirectoryExists", Map.of("path", dir.getAbsolutePath())));
+            }
+
+            // Start the download process.
+            startDownload();
+        }
     }
 
     /**
@@ -116,12 +127,9 @@ public class InstallProgressController implements Initializable {
         File outputFile = new File(InstallerState.getCurrentPath(), ConfigLoader.get().download().fileName());
 
         // Create a Task for the download
-        System.out.println("Expected size: " + InstallerState.getRequiredSpaceInBytes() + " bytes");
-        System.out.println("Existing file size: " + outputFile.length() + " bytes");
-        System.out.println("Output file exists: " + outputFile.exists());
         if (outputFile.exists() && outputFile.length() == InstallerState.getRequiredSpaceInBytes() && outputFile.length() > 0) {
-            progressBar.setProgress(1.0);
             Platform.runLater(() -> { // Small delay to ensure UI is ready.
+                progressBar.setProgress(1.0);
                 handleDownloadedFile(outputFile);
             });
             return; // Skip download if file already exists and is valid.
@@ -162,6 +170,80 @@ public class InstallProgressController implements Initializable {
 
         // Start the task in a new thread.
         new Thread(downloadTask).start();
+    }
+
+    /**
+     * Starts the uninstallation process by deleting files and directories associated with the application.
+     * Updates the progress bar and logs each step of the process.
+     */
+    private void startUninstall() {
+        _logger.Debug("Deleting files...");
+        double steps = 5.0;
+
+        _logger.Debug("Deleting desktop shortcut.");
+        File desktopShortcut = new File(InstallerState.getShortcutPath());
+        if (desktopShortcut.exists() && desktopShortcut.delete()) {
+            _logger.Debug("Desktop shortcut deleted successfully.");
+        } else {
+            _logger.Debug("Failed to delete desktop shortcut or it does not exist.");
+        }
+        progressBar.setProgress(1.0 / steps);
+
+        _logger.Debug("Deleting start menu shortcut.");
+        File startMenuShortcut = new File(InstallerState.getStartMenuPath());
+        if (startMenuShortcut.exists() && startMenuShortcut.delete()) {
+            _logger.Debug("Start menu shortcut deleted successfully.");
+        } else {
+            _logger.Debug("Failed to delete start menu shortcut or it does not exist.");
+        }
+        progressBar.setProgress(2.0 / steps);
+
+        _logger.Debug("Checking if start menu directory is not in use.");
+        File startMenuDir = new File(InstallerState.getStartMenuPath());
+        if (startMenuDir.exists()) {
+            if (InstallerState.getStartMenuPath().equals(PathUtils.getStartMenuDirectory("").getAbsolutePath())) {
+                _logger.Debug("Start menu directory is the same as the main directory. Ignoring deletion.");
+            } else if (startMenuDir.delete()) {
+                _logger.Debug("Start menu directory deleted successfully.");
+            } else {
+                _logger.Debug("Failed to delete start menu directory.");
+            }
+        } else {
+            _logger.Debug("Start menu directory does not exist.");
+        }
+        progressBar.setProgress(3.0 / steps);
+
+        _logger.Debug("Deleting installation directory.");
+        File installDir = new File(InstallerState.getCurrentPath());
+        if (installDir.exists()) {
+            try {
+                PathUtils.deleteDirectory(installDir.toPath());
+                _logger.Debug("Installation directory deleted successfully.");
+            } catch (IOException e) {
+                _logger.Error("Failed to delete installation directory: " + e.getMessage());
+            }
+        } else {
+            _logger.Debug("Installation directory does not exist.");
+        }
+        progressBar.setProgress(4.0 / steps);
+
+        _logger.Debug("Removing config file.");
+        File configFile = PathUtils.getUninstallerConfigFile();
+        if (configFile.exists()) {
+            if (configFile.delete()) {
+                _logger.Debug("Config file deleted successfully.");
+            } else {
+                _logger.Debug("Failed to delete config file.");
+            }
+        } else {
+            _logger.Debug("Config file does not exist.");
+        }
+
+        progressBar.setProgress(1.0); // Set progress to 100% after completion.
+        _logger.Debug("Uninstallation completed successfully.");
+        Platform.runLater(() -> { // Small delay to ensure UI is ready.
+            InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
+        });
     }
 
     /**
@@ -232,7 +314,7 @@ public class InstallProgressController implements Initializable {
         // Initialize the setup manager and perform the setup process.
         File dir = new File(InstallerState.getCurrentPath());
         File startMenuDir = new File(InstallerState.getStartMenuPath());
-        SetupManager manager = new SetupManager(outputFile, dir, startMenuDir, this::logStep);
+        SetupManager manager = new SetupManager(outputFile, dir, startMenuDir);
         manager.setup();
     }
 
