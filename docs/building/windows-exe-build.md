@@ -1,10 +1,10 @@
-# Building the Windows Executable with a Custom Icon
+# Building the Windows Executable
 
 This guide outlines how to create a `MesterMC.exe` file that launches your JavaFX application, complete with a custom icon. This process involves generating an icon file, creating a resource script, and then compiling a small C++ stub that links to these resources and launches your Java JAR.
 
 ---
 
-## 1. Prepare Your Icon (`icon.ico`)
+## Prepare Your Icon (`icon.ico`)
 
 First, ensure you have **ImageMagick** installed. It's a powerful tool for converting image formats and creating multi-resolution `.ico` files, which are essential for crisp icons across different sizes in Windows.
 
@@ -42,7 +42,7 @@ convert icon.png -define icon:auto-resize=16,24,32,48,64,256 icon.ico
 
 ---
 
-## 2. Create a Resource Script File (`.rc`)
+## Create a Resource Script File (`.rc`)
 
 This file tells the Windows Resource Compiler which resources (like your icon) to embed into the executable.
 
@@ -55,7 +55,7 @@ This file tells the Windows Resource Compiler which resources (like your icon) t
 
 ---
 
-## 3. Compile the Resource File
+## Compile the Resource File
 
 Use `windres` (the Windows Resource Compiler) to compile your `.rc` file into an object file (`.o`).
 
@@ -75,7 +75,7 @@ x86_64-w64-mingw32-g++ mestermc_exe.cpp mestermc_res.o -o "MesterMC.exe" -static
 
 ---
 
-## 4. Create a C++ Stub Executable (`mestermc_exe.cpp`)
+## Create a C++ Stub Executable (`mestermc_exe.cpp`)
 
 This small C++ program acts as the entry point for your Windows executable. Its primary job is to locate and launch your JavaFX application's JAR file using the `javaw.exe` runtime.
 
@@ -143,7 +143,7 @@ This small C++ program acts as the entry point for your Windows executable. Its 
 
 ---
 
-## 5. Compile the Executable
+## Compile the Executable
 
 Finally, link your C++ stub with the compiled resource file and the necessary Windows libraries.
 
@@ -162,3 +162,8 @@ If you're building your Windows executable on a Linux system, you'll use the Min
 ```bash
 x86_64-w64-mingw32-g++ mestermc_exe.cpp mestermc_res.o -o "MesterMC.exe" -static -lkernel32 -luser32 -lgdi32 -lole32 -loleaut32 -lcomctl32 -lshlwapi -lshfolder -Wl,--subsystem,windows
 ```
+
+## Copy the Generated Executable
+After compiling, you should have a `MesterMC.exe` file in your current directory.
+This executable will launch MesterMC.jar downloaded by the JavaFX application.
+Copy this file to the project's resources/io/github/tavstal/mmcinstaller/exe directory.

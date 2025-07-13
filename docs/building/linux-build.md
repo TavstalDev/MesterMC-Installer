@@ -2,11 +2,32 @@
 
 This guide explains how to build and package the MesterMC-Installer project as an AppImage on Linux.
 
-## Build the Project
-Run the buildPackage Gradle task (under the application group):
+## Prerequisites
+Ensure you have the following installed:
+- **Linux Distribution**: Any modern distribution (e.g., Ubuntu, Fedora, Arch Linux)
+- **Java Development Kit (JDK)**: Version 21. Gradle and OpenJDK are recommended, RedHat is not compatible.
+- **AppImage Tool**: For creating AppImages
+- **AppImageLauncher**: Optional, for easier AppImage testing
+
+
+## Preparing the Project
+Please visit the [Getting Started Guide](https://github.com/TavstalDev/MesterMC-Installer/blob/master/docs/building/getting-started.md) to set up the project in IntelliJ IDEA and synchronize dependencies.
+
+## Building Steps
+The building process is mostly straightforward, as jpackage handles the creation of the application image, bundling the Java Runtime Environment (JRE) with your application.
+
+### Run the buildPackage Task:
+Once the dependencies are synchronized, you can build and package the application using the buildPackage Gradle task.
+
+#### A. From IntelliJ IDEA:
+Open the Gradle tool window (usually on the right side of the IDE).
+Navigate to Tasks -> application -> buildPackage.
+Double-click buildPackage to execute the task.
+#### B. From Terminal (within the project root):
 ```bash
 ./gradlew buildPackage
 ```
+
 This will automatically create the following directories in the build/jpackage folder:
 - MesterMC-Installer
 - MesterMC-Installer.AppDir
