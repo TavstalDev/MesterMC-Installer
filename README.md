@@ -102,3 +102,8 @@ If you encounter any issues or have questions, please feel free to:
 * **Contact me**
 * * **Discord:** @Tavstal (Preferred, but not required)
 * * **Twitter X:** [@Tavstal](https://x.com/Tavstal)
+
+## ⛏️ MesterMC Official Links
+* **Website:** [MesterMC](https://mestermc.hu/)
+* **Installer:** [MesterMC Installer](https://mestermc.eu/)
+* **Discord:** [MesterMC Discord](https://discord.gg/mestermc)

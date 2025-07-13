@@ -99,3 +99,8 @@ Ha bármilyen problémába ütközik, vagy kérdése van, forduljon hozzánk biz
 * **Közvetlen kapcsolat**
 * * **Discord:** @Tavstal (Preferált, de nem kötelező)
 * * **Twitter X:** [@Tavstal](https://x.com/Tavstal)
+
+## ⛏️ MesterMC Hivatalos Linkek
+* **Weboldal:** [MesterMC](https://mestermc.hu/)
+* **Telepítő:** [MesterMC Telepítő](https://mestermc.eu/)
+* **Discord:** [MesterMC Discord](https://discord.gg/mestermc)
