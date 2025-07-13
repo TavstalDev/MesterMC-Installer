@@ -81,6 +81,8 @@ public class ConfigLoader {
             String zshUninstallFileName = YamlHelper.getString(rawConfigMap, "uninstall.zsh.file_name", "uninstall.zsh");
             String zshUninstallContent = YamlHelper.getString(rawConfigMap, "uninstall.zsh.content", "");
 
+            String uninstallerConfig = YamlHelper.getString(rawConfigMap, "uninstaller", "");
+
             // Create the main configuration instance.
             _instance = new InstallerMainConfig(
                     languages,
@@ -149,7 +151,8 @@ public class ConfigLoader {
                                     zshUninstallFileName,
                                     zshUninstallContent
                             )
-                    )
+                    ),
+                    uninstallerConfig
             );
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse configuration: " + e.getMessage(), e);
