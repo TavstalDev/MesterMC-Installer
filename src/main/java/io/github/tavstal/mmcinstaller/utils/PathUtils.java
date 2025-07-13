@@ -53,7 +53,7 @@ public class PathUtils {
             installationDir = new File(userHome, "Library" + File.separator + "Application Support" + File.separator + appName);
         } else {
             // Generic fallback for other OS types
-            System.err.println("Warning: Unrecognized OS for installation path: " + os + ". Falling back to user home.");
+            logger.Warn("Warning: Unrecognized OS for installation path: " + os + ". Falling back to user home.");
             installationDir = new File(userHome, appName);
         }
 
@@ -86,7 +86,12 @@ public class PathUtils {
                 // Windows: Use JNA to get the localized "Programs" folder.
                 String programsPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Programs);
                 if (programsPath != null && !programsPath.isEmpty()) {
-                    targetDirectory = new File(programsPath, shortcutFolderName);
+                    if (shortcutFolderName == null || shortcutFolderName.isEmpty()) {
+                        targetDirectory = new File(programsPath);
+                    }
+                    else {
+                        targetDirectory = new File(programsPath, shortcutFolderName);
+                    }
                 }
             } catch (Throwable e) {
                 // Fallback for Windows if JNA fails.
