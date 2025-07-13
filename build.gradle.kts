@@ -1,7 +1,4 @@
 import org.gradle.internal.os.OperatingSystem
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 
 plugins {
     java
@@ -9,10 +6,25 @@ plugins {
     id("org.javamodularity.moduleplugin") version "1.8.15"
     id("org.openjfx.javafxplugin") version "0.1.0"
     id("org.beryx.jlink") version "3.1.1"
+    kotlin("jvm")
 }
 
-group = "io.github.tavstal"
-version = "1.0"
+//#region Load properties
+val projectVersion: String by project
+val projectGroup: String by project
+val javaVersion: String by project
+val authors: String by project
+val linuxAppIconPath: String by project
+val windowsAppIconPath: String by project
+val macAppIconPath: String by project
+val packageOutputDir = layout.buildDirectory.dir("jpackage").get().asFile
+val linuxAppIcon = layout.projectDirectory.file(linuxAppIconPath).asFile
+val windowsAppIcon = layout.projectDirectory.file(windowsAppIconPath).asFile
+val macAppIcon = layout.projectDirectory.file(macAppIconPath).asFile
+val projectName = rootProject.name
+//#endregion
+group = projectGroup
+version = projectVersion
 
 
 repositories {
@@ -21,8 +33,9 @@ repositories {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-        sourceCompatibility = JavaVersion.VERSION_21
+        languageVersion = JavaLanguageVersion.of(javaVersion)
+        sourceCompatibility = JavaVersion.toVersion(javaVersion)
+        targetCompatibility = JavaVersion.toVersion(javaVersion)
     }
 }
 
@@ -31,12 +44,12 @@ tasks.withType<JavaCompile> {
 }
 
 application {
-    mainModule.set("io.github.tavstal.mmcinstaller")
-    mainClass.set("io.github.tavstal.mmcinstaller.InstallerApplication")
+    mainModule.set("${group}.mmcinstaller")
+    mainClass.set("${group}.mmcinstaller.InstallerApplication")
 }
 
 javafx {
-    version = "21"
+    version = javaVersion
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -61,18 +74,14 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.3")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-val vendorName = "Solymosi 'Tavstal' Zoltán"
-val packageOutputDir = layout.buildDirectory.dir("jpackage").get().asFile
-val linuxAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/icon.png").asFile
-val windowsAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/favicon.ico").asFile
-val macAppIcon = layout.projectDirectory.file("src/main/resources/io/github/tavstal/mmcinstaller/assets/icon.icns").asFile
-
+//#region JLink Configuration
 jlink {
     imageZip.set(layout.buildDirectory.file("distributions/${project.name}-${project.version}-${javafx.platform.classifier}.zip"))
     options.addAll(
@@ -90,7 +99,7 @@ jlink {
     }
     jpackage {
         appVersion = project.version.toString()
-        vendor = vendorName
+        vendor = authors
         // Output directory
         outputDir = packageOutputDir.absolutePath
         imageName = rootProject.name
@@ -101,52 +110,104 @@ jlink {
         }
     }
 }
+//#endregion
 
-val createSymlinkLauncher by tasks.registering(DefaultTask::class) {
-    group = "build"
-    description = "Creates a symbolic link for the application launcher."
-    dependsOn(tasks.installDist)
+//#region Tasks
+abstract class WriteFile : DefaultTask() {
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    @get:Input
+    abstract val contents: Property<String>
+
+    @TaskAction
+    fun write() {
+        val file = outputFile.get().asFile
+        if (file.exists()) {
+            file.delete()
+        }
+        file.parentFile.mkdirs()
+        file.writeText(contents.get())
+        logger.lifecycle("Written file: ${outputFile.asFile.get().absolutePath}")
+    }
+}
+
+val writeAppRunScript by tasks.registering(WriteFile::class) {
+    val appDirRoot = packageOutputDir.resolve("${projectName}.AppDir")
+    outputFile.set(appDirRoot.resolve("AppRun"))
+    contents.set("""
+        #!/bin/bash
+        HERE="$(dirname "$(readlink -f "$0")")"
+        exec "${'$'}HERE/usr/bin/${projectName}" "$@"
+    """.trimIndent())
+}
+
+val writeDesktopFile by tasks.registering(WriteFile::class) {
+    val appDirRoot = packageOutputDir.resolve("${projectName}.AppDir")
+    outputFile.set(appDirRoot.resolve("${projectName}.desktop"))
+    contents.set("""
+        #!/usr/bin/env xdg-open
+        [Desktop Entry]
+        Type=Application
+        Name=${projectName}
+        Exec=${projectName}
+        Icon=icon
+        Categories=Utility;
+        X-AppImage-Integrate=false
+    """.trimIndent())
+}
+
+val createLinuxAppDir by tasks.registering(Copy::class) {
+    group = "application"
+    description = "Creates the AppDir structure for Linux."
+    dependsOn(tasks.jpackageImage) // Ensure jlinked image is built
+    dependsOn(writeAppRunScript)   // Depend on the AppRun script being written
+    dependsOn(writeDesktopFile)    // Depend on the Desktop file being written
+    onlyIf { OperatingSystem.current().isLinux }
+
+    val appDirRoot = packageOutputDir.resolve("${projectName}.AppDir")
+    val jpackageImageDir = packageOutputDir.resolve(projectName)
+
+    // Ensure the root AppDir is created before other files are copied into it
+    doFirst {
+        if (!appDirRoot.exists()) {
+            appDirRoot.mkdirs()
+            logger.lifecycle("Created AppDir root: ${appDirRoot.absolutePath}")
+        }
+    }
+
+    // Configure the Copy operation
+    destinationDir = appDirRoot
+
+    // 1. Copy the jpackage bin directory content into usr/bin
+    from(jpackageImageDir.resolve("bin")) {
+        into("usr/bin/")
+    }
+
+    // 2. Copy the jpackage lib directory content into usr/lib
+    from(jpackageImageDir.resolve("lib")) {
+        into("usr/lib")
+    }
+
+    // 3. Copy the icon.png to the root of .AppDir
+    from(linuxAppIcon) {
+        rename { "icon.png" }
+    }
+
+    // This doLast block runs *after* all copying is done
     doLast {
-        // The root directory of the installed application (from installDist)
-        val installDir = layout.buildDirectory.dir("jpackage/${application.applicationName}").get().asFile.toPath()
-        val targetLauncherFullPath = installDir.resolve("bin/${application.applicationName}")
-        val symlinkPath = installDir.resolve(application.applicationName)
-        // --- Diagnostic messages ---
-        logger.lifecycle("--- Starting createSymlinkLauncher task ---")
-        logger.lifecycle("# Installation Directory: $installDir")
-        logger.lifecycle("# Target Launcher: $targetLauncherFullPath")
-        logger.lifecycle("# Symlink Path: $symlinkPath")
-
-        // --- Validate target exists before linking ---
-        if (!Files.exists(targetLauncherFullPath)) {
-            logger.error("Error: Target launcher script not found at $targetLauncherFullPath. Cannot create symlink.")
-            throw GradleException("Target launcher not found for symlink creation.")
-        }
-
-        // --- Create the relative symbolic link ---
-        // Delete existing symlink if it exists to prevent errors on re-build
-        if (Files.exists(symlinkPath)) {
-            Files.delete(symlinkPath)
-            logger.lifecycle("Removed existing symlink: $symlinkPath")
-        }
-
-        // Create a relative symlink from the installDir to the bin/launcher
-        Files.createSymbolicLink(symlinkPath, installDir.relativize(targetLauncherFullPath))
-        logger.lifecycle("Created relative symlink: $symlinkPath -> ${installDir.relativize(targetLauncherFullPath)}")
-
-        // Make the symlink executable (important for some systems/file managers)
-        symlinkPath.toFile().setExecutable(true, false)
-        logger.lifecycle("--- Finished createSymlinkLauncher task ---")
+        val appRunFile = appDirRoot.resolve("AppRun")
+        appRunFile.setExecutable(true, false) // Make AppRun executable
+        logger.lifecycle("Made AppRun executable: ${appRunFile.absolutePath}")
     }
 }
 
 val buildPackage by tasks.registering(DefaultTask::class) {
     group = "application"
-    dependsOn(tasks.jpackageImage)
-    if (OperatingSystem.current().isLinux)
-        dependsOn(createSymlinkLauncher)
+    if (OperatingSystem.current().isLinux) {
+        dependsOn(createLinuxAppDir)
+    } else {
+        dependsOn(tasks.jpackageImage)
+    }
 }
-
-tasks.named(createSymlinkLauncher.name) {
-    mustRunAfter(tasks.jpackageImage)
-}
+//#endregion
