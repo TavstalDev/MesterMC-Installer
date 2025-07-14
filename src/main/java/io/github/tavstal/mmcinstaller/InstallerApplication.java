@@ -2,6 +2,7 @@ package io.github.tavstal.mmcinstaller;
 
 import io.github.tavstal.mmcinstaller.config.ConfigLoader;
 import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.core.Constants;
 import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
@@ -23,13 +24,6 @@ import java.io.*;
 import java.util.Map;
 
 public class InstallerApplication extends Application {
-    //#region Constants
-    public final static  int LANG_WIDTH = 400;
-    public final static int LANG_HEIGHT = 200;
-    public final static int WIDTH = 700;
-    public final static int HEIGHT = 400;
-    //#endregion
-
     //#region Variables
     private static Stage _stage;
     private static InstallerLogger _logger;
@@ -182,11 +176,11 @@ public class InstallerApplication extends Application {
      */
     public static void changeStageSize(boolean isLanguageView) {
         if (isLanguageView) {
-            setWidth(LANG_WIDTH);
-            setHeight(LANG_HEIGHT);
+            setWidth(Constants.LANG_WIDTH);
+            setHeight(Constants.LANG_HEIGHT);
         } else {
-            setWidth(WIDTH);
-            setHeight(HEIGHT);
+            setWidth(Constants.WIDTH);
+            setHeight(Constants.HEIGHT);
         }
     }
 

@@ -48,7 +48,7 @@ public class SetupManager {
         this._installDir = installDir;
         this._startMenuDir = startMenuDir;
         this._logCallback = logCallback;
-        this._os = System.getProperty("os.name").toLowerCase();
+        this._os = Constants.OS_NAME;
     }
 
     /**

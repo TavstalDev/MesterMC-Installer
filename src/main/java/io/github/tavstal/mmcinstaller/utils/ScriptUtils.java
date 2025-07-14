@@ -1,5 +1,6 @@
 package io.github.tavstal.mmcinstaller.utils;
 
+import io.github.tavstal.mmcinstaller.core.Constants;
 import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
 import org.slf4j.event.Level;
 
@@ -13,9 +14,6 @@ import java.util.concurrent.TimeUnit;
  * Extends the FallbackLogger to provide logging functionality.
  */
 public class ScriptUtils extends FallbackLogger {
-    // Stores the name of the operating system in lowercase for OS-specific operations.
-    private static final String _os = System.getProperty("os.name").toLowerCase();
-
     /**
      * Creates a script file with the specified content in the given directory.
      * If the operating system is Linux or macOS, the script is made executable.
@@ -34,7 +32,7 @@ public class ScriptUtils extends FallbackLogger {
             Log(Level.DEBUG, "Created script: " + scriptFile.getAbsolutePath());
 
             // If the OS is Linux or macOS, make the script executable
-            if (_os.contains("linux") || _os.contains("mac")) {
+            if (Constants.OS_NAME.contains("linux") || Constants.OS_NAME.contains("mac")) {
                 makeExecutable(scriptFile);
             }
         } catch (IOException e) {

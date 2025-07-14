@@ -2,6 +2,7 @@ package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.core.Constants;
 import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import javafx.fxml.FXML;
@@ -64,7 +65,7 @@ public class InstallCompleteController implements Initializable {
     protected void onFinishButtonClick() {
         if (launchGameCheckBox.isSelected()) {
             _logger.Debug("Launch game checkbox is selected, launching the game...");
-            String osName = System.getProperty("os.name").toLowerCase();
+            String osName = Constants.OS_NAME;
             try {
                 if (osName.contains("mac")) {
                     new ProcessBuilder("open", InstallerState.getApplicationToLaunch())

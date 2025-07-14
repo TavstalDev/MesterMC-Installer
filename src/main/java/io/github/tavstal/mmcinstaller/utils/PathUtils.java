@@ -3,6 +3,7 @@ package io.github.tavstal.mmcinstaller.utils;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.core.Constants;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,7 +25,7 @@ public class PathUtils {
      * @return A File object representing the recommended installation directory.
      */
     public static File getDefaultInstallationPath(String appName) {
-        String os = System.getProperty("os.name").toLowerCase();
+        String os = Constants.OS_NAME;
         String userHome = System.getProperty("user.home");
         File installationDir;
         var logger = InstallerApplication.getLogger();
@@ -77,7 +78,7 @@ public class PathUtils {
      * @return A File object representing the Start Menu directory, or a fallback directory if unavailable.
      */
     public static File getStartMenuDirectory(String shortcutFolderName) {
-        String os = System.getProperty("os.name").toLowerCase();
+        String os = Constants.OS_NAME;
         String userHome = System.getProperty("user.home");
         File targetDirectory = null;
         var logger = InstallerApplication.getLogger();
@@ -140,7 +141,7 @@ public class PathUtils {
      * @return A File object representing the user's desktop directory, or null if it cannot be determined.
      */
     public static File getUserDesktopDirectory() {
-        String os = System.getProperty("os.name").toLowerCase();
+        String os = Constants.OS_NAME;
         String userHome = System.getProperty("user.home");
         File desktopDirectory = null;
         var logger = InstallerApplication.getLogger();
@@ -228,7 +229,7 @@ public class PathUtils {
      * @return A `File` object representing the path to the uninstaller configuration file.
      */
     public static File getUninstallerConfigFile() {
-        String os = System.getProperty("os.name").toLowerCase();
+        String os = Constants.OS_NAME;
         String userHome = System.getProperty("user.home");
         File uninstallerConfigFile;
 
