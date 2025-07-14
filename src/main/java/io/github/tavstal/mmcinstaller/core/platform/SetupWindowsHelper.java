@@ -75,7 +75,7 @@ public class SetupWindowsHelper extends FallbackLogger {
 
         // Define the desktop shortcut file
         File desktopShortcutFile = new File(desktopDir, "MesterMC.lnk");
-        InstallerState.setCurrentPath(desktopShortcutFile.getAbsolutePath());
+        InstallerState.setShortcutPath(desktopShortcutFile.getAbsolutePath());
 
         // Define the start menu shortcut file
         File startMenuFile = new File(_startMenuDir, "MesterMC.lnk");
