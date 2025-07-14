@@ -8,6 +8,7 @@ import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
 import io.github.tavstal.mmcinstaller.utils.YamlHelper;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -89,8 +90,10 @@ public class InstallerApplication extends Application {
         _stage.setResizable(false);
 
         _stage.show();
-        attemptCenterOnScreen();
-        attemptFocus();
+        Platform.runLater(() -> { // Small delay to ensure UI is ready.
+            attemptFocus();
+            attemptCenterOnScreen();
+        });
         _logger.Debug("Application started successfully.");
 
         // Check if uninstaller mode should be enabled
@@ -194,8 +197,10 @@ public class InstallerApplication extends Application {
      * @param width The width to set for the stage.
      */
     public static void setWidth(int width) {
-        if (_stage == null)
+        if (_stage == null) {
+            _logger.Warn("Attempted to set width on a null stage.");
             return;
+        }
 
         _stage.setMinWidth(width);
         _stage.setWidth(width);
@@ -209,8 +214,10 @@ public class InstallerApplication extends Application {
      * @param height The height to set for the stage.
      */
     public static void setHeight(int height) {
-        if (_stage == null)
+        if (_stage == null){
+            _logger.Warn("Attempted to set height on a null stage.");
             return;
+        }
 
         _stage.setMinHeight(height);
         _stage.setHeight(height);
@@ -222,8 +229,10 @@ public class InstallerApplication extends Application {
      * If the stage is not initialized, the method exits without performing any action.
      */
     public static void attemptCenterOnScreen() {
-        if (_stage == null)
+        if (_stage == null){
+            _logger.Warn("Attempted to center on screen on a null stage.");
             return;
+        }
 
         _stage.centerOnScreen();
     }
@@ -235,8 +244,10 @@ public class InstallerApplication extends Application {
      * If the stage is not initialized, the method exits without performing any action.
      */
     public static void attemptFocus() {
-        if (_stage == null)
+        if (_stage == null){
+            _logger.Warn("Attempted to focus on a null stage.");
             return;
+        }
 
         _stage.setIconified(false); // Ensure the stage is not minimized
         _stage.setAlwaysOnTop(true); // Focus fix on Windows

@@ -50,8 +50,10 @@ public class InstallProgressController implements Initializable {
             progressDescription.setText(_translator.Localize("ProgressUninstall.Description"));
             progressAction.setText(_translator.Localize("ProgressUninstall.Action"));
 
-            UninstallManager manager = new UninstallManager(this::logStep, this::updateProgressBar);
-            manager.start();
+            Platform.runLater(() -> { // Small delay to ensure UI is ready.
+                UninstallManager manager = new UninstallManager(this::logStep, this::updateProgressBar);
+                manager.start();
+            });
             return;
         }
 
@@ -67,12 +69,14 @@ public class InstallProgressController implements Initializable {
             logStep(_translator.Localize("IO.Directory.Exists", Map.of("path", dir.getAbsolutePath())));
         }
 
-        DownloadManager manager = new DownloadManager(
-                this::logStep,
-                this::updateProgressBar,
-                this::updateDownloadProgress
-        );
-        manager.start();
+        Platform.runLater(() -> { // Small delay to ensure UI is ready.
+            DownloadManager manager = new DownloadManager(
+                    this::logStep,
+                    this::updateProgressBar,
+                    this::updateDownloadProgress
+            );
+            manager.start();
+        });
     }
 
     /**
@@ -94,7 +98,6 @@ public class InstallProgressController implements Initializable {
         Platform.runLater(() -> {
             // Append the new message
             logTextArea.appendText(message + "\n");
-
             // Scroll to the end
             logTextArea.setScrollTop(Double.MAX_VALUE);
         });
@@ -107,7 +110,16 @@ public class InstallProgressController implements Initializable {
      * @param value The progress value to set (between 0.0 and 1.0).
      */
     public void updateProgressBar(double value) {
-        Platform.runLater(() -> progressBar.setProgress(value));
+        Platform.runLater(() -> {
+            // Ensure the value is between 0.0 and 1.0
+            double result = value;
+            if (value > 1.0) {
+                result = 1.0;
+            } else if (value < 0.0) {
+                result = 0.0;
+            }
+            progressBar.setProgress(result);
+        });
     }
 
     /**
@@ -120,7 +132,8 @@ public class InstallProgressController implements Initializable {
     public void updateDownloadProgress(long downloadedBytes, long totalBytes) {
         Platform.runLater(() -> {
             if (totalBytes > 0) {
-                progressBar.setProgress((double) downloadedBytes / totalBytes);
+                double value = (double) downloadedBytes / totalBytes;
+                progressBar.setProgress(value);
             }
         });
     }
