@@ -79,7 +79,7 @@ public class SetupWindowsHelper extends FallbackLogger {
 
         // Define the start menu shortcut file
         File startMenuFile = new File(_startMenuDir, "MesterMC.lnk");
-        InstallerState.setStartMenuPath(startMenuFile.getAbsolutePath());
+        InstallerState.setStartMenuShortcutPath(startMenuFile.getAbsolutePath());
 
         // Copy the shortcut to the desktop and start menu
         try {
