@@ -1,14 +1,21 @@
 package io.github.tavstal.mmcinstaller.core;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.InstallerState;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.utils.AlertUtils;
 import io.github.tavstal.mmcinstaller.utils.FileUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
-import java.io.File;
+import java.io.*;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -56,12 +63,9 @@ public class DownloadManager {
             return; // Skip download if file already exists and is valid.
         }
 
-        FileDownloader downloader = new FileDownloader(_logger, _translator);
-        Task<Void> downloadTask = downloader.createDownloadTask(
+        Task<Void> downloadTask = createDownloadTask(
                 ConfigLoader.get().download().link(),
-                outputFile,
-                _logCallback,
-                _progressBarCallBack
+                outputFile
         );
 
         // Handle the success of the download task.
@@ -162,5 +166,82 @@ public class DownloadManager {
         File startMenuDir = new File(InstallerState.getStartMenuPath());
         SetupManager manager = new SetupManager(outputFile, dir, startMenuDir, _logCallback);
         manager.setup();
+    }
+
+    /**
+     * Creates a task to download a file from the specified URL and save it to the given output file.
+     * The task handles HTTP requests, progress updates, and error handling.
+     *
+     * @param url        The URL of the file to download.
+     * @param outputFile The file where the downloaded content will be saved.
+     * @return A `Task<Void>` that performs the download operation.
+     */
+    private Task<Void> createDownloadTask(String url, File outputFile) {
+        return new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                // Log the start of the download process.
+                _logCallback.accept(_translator.Localize("Progress.Download.Started", Map.of("file", outputFile.getAbsolutePath())));
+                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                    HttpGet request = new HttpGet(url);
+
+                    // Execute the HTTP request and handle the response.
+                    httpClient.execute(request, response -> {
+                        _logger.Debug("Received response. Status: " + response.getCode());
+                        if (response.getCode() != 200) {
+                            // Handle non-200 HTTP status codes.
+                            String errorMessage = _translator.Localize("Progress.Download.Failed") +
+                                    " HTTP Status: " + response.getCode();
+                            _logger.Error(errorMessage);
+                            _logCallback.accept(errorMessage);
+                            throw new IOException("Server returned non-200 status: " + response.getCode());
+                        }
+
+                        HttpEntity entity = response.getEntity();
+                        if (entity != null) {
+                            long totalBytes = entity.getContentLength(); // Total size of the file.
+                            long downloadedBytes = 0; // Bytes downloaded so far.
+                            byte[] buffer = new byte[4096]; // Buffer for reading data.
+
+                            // Read the content and write it to the output file.
+                            try (InputStream is = entity.getContent();
+                                 OutputStream os = new FileOutputStream(outputFile)) {
+                                int bytesRead;
+                                while ((bytesRead = is.read(buffer)) != -1) {
+                                    if (isCancelled()) {
+                                        // Handle task cancellation.
+                                        _logger.Debug("Download cancelled.");
+                                        return null;
+                                    }
+                                    os.write(buffer, 0, bytesRead);
+                                    downloadedBytes += bytesRead;
+                                    _progressBarCallBack.accept(downloadedBytes, totalBytes); // Report progress.
+                                }
+                                _logger.Debug("Download complete.");
+                                _logCallback.accept(_translator.Localize("Progress.Download.Completed", Map.of("file", outputFile.getAbsolutePath())));
+                            } finally {
+                                EntityUtils.consume(entity); // Ensure the entity is fully consumed.
+                            }
+                        } else {
+                            // Handle null HTTP entity.
+                            _logCallback.accept(_translator.Localize("Progress.Download.Failed"));
+                            throw new IOException("HTTP Response entity is null. Cannot download.");
+                        }
+                        return null;
+                    });
+                } catch (IOException e) {
+                    // Log and handle IO exceptions.
+                    _logger.Error(String.format("Failed to download %s: %s", outputFile.getName(), e.getMessage()));
+                    _logCallback.accept(_translator.Localize("Progress.Download.Error", Map.of("error", e.getMessage())));
+                    throw e;
+                } catch (Exception e) {
+                    // Log and handle unexpected exceptions.
+                    _logger.Error("An unexpected error occurred during download: " + e.getMessage());
+                    _logCallback.accept(_translator.Localize("Progress.Download.Error", Map.of("error", e.getMessage())));
+                    throw e;
+                }
+                return null;
+            }
+        };
     }
 }
