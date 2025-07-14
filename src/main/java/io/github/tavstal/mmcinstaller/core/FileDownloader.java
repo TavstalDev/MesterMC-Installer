@@ -27,7 +27,7 @@ public class FileDownloader {
      * @param translator The translator to use for localizing messages.
      */
     public FileDownloader(InstallerLogger logger, InstallerTranslator translator) {
-        this._logger = logger;
+        this._logger = logger.WithModule(this.getClass());
         this._translator = translator;
     }
 
