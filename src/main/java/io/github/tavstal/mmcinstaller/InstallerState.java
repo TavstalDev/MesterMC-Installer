@@ -7,30 +7,54 @@ package io.github.tavstal.mmcinstaller;
  * paths, shortcut creation preferences, and required disk space.
  */
 public class InstallerState {
-
+    //#region Fields
+    // Indicates whether the installer is in debug mode.
+    private static boolean debugMode = false;
     // Indicates whether the license agreement has been accepted.
     private static boolean licenseAccepted = false;
-
     // Stores the current installation path.
     private static String currentPath = null;
-
     // Indicates whether a desktop shortcut should be created.
     private static boolean createDesktopShortcut = true;
-
     // Stores the path for the Start Menu shortcut.
     private static String startMenuPath = null;
-
     // Indicates whether a Start Menu shortcut should be created.
     private static boolean createStartMenuShortcut = true;
-
     // Stores the required disk space for the installation in bytes.
     private static long requiredSpace = 0;
-
     // Stores the application to be launched after installation.
     private static String applicationToLaunch = null;
-
     // Stores the selected language for the installer.
     private static String language = "hun";
+    // Indicates whether the uninstallation mode is active.
+    private static boolean _isUninstallModeActive = false;
+    // Stores the path for the shortcut.
+    private static String _shortcutPath = null;
+    // Stores the path for the Start Menu shortcut.
+    private static String _startMenuShortcutPath = null;
+    //#endregion
+
+    //#region Getters and Setters
+    //#region Debug Mode
+    /**
+     * Retrieves the current state of the debug mode.
+     *
+     * @return True if debug mode is enabled, false otherwise.
+     */
+    public static boolean isDebugMode() {
+        return debugMode;
+    }
+
+    /**
+     * Sets the state of the debug mode.
+     *
+     * @param debugMode True to enable debug mode, false to disable it.
+     */
+    public static void setDebugMode(boolean debugMode) {
+        InstallerState.debugMode = debugMode;
+    }
+    //#endregion
+    //#region Language
     /**
      * Retrieves the currently selected language for the installer.
      *
@@ -47,97 +71,8 @@ public class InstallerState {
     public static void setLanguage(String language) {
         InstallerState.language = language;
     }
-
-    /**
-     * Checks if the license agreement has been accepted.
-     *
-     * @return True if the license is accepted, false otherwise.
-     */
-    public static boolean isLicenseAccepted() {
-        return licenseAccepted;
-    }
-
-    /**
-     * Sets the license acceptance state.
-     *
-     * @param licenseAccepted True if the license is accepted, false otherwise.
-     */
-    public static void setLicenseAccepted(boolean licenseAccepted) {
-        InstallerState.licenseAccepted = licenseAccepted;
-    }
-
-    /**
-     * Retrieves the current installation path.
-     *
-     * @return The current installation path as a String.
-     */
-    public static String getCurrentPath() {
-        return currentPath;
-    }
-
-    /**
-     * Sets the current installation path.
-     *
-     * @param currentPath The installation path to set.
-     */
-    public static void setCurrentPath(String currentPath) {
-        InstallerState.currentPath = currentPath;
-    }
-
-    /**
-     * Checks if a desktop shortcut should be created.
-     *
-     * @return True if a desktop shortcut should be created, false otherwise.
-     */
-    public static boolean shouldCreateDesktopShortcut() {
-        return createDesktopShortcut;
-    }
-
-    /**
-     * Sets the desktop shortcut creation preference.
-     *
-     * @param createDesktopShortcut True to create a desktop shortcut, false otherwise.
-     */
-    public static void setCreateDesktopShortcut(boolean createDesktopShortcut) {
-        InstallerState.createDesktopShortcut = createDesktopShortcut;
-    }
-
-    /**
-     * Retrieves the path for the Start Menu shortcut.
-     *
-     * @return The Start Menu shortcut path as a String.
-     */
-    public static String getStartMenuPath() {
-        return startMenuPath;
-    }
-
-    /**
-     * Sets the path for the Start Menu shortcut.
-     *
-     * @param startMenuPath The Start Menu shortcut path to set.
-     */
-    public static void setStartMenuPath(String startMenuPath) {
-        InstallerState.startMenuPath = startMenuPath;
-    }
-
-    /**
-     * Checks if a Start Menu shortcut should be created.
-     *
-     * @return True if a Start Menu shortcut should be created, false otherwise.
-     */
-    public static boolean shouldCreateStartMenuShortcut() {
-        return createStartMenuShortcut;
-    }
-
-    /**
-     * Sets the Start Menu shortcut creation preference.
-     *
-     * @param createStartMenuShortcut True to create a Start Menu shortcut, false otherwise.
-     */
-    public static void setCreateStartMenuShortcut(boolean createStartMenuShortcut) {
-        InstallerState.createStartMenuShortcut = createStartMenuShortcut;
-    }
-
+    //#endregion
+    //#region Required Disk Space
     /**
      * Retrieves the required disk space for the installation in bytes.
      *
@@ -164,7 +99,86 @@ public class InstallerState {
     public static void setRequiredSpace(long requiredSpace) {
         InstallerState.requiredSpace = requiredSpace;
     }
+    //#endregion
 
+    //#region License Acceptance
+    /**
+     * Checks if the license agreement has been accepted.
+     *
+     * @return True if the license is accepted, false otherwise.
+     */
+    public static boolean isLicenseAccepted() {
+        return licenseAccepted;
+    }
+
+    /**
+     * Sets the license acceptance state.
+     *
+     * @param licenseAccepted True if the license is accepted, false otherwise.
+     */
+    public static void setLicenseAccepted(boolean licenseAccepted) {
+        InstallerState.licenseAccepted = licenseAccepted;
+    }
+    //#endregion
+    //#region Uninstallation Mode
+    /**
+     * Retrieves the current state of the uninstallation mode.
+     *
+     * @return True if the uninstallation mode is active, false otherwise.
+     */
+    public static boolean isUninstallModeActive() {
+        return _isUninstallModeActive;
+    }
+
+    /**
+     * Sets the state of the uninstallation mode.
+     *
+     * @param isActive True to activate the uninstallation mode, false to deactivate it.
+     */
+    public static void setUninstallMode(boolean isActive) {
+        _isUninstallModeActive = isActive;
+    }
+    //#endregion
+
+    //#region Installation Directory Path
+    /**
+     * Retrieves the current installation path.
+     *
+     * @return The current installation path as a String.
+     */
+    public static String getCurrentPath() {
+        return currentPath;
+    }
+
+    /**
+     * Sets the current installation path.
+     *
+     * @param currentPath The installation path to set.
+     */
+    public static void setCurrentPath(String currentPath) {
+        InstallerState.currentPath = currentPath;
+    }
+    //#endregion
+    //#region Start Menu Path
+    /**
+     * Retrieves the path for the Start Menu shortcut.
+     *
+     * @return The Start Menu shortcut path as a String.
+     */
+    public static String getStartMenuPath() {
+        return startMenuPath;
+    }
+
+    /**
+     * Sets the path for the Start Menu shortcut.
+     *
+     * @param startMenuPath The Start Menu shortcut path to set.
+     */
+    public static void setStartMenuPath(String startMenuPath) {
+        InstallerState.startMenuPath = startMenuPath;
+    }
+    //#endregion
+    //#region Application to Launch Path After Installation
     /**
      * Retrieves the application to be launched after installation.
      *
@@ -182,31 +196,46 @@ public class InstallerState {
     public static void setApplicationToLaunch(String appToLaunch) {
         InstallerState.applicationToLaunch = appToLaunch;
     }
+    //#endregion
 
-    // Indicates whether the uninstallation mode is active.
-    private static boolean _isUninstallModeActive = false;
-
+    //#region Shortcuts
     /**
-     * Retrieves the current state of the uninstallation mode.
+     * Checks if a desktop shortcut should be created.
      *
-     * @return True if the uninstallation mode is active, false otherwise.
+     * @return True if a desktop shortcut should be created, false otherwise.
      */
-    public static boolean getIsUninstallModeActive() {
-        return _isUninstallModeActive;
+    public static boolean shouldCreateDesktopShortcut() {
+        return createDesktopShortcut;
     }
 
     /**
-     * Sets the state of the uninstallation mode.
+     * Sets the desktop shortcut creation preference.
      *
-     * @param isUninstallModeActive True to activate the uninstallation mode, false to deactivate it.
+     * @param createDesktopShortcut True to create a desktop shortcut, false otherwise.
      */
-    public static void setIsUninstallModeActive(boolean isUninstallModeActive) {
-        _isUninstallModeActive = isUninstallModeActive;
+    public static void setCreateDesktopShortcut(boolean createDesktopShortcut) {
+        InstallerState.createDesktopShortcut = createDesktopShortcut;
     }
 
-    // Stores the path for the shortcut.
-    private static String _shortcutPath = null;
+    /**
+     * Checks if a Start Menu shortcut should be created.
+     *
+     * @return True if a Start Menu shortcut should be created, false otherwise.
+     */
+    public static boolean shouldCreateStartMenuShortcut() {
+        return createStartMenuShortcut;
+    }
 
+    /**
+     * Sets the Start Menu shortcut creation preference.
+     *
+     * @param createStartMenuShortcut True to create a Start Menu shortcut, false otherwise.
+     */
+    public static void setCreateStartMenuShortcut(boolean createStartMenuShortcut) {
+        InstallerState.createStartMenuShortcut = createStartMenuShortcut;
+    }
+    //#endregion
+    //#region Desktop Shortcut Path
     /**
      * Retrieves the path for the shortcut.
      *
@@ -224,10 +253,8 @@ public class InstallerState {
     public static void setShortcutPath(String shortcutPath) {
         _shortcutPath = shortcutPath;
     }
-
-    // Stores the path for the Start Menu shortcut.
-    private static String _startMenuShortcutPath = null;
-
+    //#endregion
+    //#region Start Menu Shortcut Path
     /**
      * Retrieves the path for the Start Menu shortcut.
      *
@@ -245,4 +272,6 @@ public class InstallerState {
     public static void setStartMenuShortcutPath(String startMenuShortcutPath) {
         _startMenuShortcutPath = startMenuShortcutPath;
     }
+    //#endregion
+    //#endregion
 }
