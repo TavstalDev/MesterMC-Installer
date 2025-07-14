@@ -40,7 +40,7 @@ public class InstallCompleteController implements Initializable {
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
         // Set localized text for UI elements.
-        if (InstallerState.getIsUninstallModeActive()) {
+        if (InstallerState.isUninstallModeActive()) {
             finishedTitle.setText(_translator.Localize("CompleteUninstall.Title"));
             finishedDescription.setText(_translator.Localize("CompleteUninstall.Description"));
             finishedAction.setText(_translator.Localize("CompleteUninstall.Action"));
