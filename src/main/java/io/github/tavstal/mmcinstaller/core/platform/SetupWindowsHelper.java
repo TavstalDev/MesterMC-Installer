@@ -1,7 +1,8 @@
-package io.github.tavstal.mmcinstaller.core;
+package io.github.tavstal.mmcinstaller.core.platform;
 
-import io.github.tavstal.mmcinstaller.InstallerState;
-import io.github.tavstal.mmcinstaller.utils.FallbackLogger;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
 import io.github.tavstal.mmcinstaller.utils.FileUtils;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.ScriptUtils;

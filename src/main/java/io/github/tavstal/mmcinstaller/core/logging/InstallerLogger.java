@@ -1,7 +1,7 @@
-package io.github.tavstal.mmcinstaller.core;
+package io.github.tavstal.mmcinstaller.core.logging;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.InstallerState;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;

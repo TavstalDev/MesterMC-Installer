@@ -1,4 +1,4 @@
-package io.github.tavstal.mmcinstaller.config;
+package io.github.tavstal.mmcinstaller.config.model;
 
 /**
  * Represents the default directory configuration.

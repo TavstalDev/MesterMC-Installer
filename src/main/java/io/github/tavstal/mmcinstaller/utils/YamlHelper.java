@@ -1,5 +1,6 @@
 package io.github.tavstal.mmcinstaller.utils;
 
+import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
 import org.slf4j.event.Level;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -101,6 +102,7 @@ public class YamlHelper extends FallbackLogger {
      * @param key The dot-separated key to locate the value.
      * @return The retrieved object, or null if not found.
      */
+    @SuppressWarnings("unused")
     public static Object getObject(Map<String, Object> map, String key) {
         return getObject(map, key, null);
     }
@@ -171,6 +173,7 @@ public class YamlHelper extends FallbackLogger {
      * @param key The dot-separated key to locate the value.
      * @return The retrieved Boolean value, or false if not found.
      */
+    @SuppressWarnings("unused")
     public static Boolean getBoolean(Map<String, Object> map, String key) {
         return getBoolean(map, key, false);
     }
@@ -206,6 +209,7 @@ public class YamlHelper extends FallbackLogger {
      * @param key The dot-separated key to locate the value.
      * @return The retrieved Integer value, or 0 if not found.
      */
+    @SuppressWarnings("unused")
     public static Integer getInteger(Map<String, Object> map, String key) {
         return getInteger(map, key, 0);
     }
@@ -241,6 +245,7 @@ public class YamlHelper extends FallbackLogger {
      * @param key The dot-separated key to locate the value.
      * @return The retrieved Double value, or 0.0 if not found.
      */
+    @SuppressWarnings("unused")
     public static Double getDouble(Map<String, Object> map, String key) {
         return getDouble(map, key, 0.0);
     }

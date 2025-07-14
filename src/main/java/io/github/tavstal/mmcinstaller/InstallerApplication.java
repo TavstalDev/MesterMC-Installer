@@ -1,7 +1,8 @@
 package io.github.tavstal.mmcinstaller;
 
-import io.github.tavstal.mmcinstaller.core.ConfigLoader;
-import io.github.tavstal.mmcinstaller.core.InstallerLogger;
+import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;

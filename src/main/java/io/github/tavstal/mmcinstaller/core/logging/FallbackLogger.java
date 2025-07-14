@@ -1,7 +1,7 @@
-package io.github.tavstal.mmcinstaller.utils;
+package io.github.tavstal.mmcinstaller.core.logging;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.core.InstallerLogger;
+import io.github.tavstal.mmcinstaller.utils.YamlHelper;
 import org.slf4j.event.Level;
 
 /**

@@ -1,4 +1,4 @@
-package io.github.tavstal.mmcinstaller;
+package io.github.tavstal.mmcinstaller.config;
 
 /**
  * Represents the state of the installer during the installation process.

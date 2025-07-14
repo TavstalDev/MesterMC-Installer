@@ -1,4 +1,4 @@
-package io.github.tavstal.mmcinstaller.config;
+package io.github.tavstal.mmcinstaller.config.model;
 
 /**
  * Represents a language configuration with its key, name, and localization.

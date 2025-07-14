@@ -1,7 +1,7 @@
-package io.github.tavstal.mmcinstaller.core;
+package io.github.tavstal.mmcinstaller.config;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.config.*;
+import io.github.tavstal.mmcinstaller.config.model.*;
 import io.github.tavstal.mmcinstaller.utils.YamlHelper;
 
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class ConfigLoader {
                             downloadChecksum
                     ),
                     new InstallConfig(
-                            new DefaultDirsConfig (
+                            new DefaultDirsConfig(
                                     appdataDir,
                                     startMenuDir
                             ),

@@ -1,4 +1,4 @@
-package io.github.tavstal.mmcinstaller.core;
+package io.github.tavstal.mmcinstaller.core.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

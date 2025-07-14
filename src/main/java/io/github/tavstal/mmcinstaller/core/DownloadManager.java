@@ -132,6 +132,7 @@ public class DownloadManager {
         // If the user chooses not to continue, delete the file and exit the application.
         if (!checksumContinue) {
             if (outputFile.exists())
+                //noinspection ResultOfMethodCallIgnored
                 outputFile.delete(); // Clean up the file if checksum validation fails.
             System.exit(0);
             return;
@@ -152,6 +153,7 @@ public class DownloadManager {
                 if (!AlertUtils.show(title, header, content, yesButtonText, noButtonText, Alert.AlertType.WARNING)) {
                     // If the user chooses not to continue, delete the file and exit the application.
                     if (outputFile.exists())
+                        //noinspection ResultOfMethodCallIgnored
                         outputFile.delete(); // Clean up the file if checksum validation fails.
                     System.exit(0);
                     return;

@@ -1,13 +1,12 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.InstallerState;
-import io.github.tavstal.mmcinstaller.config.LanguageConfig;
-import io.github.tavstal.mmcinstaller.core.ConfigLoader;
-import io.github.tavstal.mmcinstaller.core.InstallerLogger;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.config.model.LanguageConfig;
+import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -23,7 +22,6 @@ import java.util.ResourceBundle;
  * based on the selected language.
  */
 public class LanguageController implements Initializable {
-    private InstallerLogger _logger; // Logger for this controller, used for debugging and information logging.
     private InstallerTranslator _translator; // Translator for converting text to the selected language.
     public Label selectLabel; // Label prompting the user to select a language.
     public ComboBox<LanguageConfig> languageComboBox; // ComboBox for selecting the language, populated with available languages.
@@ -39,7 +37,7 @@ public class LanguageController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
+        InstallerLogger _logger = InstallerApplication.getLogger().WithModule(this.getClass());
         _translator = InstallerApplication.getTranslator();
 
         // Populate the ComboBox with available languages.
@@ -78,9 +76,8 @@ public class LanguageController implements Initializable {
      * Handles the event when the language selection changes.
      * Updates the application state and re-localizes UI elements.
      *
-     * @param actionEvent The event triggered by the language change.
      */
-    public void onLanguageChange(ActionEvent actionEvent) {
+    public void onLanguageChange() {
         if (nextButton.isDisabled())
             nextButton.setDisable(false);
         LanguageConfig selected = languageComboBox.getValue();
@@ -95,9 +92,8 @@ public class LanguageController implements Initializable {
      * Handles the event when the "Next" button is clicked.
      * Proceeds to the next step of the installer.
      *
-     * @param actionEvent The event triggered by the button click.
      */
-    public void onNextButtonClick(ActionEvent actionEvent) {
+    public void onNextButtonClick() {
         InstallerApplication.changeStageSize(false);
         InstallerApplication.setActiveScene(SceneManager.getWelcomeScene());
     }
@@ -106,9 +102,8 @@ public class LanguageController implements Initializable {
      * Handles the event when the "Cancel" button is clicked.
      * Exits the application.
      *
-     * @param actionEvent The event triggered by the button click.
      */
-    public void onCancelButtonClick(ActionEvent actionEvent) {
+    public void onCancelButtonClick() {
         System.exit(0);
     }
 }

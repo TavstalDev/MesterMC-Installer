@@ -1,7 +1,7 @@
 package io.github.tavstal.mmcinstaller.controllers;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.InstallerState;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
 import io.github.tavstal.mmcinstaller.core.DownloadManager;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.core.UninstallManager;
@@ -107,9 +107,7 @@ public class InstallProgressController implements Initializable {
      * @param value The progress value to set (between 0.0 and 1.0).
      */
     public void updateProgressBar(double value) {
-        Platform.runLater(() -> {
-            progressBar.setProgress(value);
-        });
+        Platform.runLater(() -> progressBar.setProgress(value));
     }
 
     /**

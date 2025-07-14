@@ -1,5 +1,6 @@
 package io.github.tavstal.mmcinstaller.utils;
 
+import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
 import org.slf4j.event.Level;
 
 import java.io.File;
