@@ -104,7 +104,7 @@ public class InstallerApplication extends Application {
                 InstallerState.setCurrentPath(YamlHelper.getString(fileMap, "installDir"));
                 InstallerState.setStartMenuPath(YamlHelper.getString(fileMap, "startMenuDir"));
                 InstallerState.setShortcutPath(YamlHelper.getString(fileMap, "desktopShortcut"));
-                InstallerState.setStartMenuPath(YamlHelper.getString(fileMap, "startMenuShortcut"));
+                InstallerState.setStartMenuShortcutPath(YamlHelper.getString(fileMap, "startMenuShortcut"));
 
                 _logger.Debug("Uninstaller mode is active.");
                 return; // No need to check .jar size in uninstaller mode
