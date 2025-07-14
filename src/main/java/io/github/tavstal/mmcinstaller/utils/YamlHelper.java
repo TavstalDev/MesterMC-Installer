@@ -1,6 +1,5 @@
 package io.github.tavstal.mmcinstaller.utils;
 
-import io.github.tavstal.mmcinstaller.InstallerApplication;
 import org.slf4j.event.Level;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -8,12 +7,12 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
 import java.util.Map;
 
-
 /**
- * Utility class for handling YAML files.
- * Provides methods to read YAML files and retrieve values with type-specific methods.
+ * A utility class that extends the FallbackLogger to provide YAML-related helper methods.
+ * This class includes functionality for reading and parsing YAML files, as well as retrieving
+ * values from nested Maps using dot-separated keys.
  */
-public class YamlHelper {
+public class YamlHelper extends FallbackLogger {
     private static final DumperOptions _dumperOptions = new DumperOptions() {
         {
             setDefaultFlowStyle(FlowStyle.BLOCK); // Forces multi-line formatting.
@@ -21,28 +20,6 @@ public class YamlHelper {
         }
     };
     private static final Yaml _yaml = new Yaml(_dumperOptions); // YAML parser instance.
-
-    private static void Log(Level level, String message) {
-        if (InstallerApplication.getLogger() == null)
-            System.out.println(message);
-        else
-        {
-            switch (level)
-            {
-                case Level.INFO:
-                    InstallerApplication.getLogger().Info(message);
-                    break;
-                case Level.WARN:
-                    InstallerApplication.getLogger().Warn(message);
-                    break;
-                case Level.ERROR:
-                    InstallerApplication.getLogger().Error(message);
-                    break;
-                default:
-                    InstallerApplication.getLogger().Debug(message);
-            }
-        }
-    }
 
     /**
      * Reads a YAML file from the specified resource path and converts it into a Map.
@@ -84,6 +61,8 @@ public class YamlHelper {
             return null;
         }
     }
+
+    //#region Methods for retrieving values from the Map
 
     /**
      * Retrieves an object from a nested Map using a dot-separated key.
@@ -265,4 +244,5 @@ public class YamlHelper {
     public static Double getDouble(Map<String, Object> map, String key) {
         return getDouble(map, key, 0.0);
     }
+    //#endregion
 }
