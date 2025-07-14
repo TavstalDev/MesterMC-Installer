@@ -238,6 +238,7 @@ public class InstallerApplication extends Application {
         if (_stage == null)
             return;
 
+        _stage.setIconified(false); // Ensure the stage is not minimized
         _stage.setAlwaysOnTop(true); // Focus fix on Windows
         _stage.toFront();
         _stage.requestFocus();
