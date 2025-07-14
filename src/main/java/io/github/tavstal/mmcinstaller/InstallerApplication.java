@@ -88,8 +88,8 @@ public class InstallerApplication extends Application {
         changeStageSize(true);
         _stage.setResizable(false);
 
-        attemptCenterOnScreen();
         _stage.show();
+        attemptCenterOnScreen();
         attemptFocus();
         _logger.Debug("Application started successfully.");
 
