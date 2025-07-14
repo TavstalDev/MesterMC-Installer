@@ -76,6 +76,7 @@ public class ShortcutController implements Initializable {
             directoryTextArea.setText(_defaultPath);
             InstallerState.setStartMenuPath(_defaultPath);
         }
+
         directoryTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
             File directory = new File(newValue);
             if (directory.exists() && directory.isDirectory()) {

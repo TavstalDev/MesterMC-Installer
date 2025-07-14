@@ -39,7 +39,7 @@ public class WelcomeController implements Initializable {
         // Translator instance for localization.
         InstallerTranslator _translator = InstallerApplication.getTranslator();
 
-        if (InstallerState.getIsUninstallModeActive()) {
+        if (InstallerState.isUninstallModeActive()) {
             welcomeTitle.setText(_translator.Localize("WelcomeUninstall.Title"));
             welcomeDescription.setText(_translator.Localize("WelcomeUninstall.Description"));
             welcomeAction.setText(_translator.Localize("WelcomeUninstall.Action"));
@@ -62,7 +62,7 @@ public class WelcomeController implements Initializable {
      */
     @FXML
     protected void onNextButtonClick() {
-        if (InstallerState.getIsUninstallModeActive()) {
+        if (InstallerState.isUninstallModeActive()) {
             _logger.Debug("Uninstall mode is active, switching to ReviewView.fxml.");
             InstallerApplication.setActiveScene(SceneManager.getReviewScene());
             return;

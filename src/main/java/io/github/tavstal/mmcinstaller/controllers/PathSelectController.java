@@ -29,7 +29,6 @@ public class PathSelectController implements Initializable {
     private InstallerLogger _logger; // Logger instance for logging events.
     private InstallerTranslator _translator; // Translator instance for localization.
     private String _defaultPath; // Default installation path based on the operating system.
-
     public Button backButton; // Button to navigate back to the previous screen.
     public Button nextButton; // Button to proceed to the next step.
     public Button cancelButton; // Button to cancel the installation process.
@@ -75,6 +74,8 @@ public class PathSelectController implements Initializable {
             directoryTextArea.setText(_defaultPath);
             InstallerState.setCurrentPath(_defaultPath);
         }
+
+        // Add a listener to the directory text area to update the current path in InstallerState
         directoryTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
             File directory = new File(newValue);
             if (directory.exists() && directory.isDirectory()) {

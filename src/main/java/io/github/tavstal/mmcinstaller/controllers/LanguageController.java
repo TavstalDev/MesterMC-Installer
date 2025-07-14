@@ -23,23 +23,12 @@ import java.util.ResourceBundle;
  * based on the selected language.
  */
 public class LanguageController implements Initializable {
-    /** Label for displaying the language selection prompt. */
-    public Label selectLabel;
-
-    /** Logger instance for logging events. */
-    private InstallerLogger _logger;
-
-    /** Translator instance for handling localization. */
-    private InstallerTranslator _translator;
-
-    /** ComboBox for displaying and selecting available languages. */
-    public ComboBox<LanguageConfig> languageComboBox;
-
-    /** Button to proceed to the next step of the installer. */
-    public Button nextButton;
-
-    /** Button to cancel the installation process. */
-    public Button cancelButton;
+    private InstallerLogger _logger; // Logger for this controller, used for debugging and information logging.
+    private InstallerTranslator _translator; // Translator for converting text to the selected language.
+    public Label selectLabel; // Label prompting the user to select a language.
+    public ComboBox<LanguageConfig> languageComboBox; // ComboBox for selecting the language, populated with available languages.
+    public Button nextButton; // Button to proceed to the next step of the installation process, enabled after a language is selected.
+    public Button cancelButton; // Button to cancel the installation process and exit the application.
 
     /**
      * Initializes the controller, setting up localization, logging, and populating

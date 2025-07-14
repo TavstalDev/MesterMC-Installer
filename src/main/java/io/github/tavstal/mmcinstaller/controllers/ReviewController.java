@@ -23,12 +23,10 @@ import java.util.ResourceBundle;
  * Handles user interactions and initializes the review screen.
  */
 public class ReviewController implements Initializable {
-    public StackPane rootPane;
-    private boolean isSceneInitialized = false;
-
+    private boolean isSceneInitialized = false; // Flag to check if the scene is initialized to avoid redundant updates.
     private InstallerLogger _logger; // Logger instance for logging events.
     private InstallerTranslator _translator; // Translator instance for localization.
-
+    public StackPane rootPane; // Root pane of the Review view, used for scene management.
     public TextArea reviewTextArea; // Text area displaying the review content.
     public Label reviewTitle; // Label displaying the review title.
     public Label reviewDescription; // Label displaying the review description.
@@ -50,7 +48,7 @@ public class ReviewController implements Initializable {
         _translator = InstallerApplication.getTranslator();
 
         updateReviewContent();
-        if (InstallerState.getIsUninstallModeActive()) {
+        if (InstallerState.isUninstallModeActive()) {
             reviewTitle.setText(_translator.Localize("ReviewUninstall.Title"));
             reviewDescription.setText(_translator.Localize("ReviewUninstall.Description"));
             reviewAction.setText(_translator.Localize("ReviewUninstall.Action"));
@@ -85,7 +83,7 @@ public class ReviewController implements Initializable {
      * Updates the content of the review text area with localized and dynamic data.
      */
     public void updateReviewContent() {
-        if (InstallerState.getIsUninstallModeActive()) {
+        if (InstallerState.isUninstallModeActive()) {
             String reviewContent = _translator.Localize("Review.Content", new HashMap<>() {
                 {
                     put("installPath", InstallerState.getCurrentPath());
@@ -124,7 +122,7 @@ public class ReviewController implements Initializable {
      */
     @FXML
     protected void onBackButtonClick() {
-        if (InstallerState.getIsUninstallModeActive()) {
+        if (InstallerState.isUninstallModeActive()) {
             InstallerApplication.setActiveScene(SceneManager.getWelcomeScene());
             _logger.Debug("Switching to WelcomeView.fxml");
             return;
