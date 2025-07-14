@@ -89,7 +89,7 @@ public class ReviewController implements Initializable {
                     put("installPath", InstallerState.getCurrentPath());
                     put("startMenuPath", InstallerState.getStartMenuPath());
                     put("desktopShortcut", InstallerState.getShortcutPath());
-                    put("startMenuShortcut", InstallerState.getStartMenuPath());
+                    put("startMenuShortcut", InstallerState.getStartMenuShortcutPath());
                 }
             });
             reviewTextArea.setText(reviewContent);
