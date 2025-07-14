@@ -6,7 +6,9 @@ import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.utils.FileUtils;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +66,7 @@ public class UninstallManager {
         _progressCallback.accept(1.0 / steps);
 
         // Delete start menu shortcut.
-        File startMenuShortcut = new File(InstallerState.getStartMenuPath());
+        File startMenuShortcut = new File(InstallerState.getStartMenuShortcutPath());
         if (startMenuShortcut.exists()) {
             if (startMenuShortcut.delete()) {
                 _logCallback.accept(_translator.Localize("IO.File.Deleted", Map.of("path", desktopShortcut.getAbsolutePath())));
@@ -131,7 +133,11 @@ public class UninstallManager {
         }
 
         Platform.runLater(() -> { // Small delay to ensure UI is ready.
-            InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
+            PauseTransition pause = new PauseTransition(Duration.seconds(3));
+            pause.setOnFinished(event -> {
+                InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
+            });
+            pause.play();
         });
     }
 }

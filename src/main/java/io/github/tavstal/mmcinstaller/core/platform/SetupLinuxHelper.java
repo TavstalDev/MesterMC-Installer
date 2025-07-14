@@ -1,7 +1,9 @@
 package io.github.tavstal.mmcinstaller.core.platform;
 
-import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.ScriptUtils;
@@ -11,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Helper class for setting up the Linux-specific application environment.
@@ -20,15 +24,16 @@ import java.nio.file.StandardCopyOption;
 public class SetupLinuxHelper extends FallbackLogger {
 
     /**
-     * Sets up the Linux application environment by creating .desktop files, shortcuts, and an uninstallation script.
-     * This method handles the creation of the main .desktop file, desktop shortcut, start menu shortcut,
-     * and uninstallation script, logging the process and handling errors as needed.
+     * Sets up the Linux-specific application environment by creating .desktop files, shortcuts,
+     * and an uninstallation script. This method handles file creation, logging, and error handling.
      *
      * @param installDir   The directory where the application is installed.
      * @param startMenuDir The directory where the start menu shortcut will be created.
-     * @param jarFile      The JAR file of the application to be included in the .desktop file.
+     * @param jarFile      The JAR file of the application.
+     * @param logCallback  A callback function to log messages during the setup process.
      */
-    public static void setup(File installDir, File startMenuDir, File jarFile) {
+    public static void setup(File installDir, File startMenuDir, File jarFile, Consumer<String> logCallback) {
+        InstallerTranslator translator = InstallerApplication.getTranslator();
         // Get the name and content of the .desktop file from the configuration
         String desktopFileName = ConfigLoader.get().install().linuxDesktop().fileName();
         String desktopFileContent = ConfigLoader.get().install().linuxDesktop().content()
@@ -51,12 +56,19 @@ public class SetupLinuxHelper extends FallbackLogger {
             Log(Level.DEBUG, "Creating .desktop file: " + linuxLaunchFile.getAbsolutePath());
             // Write the content to the .desktop file
             Files.writeString(linuxLaunchFile.toPath(), desktopFileContent);
+            logCallback.accept(translator.Localize("IO.File.Created", Map.of(
+                    "path", linuxLaunchFile.getAbsolutePath()
+            )));
 
             // Check if a desktop shortcut should be created
             if (InstallerState.shouldCreateDesktopShortcut()) {
                 Log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
                 // Copy the .desktop file to the desktop directory
                 Files.copy(linuxLaunchFile.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
+                        "source", linuxLaunchFile.getAbsolutePath(),
+                        "destination", desktopShortcutFile.getAbsolutePath()
+                )));
             }
 
             // Check if a start menu shortcut should be created
@@ -64,10 +76,18 @@ public class SetupLinuxHelper extends FallbackLogger {
                 Log(Level.DEBUG,"Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
                 // Copy the .desktop file to the start menu directory
                 Files.copy(linuxLaunchFile.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
+                        "source", linuxLaunchFile.getAbsolutePath(),
+                        "destination", startMenuFile.getAbsolutePath()
+                )));
             }
         } catch (IOException e) {
             // Log an error if the .desktop file creation or shortcut creation fails
             Log(Level.ERROR,"Failed to write .desktop file: " + e.getMessage());
+            logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
+                    "path", linuxLaunchFile.getAbsolutePath(),
+                    "error", e.getMessage()
+            )));
         }
 
         // Create the uninstallation script file

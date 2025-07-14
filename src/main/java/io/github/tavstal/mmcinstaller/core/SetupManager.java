@@ -1,8 +1,8 @@
 package io.github.tavstal.mmcinstaller.core;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.config.InstallerState;
 import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
 import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.platform.SetupLinuxHelper;
 import io.github.tavstal.mmcinstaller.core.platform.SetupMacOsHelper;
@@ -11,6 +11,9 @@ import io.github.tavstal.mmcinstaller.utils.FileUtils;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
 import io.github.tavstal.mmcinstaller.utils.ScriptUtils;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -74,33 +77,59 @@ public class SetupManager {
             // Copy common resources
             // Moved icons to their own OS-specific setup methods
             // to avoid unnecessary copying and bloating the installation directory
-            FileUtils.copyResource(_installDir.getAbsolutePath(),"info.txt", "info.txt");
+            File infoTextFile = FileUtils.copyResource(_installDir.getAbsolutePath(),"info.txt", "info.txt");
+            if (infoTextFile == null) {
+                _logCallback.accept(_translator.Localize("IO.File.CopyError", Map.of(
+                        "source", "resources/info.txt",
+                        "destination", _installDir.getAbsolutePath(),
+                        "error", "?"
+                )));
+            }
+            _logCallback.accept(_translator.Localize("IO.File.Copied", Map.of(
+                    "source", "resources/info.txt",
+                    "destination", _installDir.getAbsolutePath()
+            )));
 
             // Perform OS-specific setup
             if (_os.contains("win")) { // WINDOWS
                 File icoFile = FileUtils.copyResource(_installDir.getAbsolutePath(),"assets/favicon.ico", "icon.ico");
                 _logCallback.accept(_translator.Localize("Common.DetectedOS", Map.of("os", "Windows")));
                 // Create the batch script file
-                ScriptUtils.createFile(
+                File bashScriptFile = ScriptUtils.createFile(
                         _installDir.getAbsolutePath(),
                         ConfigLoader.get().install().batch().fileName(),
                         ConfigLoader.get().install().batch().content()
                                 .replaceAll("%dirPath%", installPath.replace("\\", "\\\\"))
                                 .replaceAll("%jarPath%", _jarFile.getAbsolutePath().replace("\\", "\\\\"))
                 );
+                _logCallback.accept(_translator.Localize("IO.File.Created", Map.of(
+                        "path", bashScriptFile.getAbsolutePath()
+                )));
                 // Setup Windows-specific configurations
-                SetupWindowsHelper.setup(_installDir, _startMenuDir, icoFile);
+                SetupWindowsHelper.setup(_installDir, _startMenuDir, icoFile, _logCallback);
             } else if (_os.contains("mac")) { // MAC OS
                 _logCallback.accept(_translator.Localize("Common.DetectedOS", Map.of("os", "MacOS")));
                 // Setup macOS-specific configurations
-                SetupMacOsHelper.setup(_installDir, _startMenuDir, _jarFile);
+                SetupMacOsHelper.setup(_installDir, _startMenuDir, _jarFile, _logCallback);
             } else {  // LINUX
                 if (_os.contains("linux"))
                     _logCallback.accept(_translator.Localize("Common.DetectedOS", Map.of("os", "Linux")));
                 else
                     _logCallback.accept(_translator.Localize("Common.UnsupportedOS", Map.of("os", _os)));
 
-                FileUtils.copyResource(_installDir.getAbsolutePath(),"assets/icon.png", "icon.png");
+                File linuxIconFile = FileUtils.copyResource(_installDir.getAbsolutePath(),"assets/icon.png", "icon.png");
+                if (linuxIconFile == null) {
+                    _logCallback.accept(_translator.Localize("IO.File.CopyError", Map.of(
+                            "source", "resources/assets/icon.png",
+                            "destination", _installDir.getAbsolutePath(),
+                            "error", "?"
+                    )));
+                } else {
+                    _logCallback.accept(_translator.Localize("IO.File.Copied", Map.of(
+                            "source", "resources/assets/icon.png",
+                            "destination", _installDir.getAbsolutePath()
+                    )));
+                }
 
                 // Create the bash script file
                 File scriptFile = ScriptUtils.createFile(
@@ -110,10 +139,14 @@ public class SetupManager {
                                 .replaceAll("%dirPath%", installPath)
                                 .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
                 );
+                _logCallback.accept(_translator.Localize("IO.File.Created", Map.of(
+                        "path", scriptFile.getAbsolutePath()
+                )));
+
                 // Set the application launch path
                 InstallerState.setApplicationToLaunch(scriptFile.getAbsolutePath());
                 // Setup Linux-specific configurations
-                SetupLinuxHelper.setup(_installDir, _startMenuDir, _jarFile);
+                SetupLinuxHelper.setup(_installDir, _startMenuDir, _jarFile, _logCallback);
             }
             // Create the uninstaller configuration file
             // Depends on the OS specific setup.
@@ -126,7 +159,13 @@ public class SetupManager {
         }
 
         // Set the active scene to "Install Complete"
-        InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
+        Platform.runLater(() -> { // Small delay to ensure UI is ready.
+            PauseTransition pause = new PauseTransition(Duration.seconds(3));
+            pause.setOnFinished(event -> {
+                InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
+            });
+            pause.play();
+        });
     }
 
     /**
@@ -160,13 +199,13 @@ public class SetupManager {
         try {
             // Write the content to the uninstaller configuration file
             Files.writeString(uninstallerConfigFile.toPath().toAbsolutePath(), content);
-            _logCallback.accept("Uninstaller configuration file created: " + uninstallerConfigFile.getAbsolutePath());
+            _logCallback.accept(_translator.Localize("IO.File.Created", Map.of(
+                    "path", uninstallerConfigFile.getAbsolutePath()
+            )));
         } catch (Exception ex) {
             // Log an error if the file writing fails
             _logger.Error("Failed to write uninstaller configuration file: " + ex.getMessage());
-            _logCallback.accept("Failed to write uninstaller configuration file: " + ex.getMessage());
+            _logCallback.accept(ex.getLocalizedMessage());
         }
     }
-
-
 }

@@ -1,7 +1,9 @@
 package io.github.tavstal.mmcinstaller.core.platform;
 
-import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
 import io.github.tavstal.mmcinstaller.utils.FileUtils;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
@@ -12,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Helper class for setting up the Windows-specific application environment.
@@ -20,15 +24,17 @@ import java.nio.file.StandardCopyOption;
  */
 public class SetupWindowsHelper extends FallbackLogger {
     /**
-     * Sets up the Windows application environment by creating shortcuts, copying executable files,
-     * and generating an uninstallation script. This method handles the creation of desktop and start menu shortcuts,
-     * logging the process and handling errors as needed.
+     * Sets up the Windows-specific application environment by creating shortcuts, copying resources,
+     * and generating an uninstallation script. This method handles file operations, PowerShell script execution,
+     * and error handling.
      *
      * @param _installDir   The directory where the application is installed.
      * @param _startMenuDir The directory where the start menu shortcut will be created.
-     * @param iconIcoPath   The path to the icon file to be used for the shortcut.
+     * @param iconIcoPath   The path to the icon file (.ico) used for the shortcut.
+     * @param logCallback   A callback function to log messages during the setup process.
      */
-    public static void setup(File _installDir, File _startMenuDir, File iconIcoPath) {
+    public static void setup(File _installDir, File _startMenuDir, File iconIcoPath, Consumer<String> logCallback) {
+        InstallerTranslator translator = InstallerApplication.getTranslator();
         // Get the user's desktop directory
         File desktopDir = PathUtils.getUserDesktopDirectory();
 
@@ -39,9 +45,15 @@ public class SetupWindowsHelper extends FallbackLogger {
         File shortcutPath = new File(_installDir, "MesterMC.lnk");
 
         // Copy the executable file from resources to the installation directory
-        File exeFile = FileUtils.copyResource(_installDir.getAbsolutePath(),ConfigLoader.get().install().exe().resourcePath(), exeFileName);
+        var exeResourcePath = ConfigLoader.get().install().exe().resourcePath();
+        File exeFile = FileUtils.copyResource(_installDir.getAbsolutePath(), exeResourcePath, exeFileName);
         if (exeFile == null) {
             Log(Level.ERROR, "Executable file not found: " + exeFileName);
+            logCallback.accept(translator.Localize("IO.File.CopyError", Map.of(
+                    "source", exeResourcePath,
+                    "destination",  exeResourcePath + File.separator +  exeFileName,
+                    "error", "Not found."
+            )));
             return;
         }
         // Set the application launch path to the executable file
@@ -63,13 +75,26 @@ public class SetupWindowsHelper extends FallbackLogger {
             Process process = new ProcessBuilder("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", ps1File.getAbsolutePath()).start();
             int exitCode = process.waitFor();
             Log(Level.DEBUG,"PowerShell script executed with exit code: " + exitCode);
+            logCallback.accept(translator.Localize("Process.Success", Map.of(
+                    "processName", "PowerShell",
+                    "exitCode", String.valueOf(exitCode)
+            )));
 
             // Clean up the temporary script file
-            if (!ps1File.delete())
-                Log(Level.WARN,"Failed to delete temporary PowerShell script: " + ps1File.getAbsolutePath());
+            if (!ps1File.delete()) {
+                Log(Level.WARN, "Failed to delete temporary PowerShell script: " + ps1File.getAbsolutePath());
+                logCallback.accept(translator.Localize("IO.File.DeleteError", Map.of(
+                        "path", ps1File.getAbsolutePath(),
+                        "error", "?"
+                )));
+            }
         } catch (IOException | InterruptedException e) {
             // Log an error if the PowerShell script execution fails
             Log(Level.ERROR,"Failed to create Windows shortcut: " + e.getMessage());
+            logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
+                    "path", shortcutPath.getAbsolutePath(),
+                    "error", e.getMessage()
+            )));
             return;
         }
 
@@ -88,6 +113,10 @@ public class SetupWindowsHelper extends FallbackLogger {
                 Log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
                 // Copy the shortcut file to the desktop directory
                 Files.copy(shortcutPath.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
+                        "source", shortcutPath.getAbsolutePath(),
+                        "destination", desktopShortcutFile.getAbsolutePath()
+                )));
             }
 
             // Check if a start menu shortcut should be created
@@ -95,6 +124,10 @@ public class SetupWindowsHelper extends FallbackLogger {
                 Log(Level.DEBUG,"Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
                 // Copy the shortcut file to the start menu directory
                 Files.copy(shortcutPath.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
+                        "source", shortcutPath.getAbsolutePath(),
+                        "destination", startMenuFile.getAbsolutePath()
+                )));
             }
 
             // Delete the original shortcut file in the installation directory
@@ -105,6 +138,11 @@ public class SetupWindowsHelper extends FallbackLogger {
         } catch (IOException e) {
             // Log an error if copying the shortcut files fails
             Log(Level.ERROR,"Failed to copy shortcut files: " + e.getMessage());
+            logCallback.accept(translator.Localize("IO.File.CopyError", Map.of(
+                    "source", shortcutPath.getAbsolutePath(),
+                    "destination", desktopShortcutFile.getAbsolutePath() + " or " + startMenuFile.getAbsolutePath(),
+                    "error", e.getMessage()
+            )));
         }
 
         // Create the uninstallation script file

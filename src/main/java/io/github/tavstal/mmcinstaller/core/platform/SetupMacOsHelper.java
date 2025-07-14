@@ -1,7 +1,9 @@
 package io.github.tavstal.mmcinstaller.core.platform;
 
-import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
+import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
 import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
 import io.github.tavstal.mmcinstaller.utils.FileUtils;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
@@ -13,7 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Helper class for setting up macOS-specific application environments.
@@ -22,15 +26,16 @@ import java.util.Set;
  */
 public class SetupMacOsHelper extends FallbackLogger {
     /**
-     * Sets up the macOS application environment by creating app bundles, shortcuts, and an uninstaller.
-     * This method handles the creation of the main app bundle, desktop shortcut, start menu shortcut,
-     * and uninstaller app bundle, logging the process and handling errors as needed.
+     * Sets up the macOS-specific application environment by creating app bundles, shortcuts,
+     * and an uninstaller. This method handles file creation, logging, and error handling.
      *
      * @param installDir   The directory where the application is installed.
      * @param startMenuDir The directory where the start menu shortcut will be created.
-     * @param jarFile      The JAR file of the application to be included in the app bundle.
+     * @param jarFile      The JAR file of the application.
+     * @param logCallback  A callback function to log messages during the setup process.
      */
-    public static void setup(File installDir, File startMenuDir, File jarFile) {
+    public static void setup(File installDir, File startMenuDir, File jarFile, Consumer<String> logCallback) {
+        InstallerTranslator translator = InstallerApplication.getTranslator();
         // Get the user's desktop directory
         File desktopDir = PathUtils.getUserDesktopDirectory();
         // Retrieve the name of the macOS app bundle from the configuration
@@ -45,6 +50,18 @@ public class SetupMacOsHelper extends FallbackLogger {
         // Copy the .icns icon file from resources
         String iconFileName = "icon.icns";
         File icnsFile = FileUtils.copyResource(installDir.getAbsolutePath(), "assets/icon.icns", iconFileName);
+        if (icnsFile == null) {
+            logCallback.accept(translator.Localize("IO.File.CopyError", Map.of(
+                    "source", "resources/assets/icon.icns",
+                    "destination", installDir.getAbsolutePath() + File.separator + iconFileName,
+                    "error", "?"
+            )));
+        } else {
+            logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
+                    "source", "resources/assets/icon.icns",
+                    "destination", icnsFile.getAbsolutePath()
+            )));
+        }
 
         try {
             // Log the creation of the macOS app bundle
@@ -69,6 +86,10 @@ public class SetupMacOsHelper extends FallbackLogger {
                     Log(Level.DEBUG, "Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
                     // Create a copy of the original .app bundle
                     FileUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath());
+                    logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
+                            "source", launchAppBundlePath.toAbsolutePath().toString(),
+                            "destination", desktopShortcutFile.getAbsolutePath()
+                    )));
                 }
 
                 // Check if a start menu shortcut should be created
@@ -76,11 +97,19 @@ public class SetupMacOsHelper extends FallbackLogger {
                     Log(Level.DEBUG, "Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
                     // Create a copy of the original .app bundle
                     FileUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath());
+                    logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
+                            "source", launchAppBundlePath.toAbsolutePath().toString(),
+                            "destination", startMenuFile.getAbsolutePath()
+                    )));
                 }
             }
             else {
                 // Log an error if the app bundle creation failed
                 Log(Level.ERROR, "Failed to create macOS app bundle.");
+                logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
+                        "path", desktopFileName,
+                        "error", "?"
+                )));
             }
 
             // Create Uninstaller App Bundle
@@ -97,14 +126,23 @@ public class SetupMacOsHelper extends FallbackLogger {
             if (uninstallAppBundlePath == null) {
                 // Log an error if the uninstaller app bundle creation failed
                 Log(Level.ERROR, "Failed to create macOS uninstaller app bundle.");
+                logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
+                        "path", installDir.toPath() + File.separator + ConfigLoader.get().uninstall().zsh().fileName(),
+                        "error", "?"
+                )));
+
             } else {
                 // Log the successful creation of the uninstaller app bundle
                 Log(Level.DEBUG, "Created macOS uninstaller app bundle at: " + uninstallAppBundlePath.toAbsolutePath());
+                logCallback.accept(translator.Localize("IO.File.Created", Map.of(
+                        "path", uninstallAppBundlePath.toAbsolutePath().toString()
+                )));
             }
         }
         catch (Exception ex) {
             // Log an error if the macOS app bundle creation fails
             Log(Level.ERROR, "Failed to create macOS app bundle: " + ex.getMessage());
+            logCallback.accept(ex.getLocalizedMessage());
         }
     }
 
