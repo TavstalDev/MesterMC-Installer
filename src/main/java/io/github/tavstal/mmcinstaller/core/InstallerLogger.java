@@ -1,7 +1,9 @@
 package io.github.tavstal.mmcinstaller.core;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
 
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,31 +13,43 @@ import java.util.logging.Logger;
  * Supports optional module-specific logging and debug mode.
  */
 public class InstallerLogger {
-    private final boolean _debug; // Indicates whether debug mode is enabled.
     private final String _module; // The name of the module for module-specific logging.
     private final Logger _logger; // The underlying Java Logger instance.
+    private ConsoleHandler _consoleHandler; // ConsoleHandler for logging to the console with color formatting.
 
     /**
-     * Constructor for creating a logger without a specific module.
+     * Constructs an `InstallerLogger` instance with the specified module name and console handler.
+     * <p>
+     * If the provided console handler is null, a new `ConsoleHandler` is created with an
+     * `AnsiColorFormatter` and added to the logger. Existing console handlers in the root logger
+     * are removed to avoid duplicate output.
+     * </p>
      *
-     * @param debug Whether debug mode is enabled.
+     * @param module          The name of the module for module-specific logging.
+     * @param consoleHandler  The `ConsoleHandler` for logging to the console. If null, a new handler is created.
      */
-    public InstallerLogger(boolean debug) {
-        _debug = debug;
-        _module = null;
-        _logger = Logger.getLogger(InstallerApplication.class.getPackage().getName());
-    }
-
-    /**
-     * Constructor for creating a logger with a specific module.
-     *
-     * @param module The name of the module.
-     * @param debug  Whether debug mode is enabled.
-     */
-    public InstallerLogger(String module, boolean debug) {
-        _debug = debug;
+    public InstallerLogger(String module, ConsoleHandler consoleHandler) {
         _module = module;
         _logger = Logger.getLogger(InstallerApplication.class.getPackage().getName());
+        _consoleHandler = consoleHandler;
+
+        if (_consoleHandler == null) {
+            Logger rootLogger = Logger.getLogger("");
+            // Remove existing ConsoleHandlers to avoid duplicate output
+            for (java.util.logging.Handler handler : rootLogger.getHandlers()) {
+                if (handler instanceof ConsoleHandler) {
+                    rootLogger.removeHandler(handler);
+                }
+            }
+
+            _consoleHandler = new ConsoleHandler();
+            _consoleHandler.setFormatter(new AnsiColorFormatter());
+            _consoleHandler.setLevel(Level.ALL);
+
+            _logger.addHandler(_consoleHandler);
+            _logger.setLevel(Level.ALL);
+            _logger.setUseParentHandlers(false); // To prevent the log from going to the root logger's default handler as well
+        }
     }
 
     /**
@@ -45,7 +59,7 @@ public class InstallerLogger {
      * @return A new InstallerLogger instance.
      */
     public InstallerLogger WithModule(String module) {
-        return new InstallerLogger(module, _debug);
+        return new InstallerLogger(module, _consoleHandler);
     }
 
     /**
@@ -56,7 +70,7 @@ public class InstallerLogger {
      * @return A new `InstallerLogger` instance configured with the module name and debug mode.
      */
     public InstallerLogger WithModule(Class<?> module) {
-        return new InstallerLogger(module.getName(), _debug);
+        return new InstallerLogger(module.getSimpleName(), _consoleHandler);
     }
 
     /**
@@ -124,7 +138,7 @@ public class InstallerLogger {
      * @param text The message or object to log.
      */
     public void Debug(Object text) {
-        if (_debug)
-            Log(Level.INFO, GetString(text));
+        if (InstallerState.isDebugMode())
+            Log(Level.FINE, GetString(text));
     }
 }
