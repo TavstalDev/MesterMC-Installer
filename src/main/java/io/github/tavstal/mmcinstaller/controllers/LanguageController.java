@@ -95,6 +95,7 @@ public class LanguageController implements Initializable {
      */
     public void onNextButtonClick() {
         InstallerApplication.changeStageSize(false);
+        InstallerApplication.attemptCenterOnScreen();
         InstallerApplication.setActiveScene(SceneManager.getWelcomeScene());
     }
 

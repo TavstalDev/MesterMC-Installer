@@ -6,7 +6,6 @@ import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.utils.FileUtils;
 import io.github.tavstal.mmcinstaller.utils.PathUtils;
 import io.github.tavstal.mmcinstaller.utils.SceneManager;
-import javafx.application.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,8 +130,6 @@ public class UninstallManager {
         }
 
         _progressCallback.accept(1.0); // Set progress to 100% after completion.
-        Platform.runLater(() -> { // Small delay to ensure UI is ready.
-            InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
-        });
+        InstallerApplication.setActiveScene(SceneManager.getInstallCompleteScene());
     }
 }

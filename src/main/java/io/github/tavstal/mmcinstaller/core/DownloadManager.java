@@ -1,12 +1,11 @@
 package io.github.tavstal.mmcinstaller.core;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
-import io.github.tavstal.mmcinstaller.config.InstallerState;
 import io.github.tavstal.mmcinstaller.config.ConfigLoader;
+import io.github.tavstal.mmcinstaller.config.InstallerState;
 import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.utils.AlertUtils;
 import io.github.tavstal.mmcinstaller.utils.FileUtils;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -56,10 +55,8 @@ public class DownloadManager {
 
         // Create a Task for the download
         if (outputFile.exists() && outputFile.length() == InstallerState.getRequiredSpaceInBytes() && outputFile.length() > 0) {
-            Platform.runLater(() -> { // Small delay to ensure UI is ready.
-                _progressCallback.accept(1.0);
-                handleDownloadedFile(outputFile);
-            });
+            _progressCallback.accept(1.0);
+            handleDownloadedFile(outputFile);
             return; // Skip download if file already exists and is valid.
         }
 
