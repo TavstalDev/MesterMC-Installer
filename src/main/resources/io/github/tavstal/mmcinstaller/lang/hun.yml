@@ -12,6 +12,8 @@ Common:
   NoText: "Nem"
   Close: "Bezárás"
   Browse: "Tallózás..."
+  DetectedOS: "Felismerve az operációs rendszer: %os%"
+  UnsupportedOS: "Figyelem: Az operációs rendszer nem támogatott, vagy nem felismert: %os%"
 
 Window:
   Title: "MesterMC Kliens Telepítő"
@@ -54,11 +56,11 @@ License:
     Szerzői jog (c) 2025 Solymosi 'Tavstal' Zoltán. Minden jog fenntartva.
 
 InstallPath:
-    Title: "Válasszon célkönyvtárat"
-    Description: "Hova települjön a MesterMC?"
-    Action: "A folytatáshoz, kattintson a 'Tovább' gombra. Ha másik könyvtárat szeretne választani, használja a 'Tallózás' gombot."
-    FreeSpace: "Legalább %freeSpace% szabad hely szükséges a telepítéshez."
-    BrowseTitle: "Válasszon telepítési könyvtárat"
+  Title: "Válasszon célkönyvtárat"
+  Description: "Hova települjön a MesterMC?"
+  Action: "A folytatáshoz, kattintson a 'Tovább' gombra. Ha másik könyvtárat szeretne választani, használja a 'Tallózás' gombot."
+  FreeSpace: "Legalább %freeSpace% szabad hely szükséges a telepítéshez."
+  BrowseTitle: "Válasszon telepítési könyvtárat"
 
 Shortcut:
   Title: "Parancsikonok"
@@ -101,8 +103,6 @@ Progress:
   Title: "Telepítés"
   Description: "Kérem várjon, amíg a MesterMC telepítése zajlik."
   Action: "Kliens telepítése folyamatban. Kérem, ne zárja be az ablakot, amíg a telepítés be nem fejeződik."
-  DirectoryExists: "A megadott telepítési könyvtár már létezik."
-  DirectoryCreated: "A megadott telepítési könyvtár létrehozva: %path%"
   Download:
     Started: "Letöltés megkezdődött..."
     Status: "Letöltés állapota: %status%"
@@ -112,45 +112,13 @@ Progress:
     Error: "Hiba történt a letöltés során: %error%"
   Scripts:
     Creating: "Parancsfájlok és scriptek létrehozása..."
-    StartMenuDirCreationFailed: "Nem sikerült létrehozni a Start menü mappát: %path%"
-    ResourceNotFound: "Hiba: A szükséges erőforrás nem található: %resource%"
-    FileCopied: "%fileName% fájl sikeresen átmásolva a telepítési könyvtárba."
-    FileCopyError: "Hiba történt az %fileName% fájl másolása során: %error%"
-    DetectedOS: "Felismerve az operációs rendszer: %os%"
-    UnsupportedOS: "Figyelem: Az operációs rendszer nem támogatott, vagy nem felismert: %os%"
-    LauncherCreated: "A script alapú indító fájl létrehozva: %filePath%"
-    LauncherCreationError: "Hiba: A script alapú indító fájl létrehozása sikertelen: %error%"
-    MakingExecutable: "A script fájlok futtathatóvá tétele..."
-    ExecutableMade: "A script fájl futtathatóvá téve: %filePath%"
-    ExecutableError: "Hiba: A script fájl futtathatóvá tétele sikertelen: %error%"
-    ExecutableTimeout: "Hiba: A script fájl futtathatóvá tétele időtúllépés miatt sikertelen."
-    ExecutableException: "Hiba: A script fájl futtathatóvá tétele során kritikus hiba történt: %error%"
-    DesktopShortcutCreated: "Asztali parancsikon létrehozva: %filePath%"
-    StartMenuShortcutCreated: "Start menü parancsikon létrehozva: %filePath%"
-    DesktopFileCreationError: "Hiba: Az asztali parancsikon létrehozása sikertelen: %error%"
-    ShortcutCopyError: "Hiba: A parancsikon(ok) másolása sikertelen: %error%"
     SetupFailed: "A telepítés sikertelen volt. Kérem, ellenőrizze a naplófájlokat a részletekért."
-    MacAppBundleCreationError: "Hiba: A Mac alkalmazás csomag létrehozása sikertelen: %error%"
-    MacUninstallerBundleCreationError: "Hiba: A Mac eltávolító csomag létrehozása sikertelen: %error%"
-    UninstallerConfigFailed: "Hiba: Az eltávolító konfigurációs fájl létrehozása sikertelen: %error%"
-  CheckSumError:
-    Header: "A letöltött fájl ellenőrzése sikertelen"
-    Content: |
-      A fájl nem ellenőrizhető (sérült/olvasási hiba).
-      Kérjük, próbálja újra, vagy keresse a támogatást.
-      A 'megszakítás' gombra kattintva törlődik a fájl.
-  CheckSumWarning:
-    Header: "A letöltött fájl ellenőrzése figyelmeztetést adott"
-    Content: |
-      A fájl ellenőrzőösszege nem egyezik a várt értékkel.
-      Kérjük, próbálja újra, vagy keresse a támogatást.
-      A 'megszakítás' gombra kattintva törlődik a fájl.
-
 
 ProgressUninstall:
   Title: "Eltávolítás"
   Description: "Kérem várjon, amíg a MesterMC eltávolítása zajlik."
   Action: "Kliens eltávolítása folyamatban. Kérem, ne zárja be az ablakot, amíg az eltávolítás be nem fejeződik."
+  Deleting: "Fájlok és mappák törlése..."
 
 Complete:
   Title: "A MesterMC telepítésének befejezése"
@@ -162,3 +130,54 @@ CompleteUninstall:
   Title: "A MesterMC eltávolításának befejezése"
   Description: "Az eltávolító végzett a MesterMC eltávolításával."
   Action: "Kattintson a 'Befejezés' gombra az eltávolító bezárásához."
+
+IO:
+  Resource:
+    NotFound: "A megadott erőforrás nem található: %resource%"
+    NotAccessible: "A megadott erőforrás nem elérhető: %resource%"
+    NotWritable: "A megadott erőforrás nem írható: %resource%"
+    Exists: "A megadott erőforrás már létezik: %resource%"
+    Copied: "Az erőforrás sikeresen átmásolva: %source% -> %destination%"
+    CopyError: "Hiba történt az erőforrás másolása során: %source% -> %destination%: %error%"
+  Directory:
+    NotFound: "A megadott könyvtár nem található: %path%"
+    NotAccessible: "A megadott könyvtár nem elérhető: %path%"
+    NotWritable: "A megadott könyvtár nem írható: %path%"
+    Exists: "A megadott könyvtár már létezik: %path%"
+    Created: "A megadott könyvtár létrehozva: %path%"
+    CreateError: "Hiba történt a könyvtár létrehozása során: %path%: %error%"
+    Deleted: "A megadott könyvtár törölve: %path%"
+    DeleteError: "Hiba történt a könyvtár törlése során: %path%: %error%"
+  File:
+    NotFound: "A megadott fájl nem található: %path%"
+    NotAccessible: "A megadott fájl nem elérhető: %path%"
+    NotWritable: "A megadott fájl nem írható: %path%"
+    Exists: "A megadott fájl már létezik: %path%"
+    Created: "A megadott fájl létrehozva: %path%"
+    CreateError: "Hiba történt a fájl létrehozása során: %path%: %error%"
+    Deleted: "A megadott fájl törölve: %path%"
+    DeleteError: "Hiba történt a fájl törlése során: %path%: %error%"
+    Copied: "A fájl sikeresen átmásolva: %source% -> %destination%"
+    CopyError: "Hiba történt a fájl másolása során: %source% -> %destination%: %error%"
+  AppBundle:
+    Created: "Az alkalmazás csomag létrehozva: %path%"
+    CreateError: "Hiba történt az alkalmazás csomag létrehozása során: %path%: %error%"
+    UninstallerCreated: "Az eltávolító csomag létrehozva: %path%"
+    UninstallerCreateError: "Hiba történt az eltávolító csomag létrehozása során: %path%: %error%"
+  Checksum:
+    Mismatch: "A letöltött fájl ellenőrzése figyelmeztetést adott"
+    MismatchDetails: |
+      A fájl ellenőrzőösszege nem egyezik a várt értékkel.
+      Kérjük, próbálja újra, vagy keresse a támogatást.
+      A 'megszakítás' gombra kattintva törlődik a fájl.
+    Error: "A letöltött fájl ellenőrzése sikertelen"
+    ErrorDetails: |
+      A fájl nem ellenőrizhető (sérült/olvasási hiba).
+      Kérjük, próbálja újra, vagy keresse a támogatást.
+      A 'megszakítás' gombra kattintva törlődik a fájl.
+  Misc:
+    SymlinkCreated: "Szimbolikus hivatkozás létrehozva: %linkPath% -> %targetPath%"
+    SymlinkCreateError: "Hiba történt a szimbolikus hivatkozás létrehozása során: %linkPath% -> %targetPath%: %error%"
+    MadeExecutable: "A fájl futtathatóvá téve: %filePath%"
+    MakeExecutableError: "Hiba történt a fájl futtathatóvá tétele során: %filePath%: %error%"
+    MakeExecutableTimeout: "Hiba: A fájl futtathatóvá tétele időtúllépés miatt sikertelen: %filePath%"

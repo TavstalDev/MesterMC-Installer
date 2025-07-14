@@ -12,6 +12,8 @@ Common:
   NoText: "No"
   Close: "Close"
   Browse: "Browse..."
+  DetectedOS: "Detected operating system: %os%"
+  UnsupportedOS: "Warning: The operating system is unsupported or unrecognized: %os%"
 
 Window:
   Title: "MesterMC Client Installer"
@@ -101,8 +103,6 @@ Progress:
   Title: "Installing"
   Description: "Please wait while MesterMC is being installed."
   Action: "Client installation in progress. Please do not close this window until the installation is complete."
-  DirectoryExists: "The selected installation directory already exists."
-  DirectoryCreated: "The installation directory was created: %path%"
   Download:
     Started: "Download started..."
     Status: "Download status: %status%"
@@ -112,45 +112,13 @@ Progress:
     Error: "An error occurred during download: %error%"
   Scripts:
     Creating: "Creating scripts and command files..."
-    StartMenuDirCreationFailed: "Failed to create Start Menu folder: %path%"
-    ResourceNotFound: "Error: Required resource not found: %resource%"
-    FileCopied: "File %fileName% successfully copied to the installation directory."
-    FileCopyError: "Error occurred while copying file %fileName%: %error%"
-    DetectedOS: "Detected operating system: %os%"
-    UnsupportedOS: "Warning: Unsupported or unrecognized operating system: %os%"
-    LauncherCreated: "Script-based launcher file created: %filePath%"
-    LauncherCreationError: "Error: Failed to create script-based launcher file: %error%"
-    MakingExecutable: "Making script files executable..."
-    ExecutableMade: "Script file made executable: %filePath%"
-    ExecutableError: "Error: Failed to make script file executable: %error%"
-    ExecutableTimeout: "Error: Making script file executable failed due to timeout."
-    ExecutableException: "Error: Critical error occurred while making script file executable: %error%"
-    DesktopShortcutCreated: "Desktop shortcut created: %filePath%"
-    StartMenuShortcutCreated: "Start Menu shortcut created: %filePath%"
-    DesktopFileCreationError: "Error: Failed to create desktop shortcut: %error%"
-    ShortcutCopyError: "Error: Failed to copy shortcut(s): %error%"
-    SetupFailed: "The installation failed. Please check the log files for details."
-    MacAppBundleCreationError: "Error: Failed to create Mac application bundle: %error%"
-    MacUninstallerBundleCreationError: "Error: Failed to create Mac uninstaller bundle: %error%"
-    UninstallerConfigFailed: "Error: Failed to create uninstaller configuration file: %error%"
-  CheckSumError:
-    Header: "The downloaded file failed validation"
-    Content: |
-      File could not be validated (corrupt/read error).
-      Please retry download, or contact support.
-      Clicking 'cancel' deletes the file.
-  CheckSumWarning:
-    Header: "The downloaded file validation issued a warning"
-    Content: |
-      File checksum does not match expected value.
-      Please retry download, or contact support.
-      Clicking 'cancel' deletes the file.
-
+    SetupFailed: "Installation failed. Please check the log files for details."
 
 ProgressUninstall:
   Title: "Uninstalling"
   Description: "Please wait while MesterMC is being uninstalled."
   Action: "Uninstallation in progress. Please do not close this window until the uninstallation is complete."
+  Deleting: "Deleting files and directories..."
 
 Complete:
   Title: "MesterMC Installation Complete"
@@ -162,3 +130,54 @@ CompleteUninstall:
   Title: "MesterMC Uninstallation Complete"
   Description: "The uninstaller has finished removing MesterMC."
   Action: "Click 'Finish' to close the uninstaller."
+
+IO:
+  Resource:
+    NotFound: "The specified resource was not found: %resource%"
+    NotAccessible: "The specified resource is not accessible: %resource%"
+    NotWritable: "The specified resource is not writable: %resource%"
+    Exists: "The specified resource already exists: %resource%"
+    Copied: "Resource successfully copied: %source% -> %destination%"
+    CopyError: "An error occurred during resource copy: %source% -> %destination%: %error%"
+  Directory:
+    NotFound: "The specified directory was not found: %path%"
+    NotAccessible: "The specified directory is not accessible: %path%"
+    NotWritable: "The specified directory is not writable: %path%"
+    Exists: "The specified directory already exists: %path%"
+    Created: "The specified directory created: %path%"
+    CreateError: "An error occurred during directory creation: %path%: %error%"
+    Deleted: "The specified directory deleted: %path%"
+    DeleteError: "An error occurred during directory deletion: %path%: %error%"
+  File:
+    NotFound: "The specified file was not found: %path%"
+    NotAccessible: "The specified file is not accessible: %path%"
+    NotWritable: "The specified file is not writable: %path%"
+    Exists: "The specified file already exists: %path%"
+    Created: "The specified file created: %path%"
+    CreateError: "An error occurred during file creation: %path%: %error%"
+    Deleted: "The specified file deleted: %path%"
+    DeleteError: "An error occurred during file deletion: %path%: %error%"
+    Copied: "File successfully copied: %source% -> %destination%"
+    CopyError: "An error occurred during file copy: %source% -> %destination%: %error%"
+  AppBundle:
+    Created: "Application bundle created: %path%"
+    CreateError: "An error occurred during application bundle creation: %path%: %error%"
+    UninstallerCreated: "Uninstaller bundle created: %path%"
+    UninstallerCreateError: "An error occurred during uninstaller bundle creation: %path%: %error%"
+  Checksum:
+    Mismatch: "Downloaded file checksum gave a warning"
+    MismatchDetails: |
+      The file checksum does not match the expected value.
+      Please try again, or seek support.
+      Clicking 'cancel' will delete the file.
+    Error: "Downloaded file checksum failed"
+    ErrorDetails: |
+      The file cannot be verified (corrupt/read error).
+      Please try again, or seek support.
+      Clicking 'cancel' will delete the file.
+  Misc:
+    SymlinkCreated: "Symbolic link created: %linkPath% -> %targetPath%"
+    SymlinkCreateError: "An error occurred during symbolic link creation: %linkPath% -> %targetPath%: %error%"
+    MadeExecutable: "File made executable: %filePath%"
+    MakeExecutableError: "An error occurred while making the file executable: %filePath%: %error%"
+    MakeExecutableTimeout: "Error: Making the file executable failed due to timeout: %filePath%"
