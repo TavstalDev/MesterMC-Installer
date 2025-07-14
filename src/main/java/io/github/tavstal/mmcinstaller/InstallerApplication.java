@@ -59,12 +59,12 @@ public class InstallerApplication extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
+        _logger = new InstallerLogger(null ,null);
         ConfigLoader.init();
-        _logger = new InstallerLogger(ConfigLoader.get().debug());
+        InstallerState.setDebugMode(ConfigLoader.get().debug());
         _translator = new InstallerTranslator(new String[] {"eng", "hun"});
         _translator.Load();
         _stage = stage;
-
 
         _stage.setTitle(_translator.Localize("Window.Title"));
         _stage.setScene(SceneManager.getLanguageViewScene());
@@ -91,13 +91,13 @@ public class InstallerApplication extends Application {
         _stage.show();
         _stage.toFront();
         _stage.requestFocus();
-        _logger.Debug("InstallerApplication started successfully.");
+        _logger.Debug("Application started successfully.");
 
         // Check if uninstaller mode should be enabled
         var uninstallConfigFile = PathUtils.getUninstallerConfigFile();
-        InstallerState.setIsUninstallModeActive(uninstallConfigFile.exists());
-        if (InstallerState.getIsUninstallModeActive()) {
-
+        InstallerState.setUninstallMode(uninstallConfigFile.exists());
+        _logger.Debug("Handling uninstaller mode...");
+        if (InstallerState.isUninstallModeActive()) {
             try (FileReader reader = new FileReader(uninstallConfigFile)) {
                 Yaml yaml = new Yaml();
                 Map<String, Object> fileMap = yaml.load(reader);
@@ -111,11 +111,11 @@ public class InstallerApplication extends Application {
             }
             catch (Exception ex) {
                 _logger.Error("Failed to read uninstaller configuration file: " + ex.getMessage());
-                InstallerState.setIsUninstallModeActive(false);
+                InstallerState.setUninstallMode(false);
             }
         }
 
-        _logger.Debug("Checking .jar size.");
+        _logger.Debug("Checking file size to download.");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             _logger.Debug("Sending HTTP request...");
             HttpHead request = new HttpHead(ConfigLoader.get().download().link());
@@ -148,7 +148,7 @@ public class InstallerApplication extends Application {
 
             httpClient.execute(request, responseHandler);
         } catch (IOException e) {
-            _logger.Error("Failed to check jar file.");
+            _logger.Error("Failed to check file size to download.");
         }
     }
 
