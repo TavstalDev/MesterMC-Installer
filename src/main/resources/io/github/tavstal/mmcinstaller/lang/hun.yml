@@ -131,6 +131,10 @@ CompleteUninstall:
   Description: "Az eltávolító végzett a MesterMC eltávolításával."
   Action: "Kattintson a 'Befejezés' gombra az eltávolító bezárásához."
 
+Process:
+  Success: "A folyamat sikeresen befejeződött: %processName%- %exitCode%"
+  Error: "Hiba történt a folyamat során: %processName%: %error%"
+
 IO:
   Resource:
     NotFound: "A megadott erőforrás nem található: %resource%"

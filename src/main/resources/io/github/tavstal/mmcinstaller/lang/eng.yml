@@ -131,6 +131,10 @@ CompleteUninstall:
   Description: "The uninstaller has finished removing MesterMC."
   Action: "Click 'Finish' to close the uninstaller."
 
+Process:
+  Success: "The operation was successful: %processName% - %exitCode%"
+  Error: "An error occurred during the operation: %processName%: %error%"
+
 IO:
   Resource:
     NotFound: "The specified resource was not found: %resource%"
