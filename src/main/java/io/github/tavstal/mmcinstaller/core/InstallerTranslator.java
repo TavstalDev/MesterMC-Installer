@@ -8,56 +8,59 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A class responsible for handling localization and translations for the application.
- * It loads localization files, retrieves translations, and supports multiple locales.
+ * Handles localization and translation for the installer application.
+ * Provides methods to load localization files and retrieve translations
+ * for specific keys and locales.
  */
 public class InstallerTranslator {
     private final InstallerLogger _logger; // Logger instance for logging messages.
     private final String[] _locales; // Array of supported locale identifiers.
     private Map<String, Map<String, Object>> _localization; // Map storing localization data.
 
+    /**
+     * Constructs an `InstallerTranslator` with the specified locales.
+     *
+     * @param locales Array of locale identifiers to support.
+     */
     public InstallerTranslator(String[] locales) {
         _locales = locales;
-        _logger = InstallerApplication.getLogger();
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
     }
 
+    /**
+     * Loads localization files for the supported locales.
+     * Reads YAML files from the `lang` directory and stores the data in memory.
+     */
     public void Load() {
         _localization = new HashMap<>();
         _logger.Debug("Reading lang files...");
         for (String locale : _locales) {
-
             _logger.Debug("Reading localization file for locale: " + locale);
             var result = YamlHelper.readFromResource(String.format("lang/%s.yml", locale), InstallerApplication.class);
             if (result == null) {
                 _logger.Error(String.format("Failed to read localization file for locale: %s", locale));
                 continue;
             }
-
             _localization.put(locale, result);
             _logger.Debug("Successfully loaded localization for locale: " + locale);
         }
     }
 
     /**
-     * Retrieves a localized string for the given key in the default locale.
+     * Retrieves a localized string for the current language based on the given key.
      *
-     * @param key The translation key.
-     * @return The localized string, or an empty string if not found.
+     * @param key The translation key to look up.
+     * @return The localized string, or an empty string if the key is not found.
      */
     public String Localize(String key) {
         try {
-            String[] keys = key.split("\\.");
-            Object value = _localization.get(InstallerState.getLanguage());
-            for (String k : keys) {
-                if (value instanceof Map) {
-                    value = ((Map<?, ?>) value).get(k);
-                } else {
-                    _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
-                    return "";
-                }
+            var localeMap = _localization.get(InstallerState.getLanguage());
+            var result = YamlHelper.getString(localeMap, key);
+            if (result == null) {
+                _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
+                return "";
             }
-
-            return value.toString();
+            return result;
         } catch (Exception ex) {
             _logger.Warn(String.format("Unknown error happened while translating '%s'.", key));
             _logger.Error(ex.getMessage());
@@ -66,34 +69,24 @@ public class InstallerTranslator {
     }
 
     /**
-     * Retrieves a localized string for the given key in the default locale, with arguments replaced.
+     * Retrieves a localized string for the current language and replaces placeholders with arguments.
      *
-     * @param key  The translation key.
-     * @param args A map of arguments to replace in the localized string.
-     * @return The localized string with arguments replaced, or an empty string if not found.
+     * @param key  The translation key to look up.
+     * @param args A map of placeholders and their replacement values.
+     * @return The localized string with placeholders replaced, or an empty string if the key is not found.
      */
     public String Localize(String key, Map<String, Object> args) {
         try {
-            String[] keys = key.split("\\.");
-            Object value = _localization.get(InstallerState.getLanguage());
-            for (String k : keys) {
-                if (value instanceof Map) {
-                    value = ((Map<?, ?>) value).get(k);
-                } else {
-                    _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
-                    return "";
-                }
+            var localeMap = _localization.get(InstallerState.getLanguage());
+            var result = YamlHelper.getString(localeMap, key);
+            if (result == null) {
+                _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
+                return "";
             }
 
-            // Replace placeholders with arguments
-            String result = value.toString();
             var argKeys = args.keySet();
             for (var dirKey : argKeys) {
-                String finalKey;
-                if (dirKey.startsWith("%"))
-                    finalKey = dirKey;
-                else
-                    finalKey = "%" + dirKey + "%";
+                String finalKey = dirKey.startsWith("%") ? dirKey : "%" + dirKey + "%";
                 result = result.replace(finalKey, args.get(dirKey).toString());
             }
 
@@ -106,28 +99,23 @@ public class InstallerTranslator {
     }
 
     /**
-     * Retrieves a localized string for the given key in the specified locale.
+     * Retrieves a localized string for a specific locale based on the given key.
      *
-     * @param locale The locale identifier.
-     * @param key    The translation key.
-     * @return The localized string, or an empty string if not found.
+     * @param locale The locale identifier to use for translation.
+     * @param key    The translation key to look up.
+     * @return The localized string, or an empty string if the key is not found.
      */
     public String Localize(String locale, String key) {
         try {
-            String[] keys = key.split("\\.");
-            Object value = _localization.get(locale);
-            if (value == null)
-                value = _localization.get(InstallerState.getLanguage());
-            for (String k : keys) {
-                if (value instanceof Map) {
-                    value = ((Map<?, ?>) value).get(k);
-                } else {
-                    _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
-                    return "";
-                }
+            var localeMap = _localization.get(locale);
+            if (localeMap == null)
+                localeMap = _localization.get(InstallerState.getLanguage());
+            var result = YamlHelper.getString(localeMap, key);
+            if (result == null) {
+                _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
+                return "";
             }
-
-            return value.toString();
+            return result;
         } catch (Exception ex) {
             _logger.Warn(String.format("Unknown error happened while translating '%s'.", key));
             _logger.Error(ex.getMessage());
@@ -136,37 +124,27 @@ public class InstallerTranslator {
     }
 
     /**
-     * Retrieves a localized string for the given key in the specified locale, with arguments replaced.
+     * Retrieves a localized string for a specific locale and replaces placeholders with arguments.
      *
-     * @param locale The locale identifier.
-     * @param key    The translation key.
-     * @param args   A map of arguments to replace in the localized string.
-     * @return The localized string with arguments replaced, or an empty string if not found.
+     * @param locale The locale identifier to use for translation.
+     * @param key    The translation key to look up.
+     * @param args   A map of placeholders and their replacement values.
+     * @return The localized string with placeholders replaced, or an empty string if the key is not found.
      */
     public String Localize(String locale, String key, Map<String, Object> args) {
         try {
-            String[] keys = key.split("\\.");
-            Object value = _localization.get(locale);
-            if (value == null)
-                value = _localization.get(InstallerState.getLanguage());
-            for (String k : keys) {
-                if (value instanceof Map) {
-                    value = ((Map<?, ?>) value).get(k);
-                } else {
-                    _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
-                    return "";
-                }
+            var localeMap = _localization.get(locale);
+            if (localeMap == null)
+                localeMap = _localization.get(InstallerState.getLanguage());
+            var result = YamlHelper.getString(localeMap, key);
+            if (result == null) {
+                _logger.Warn(String.format("Failed to get the translation for the '%s' translation key.", key));
+                return "";
             }
 
-            // Replace placeholders with arguments
-            String result = value.toString();
             var argKeys = args.keySet();
             for (var dirKey : argKeys) {
-                String finalKey;
-                if (dirKey.startsWith("%"))
-                    finalKey = dirKey;
-                else
-                    finalKey = "%" + dirKey + "%";
+                String finalKey = dirKey.startsWith("%") ? dirKey : "%" + dirKey + "%";
                 result = result.replace(finalKey, args.get(dirKey).toString());
             }
 
