@@ -88,10 +88,9 @@ public class InstallerApplication extends Application {
         changeStageSize(true);
         _stage.setResizable(false);
 
-        _stage.centerOnScreen();
+        attemptCenterOnScreen();
         _stage.show();
-        _stage.toFront();
-        _stage.requestFocus();
+        attemptFocus();
         _logger.Debug("Application started successfully.");
 
         // Check if uninstaller mode should be enabled
@@ -195,6 +194,9 @@ public class InstallerApplication extends Application {
      * @param width The width to set for the stage.
      */
     public static void setWidth(int width) {
+        if (_stage == null)
+            return;
+
         _stage.setMinWidth(width);
         _stage.setWidth(width);
         _stage.setMaxWidth(width);
@@ -207,9 +209,39 @@ public class InstallerApplication extends Application {
      * @param height The height to set for the stage.
      */
     public static void setHeight(int height) {
+        if (_stage == null)
+            return;
+
         _stage.setMinHeight(height);
         _stage.setHeight(height);
         _stage.setMaxHeight(height);
+    }
+
+    /**
+     * Attempts to center the application stage on the screen.
+     * If the stage is not initialized, the method exits without performing any action.
+     */
+    public static void attemptCenterOnScreen() {
+        if (_stage == null)
+            return;
+
+        _stage.centerOnScreen();
+    }
+
+    /**
+     * Attempts to bring the application stage to the front and focus it.
+     * This method temporarily sets the stage to always be on top to ensure focus,
+     * then resets the always-on-top property to its original state.
+     * If the stage is not initialized, the method exits without performing any action.
+     */
+    public static void attemptFocus() {
+        if (_stage == null)
+            return;
+
+        _stage.setAlwaysOnTop(true); // Focus fix on Windows
+        _stage.toFront();
+        _stage.requestFocus();
+        _stage.setAlwaysOnTop(false);
     }
     //#endregion
 }
