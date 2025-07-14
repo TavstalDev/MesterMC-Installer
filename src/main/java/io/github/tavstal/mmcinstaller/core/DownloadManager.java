@@ -1,0 +1,166 @@
+package io.github.tavstal.mmcinstaller.core;
+
+import io.github.tavstal.mmcinstaller.InstallerApplication;
+import io.github.tavstal.mmcinstaller.InstallerState;
+import io.github.tavstal.mmcinstaller.utils.AlertUtils;
+import io.github.tavstal.mmcinstaller.utils.FileUtils;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.scene.control.Alert;
+
+import java.io.File;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+/**
+ * The `DownloadManager` class is responsible for managing the download process of files.
+ * It provides logging, progress updates, and UI callbacks to handle the download lifecycle.
+ */
+public class DownloadManager {
+    private final InstallerLogger _logger; // Logger instance for logging download-related messages.
+    private final InstallerTranslator _translator; // Translator instance for localizing messages.
+    private final Consumer<String> _logCallback; // Callback for logging messages.
+    private final Consumer<Double> _progressCallback; // Callback for progress updates.
+    private final BiConsumer<Long, Long> _progressBarCallBack; // Progress bar to update UI.
+
+    /**
+     * Constructs a new `DownloadManager` instance.
+     *
+     * @param logCallback         A callback function for logging messages during the download process.
+     * @param progressCallback    A callback function for updating progress values (0.0 to 1.0).
+     * @param progressBarCallBack A callback function for updating the progress bar with downloaded and total bytes.
+     */
+    public DownloadManager(Consumer<String> logCallback, Consumer<Double> progressCallback, BiConsumer<Long, Long> progressBarCallBack) {
+        _logger = InstallerApplication.getLogger().WithModule(this.getClass());
+        _translator = InstallerApplication.getTranslator();
+        _logCallback = logCallback;
+        _progressCallback = progressCallback;
+        _progressBarCallBack = progressBarCallBack;
+    }
+
+    /**
+     * Starts the download process by creating a task to download the required file.
+     * Updates the UI with progress and handles success, failure, or cancellation of the task.
+     */
+    public void start() {
+        // Define the installation directory, start menu directory, and output file for the download.
+        File outputFile = new File(InstallerState.getCurrentPath(), ConfigLoader.get().download().fileName());
+
+        // Create a Task for the download
+        if (outputFile.exists() && outputFile.length() == InstallerState.getRequiredSpaceInBytes() && outputFile.length() > 0) {
+            Platform.runLater(() -> { // Small delay to ensure UI is ready.
+                _progressCallback.accept(1.0);
+                handleDownloadedFile(outputFile);
+            });
+            return; // Skip download if file already exists and is valid.
+        }
+
+        FileDownloader downloader = new FileDownloader(_logger, _translator);
+        Task<Void> downloadTask = downloader.createDownloadTask(
+                ConfigLoader.get().download().link(),
+                outputFile,
+                _logCallback,
+                _progressBarCallBack
+        );
+
+        // Handle the success of the download task.
+        downloadTask.setOnSucceeded(event -> {
+            _logger.Debug("Download task succeeded.");
+            //progressBar.progressProperty().unbind(); // Unbind after completion.
+            _progressCallback.accept(1.0); // Ensure it shows 100%.
+            _logCallback.accept(_translator.Localize("Progress.Scripts.Creating"));
+            handleDownloadedFile(outputFile); // Handle the downloaded file.
+        });
+
+        // Handle the failure of the download task.
+        downloadTask.setOnFailed(event -> {
+            _logger.Error("Download task failed: " + downloadTask.getException().getMessage());
+            //progressBar.progressProperty().unbind();
+            _progressCallback.accept(0.0); // Reset or show error.
+        });
+
+        // Handle the cancellation of the download task.
+        downloadTask.setOnCancelled(event -> {
+            _logger.Debug("Download task cancelled.");
+            //progressBar.progressProperty().unbind();
+            _progressCallback.accept(0.0);
+            _logCallback.accept(_translator.Localize("Progress.Download.Cancelled"));
+        });
+
+        // Start the task in a new thread.
+        new Thread(downloadTask).start();
+    }
+
+    /**
+     * Handles the downloaded file by verifying its checksum and performing setup operations.
+     * If the checksum validation fails, the file is deleted, and the application exits.
+     * If the checksum is valid or the user chooses to proceed despite a mismatch, the setup process is initiated.
+     *
+     * @param outputFile The downloaded file to be handled.
+     */
+    private void handleDownloadedFile(File outputFile) {
+        // Localized strings for error and warning messages.
+        String errorTitle = _translator.Localize("Common.Error");
+        String errorHeader = _translator.Localize("IO.Checksum.Error");
+        String errorContent = _translator.Localize("IO.Checksum.ErrorDetails");
+        String yesButtonText = _translator.Localize("Common.Next");
+        String noButtonText = _translator.Localize("Common.Cancel");
+        String outputChecksum = "";
+        boolean checksumContinue;
+
+        try {
+            // Calculate the checksum of the downloaded file.
+            outputChecksum = FileUtils.getFileChecksum(outputFile.getAbsolutePath());
+            if (outputChecksum.isEmpty()) {
+                // Log an error if the checksum is empty and show an error alert.
+                _logger.Error("Checksum is null or empty for file: " + outputFile.getAbsolutePath());
+                checksumContinue = AlertUtils.show(errorTitle, errorHeader, errorContent, yesButtonText, noButtonText, Alert.AlertType.ERROR);
+            } else {
+                checksumContinue = true;
+            }
+        } catch (Exception ex) {
+            // Log an error if checksum calculation fails and show an error alert.
+            _logger.Error("Failed to calculate checksum: " + ex.getMessage());
+            checksumContinue = AlertUtils.show(errorTitle, errorHeader, errorContent, yesButtonText, noButtonText, Alert.AlertType.ERROR);
+        }
+
+        // If the user chooses not to continue, delete the file and exit the application.
+        if (!checksumContinue) {
+            if (outputFile.exists())
+                outputFile.delete(); // Clean up the file if checksum validation fails.
+            System.exit(0);
+            return;
+        }
+
+        // Retrieve the expected checksum from the configuration.
+        String expectedChecksum = ConfigLoader.get().download().hash();
+        if (!(expectedChecksum == null || expectedChecksum.isEmpty())) {
+            // Compare the calculated checksum with the expected checksum.
+            if (!outputChecksum.equals(expectedChecksum)) {
+                // Show a warning alert if the checksums do not match.
+                String title = _translator.Localize("Common.Warning");
+                String header = _translator.Localize("IO.Checksum.Mismatch");
+                String content = _translator.Localize("IO.Checksum.MismatchDetails", Map.of(
+                        "expected", expectedChecksum,
+                        "actual", outputChecksum
+                ));
+                if (!AlertUtils.show(title, header, content, yesButtonText, noButtonText, Alert.AlertType.WARNING)) {
+                    // If the user chooses not to continue, delete the file and exit the application.
+                    if (outputFile.exists())
+                        outputFile.delete(); // Clean up the file if checksum validation fails.
+                    System.exit(0);
+                    return;
+                } else {
+                    _logger.Debug("Checksum mismatch but user chose to continue.");
+                }
+            }
+        }
+
+        // Initialize the setup manager and perform the setup process.
+        File dir = new File(InstallerState.getCurrentPath());
+        File startMenuDir = new File(InstallerState.getStartMenuPath());
+        SetupManager manager = new SetupManager(outputFile, dir, startMenuDir, _logCallback);
+        manager.setup();
+    }
+}
