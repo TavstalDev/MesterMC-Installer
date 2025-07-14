@@ -13,28 +13,22 @@
 >
 
     <!-- Top Section -->
-    <HBox>
+    <HBox VBox.vgrow="ALWAYS">
         <padding>
-            <Insets top="15.0" left="15.0"  right="15.0" bottom="15"/>
+            <Insets top="15.0" left="15.0"  right="15.0" bottom="10"/>
         </padding>
         <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true">
             <Image url="@../assets/logo.png"/>
         </ImageView>
-        <Label fx:id="selectLabel" text="Please select a language.">
+        <VBox VBox.vgrow="ALWAYS">
             <padding>
-                <Insets left="15.0" />
+                <Insets left="15.0"/>
             </padding>
-        </Label>
+            <Label fx:id="selectLabel" text="Please select a language."/>
+            <Region VBox.vgrow="ALWAYS" />
+            <ComboBox fx:id="languageComboBox" onAction="#onLanguageChange"  prefWidth="300" promptText="Choose a language..."/>
+        </VBox>
     </HBox>
-
-    <!-- Main Content Area -->
-    <VBox prefHeight="80.0" alignment="CENTER_RIGHT">
-        <padding>
-            <Insets left="15.0"  right="15.0"/>
-        </padding>
-        <ComboBox fx:id="languageComboBox" onAction="#onLanguageChange" prefWidth="300.0" promptText="Choose a language..."/>
-        <Region VBox.vgrow="ALWAYS" />
-    </VBox>
 
     <!-- Bottom Section -->
     <HBox alignment="BOTTOM_RIGHT" spacing="10.0">
