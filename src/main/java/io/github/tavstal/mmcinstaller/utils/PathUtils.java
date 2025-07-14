@@ -4,10 +4,11 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 
-import java.io.*;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * Utility class for handling file paths and directories across different operating systems.
@@ -102,7 +103,11 @@ public class PathUtils {
                             File.separator + "Start Menu" + File.separator + "Programs" +
                             File.separator + shortcutFolderName);
                 } else {
-                    targetDirectory = new File(userHome, shortcutFolderName);
+                    if (shortcutFolderName == null || shortcutFolderName.isEmpty()) {
+                        targetDirectory = new File(userHome);
+                    } else {
+                        targetDirectory = new File(userHome, shortcutFolderName);
+                    }
                 }
             }
         } else if (os.contains("linux")) {
@@ -206,125 +211,6 @@ public class PathUtils {
             }
         }
         return null;
-    }
-
-    /**
-     * Copies the contents of a directory from the source path to the target path.
-     * <br/>
-     * This method uses `Files.walkFileTree` to traverse the directory tree and copy
-     * all files and subdirectories from the source to the target location.
-     * <br/>
-     * If a file or directory already exists at the target location, it will be replaced.
-     *
-     * @param source The source directory to copy from.
-     * @param target The target directory to copy to.
-     * @throws IOException If an I/O error occurs during the copy process.
-     */
-    public static void copyDirectory(Path source, Path target) throws IOException {
-        Files.walkFileTree(source, new SimpleFileVisitor<>() {
-            /**
-             * Creates the corresponding directory in the target location before visiting its contents.
-             *
-             * @param dir The current directory being visited.
-             * @param attrs The attributes of the directory.
-             * @return `FileVisitResult.CONTINUE` to continue the directory traversal.
-             * @throws IOException If an error occurs while creating the directory.
-             */
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                Path targetDir = target.resolve(source.relativize(dir));
-                Files.createDirectories(targetDir);
-                return FileVisitResult.CONTINUE;
-            }
-
-            /**
-             * Copies a file from the source directory to the target directory.
-             *
-             * @param file The file being visited.
-             * @param attrs The attributes of the file.
-             * @return `FileVisitResult.CONTINUE` to continue the file traversal.
-             * @throws IOException If an error occurs while copying the file.
-             */
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Path targetFile = target.resolve(source.relativize(file));
-                Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-                return FileVisitResult.CONTINUE;
-            }
-        });
-    }
-
-    /**
-     * Deletes a directory and all its contents recursively.
-     * <br/>
-     * This method uses `Files.walkFileTree` to traverse the directory tree and delete
-     * all files and subdirectories before deleting the directory itself.
-     *
-     * @param path The path to the directory to be deleted.
-     * @throws IOException If an I/O error occurs during the deletion process.
-     */
-    public static void deleteDirectory(Path path) throws IOException {
-        Files.walkFileTree(path, new SimpleFileVisitor<>() {
-            /**
-             * Deletes a file during the traversal.
-             *
-             * @param file The file to be deleted.
-             * @param attrs The attributes of the file.
-             * @return `FileVisitResult.CONTINUE` to continue the traversal.
-             * @throws IOException If an error occurs while deleting the file.
-             */
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            /**
-             * Deletes a directory after all its contents have been visited and deleted.
-             *
-             * @param dir The directory to be deleted.
-             * @param exc An exception thrown during the visit, or `null` if none.
-             * @return `FileVisitResult.CONTINUE` to continue the traversal.
-             * @throws IOException If an error occurs while deleting the directory.
-             */
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
-    }
-
-    /**
-     * Computes the SHA-256 checksum of a file.
-     * <br/>
-     * This method reads the file in chunks and updates the message digest
-     * incrementally to compute the checksum. The result is returned as a
-     * hexadecimal string.
-     *
-     * @param filepath The path to the file for which the checksum is to be computed.
-     * @return A string representing the SHA-256 checksum of the file in hexadecimal format.
-     * @throws Exception If an error occurs while reading the file or initializing the digest.
-     */
-    public static String getFileChecksum(String filepath) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (InputStream fis = new FileInputStream(filepath)) {
-            byte[] byteBuffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = fis.read(byteBuffer)) != -1) {
-                digest.update(byteBuffer, 0, bytesRead);
-            }
-        }
-
-        byte[] hashBytes = digest.digest();
-
-        // Convert bytes to hex string
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hashBytes) {
-            String hex = String.format("%02x", b);
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 
     /**
