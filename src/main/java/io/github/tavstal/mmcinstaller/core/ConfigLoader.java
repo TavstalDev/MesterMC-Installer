@@ -39,7 +39,7 @@ public class ConfigLoader {
             if (langObj instanceof List) {
                 for (Object langItem : (List<?>) langObj) {
                     if (langItem instanceof Map) {
-                        Map<String, Object> langMap = (Map<String, Object>) langItem;
+                        @SuppressWarnings("unchecked") Map<String, Object> langMap = (Map<String, Object>) langItem;
                         String code = YamlHelper.getString(langMap, "key", "");
                         String name = YamlHelper.getString(langMap, "name", "");
                         String localization = YamlHelper.getString(langMap, "localization", "");
