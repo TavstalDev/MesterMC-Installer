@@ -12,6 +12,7 @@ module io.github.tavstal.mmcinstaller {
     requires com.sun.jna.platform;
     requires org.slf4j;
     requires kotlin.stdlib;
+    requires annotations;
 
     opens io.github.tavstal.mmcinstaller to javafx.fxml;
     exports io.github.tavstal.mmcinstaller;
