@@ -86,6 +86,7 @@ public class LanguageController implements Initializable {
         languageComboBox.setPromptText(_translator.Localize("Language.Action"));
         nextButton.setText(_translator.Localize("Common.Next"));
         cancelButton.setText(_translator.Localize("Common.Cancel"));
+        InstallerApplication.setTitle(_translator.Localize("Window.Title"));
     }
 
     /**

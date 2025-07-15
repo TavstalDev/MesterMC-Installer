@@ -219,6 +219,21 @@ public class InstallerApplication extends Application {
     }
 
     /**
+     * Sets the title of the application stage to the specified value.
+     * If the stage is not initialized, logs a warning and exits without performing any action.
+     *
+     * @param title The title to set for the application stage.
+     */
+    public static void setTitle(String title) {
+        if (_stage == null){
+            _logger.Warn("Attempted to set title on a null stage.");
+            return;
+        }
+
+        _stage.setTitle(title);
+    }
+
+    /**
      * Attempts to center the application stage on the screen.
      * If the stage is not initialized, the method exits without performing any action.
      */
