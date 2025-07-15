@@ -14,7 +14,7 @@ A **MesterMC Telepítő** egy többplatformos megoldás, amelyet a MesterMC ind�
 * **Többplatformos Kompatibilitás:** Telepítse a MesterMC-t zökkenőmentesen Windowsra, Linuxra és macOS-re.
 * **Felhasználóbarát Grafikus Felület:** Egyértelmű és intuitív lépésről lépésre haladó varázsló vezet végig a telepítési folyamaton.
 * **Testreszabható Telepítési Útvonal:** Válassza ki, hová szeretné telepíteni a MesterMC indítóprogramot.
-* **Parancsikon Létrehozása:** Dönthet asztali és/vagy Start Menü parancsikonok létrehozása mellett (Windows).
+* **Parancsikon Létrehozása:** Dönthet asztali és/vagy Start Menü parancsikonok létrehozása mellett.
 * **Licencszerződés Megjelenítése:** Tekintse át és fogadja el a MesterMC licencet közvetlenül a telepítőben.
 * **Telepítési Folyamat Nyomon Követése:** Valós időben figyelemmel kísérheti a telepítés előrehaladását.
 * **Automatikus Indítás Opció:** Indítsa el a MesterMC-t azonnal a telepítés befejezése után.

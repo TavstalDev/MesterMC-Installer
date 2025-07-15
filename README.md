@@ -14,7 +14,7 @@ The **MesterMC Installer** is a cross-platform solution designed to simplify the
 * **Cross-Platform Compatibility:** Install MesterMC seamlessly on Windows, Linux, and macOS.
 * **User-Friendly Graphical Interface:** A clear and intuitive step-by-step wizard guides you through the installation process.
 * **Customizable Installation Path:** Choose where you want to install the MesterMC launcher.
-* **Shortcut Creation:** Opt to create convenient desktop and/or Start Menu shortcuts (Windows).
+* **Shortcut Creation:** Opt to create convenient desktop and/or Start Menu shortcuts.
 * **License Agreement Display:** Review and accept the MesterMC license directly within the installer.
 * **Installation Progress Tracking:** Monitor the progress of your installation in real-time.
 * **Auto-Launch Option:** Launch MesterMC immediately after the installation completes.
