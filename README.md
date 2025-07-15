@@ -78,7 +78,14 @@ Please follow the [Getting Started Guide](https://github.com/TavstalDev/MesterMC
 
 ## 📸 Screenshots
 
-*(No screenshots available yet. This section will be updated soon with visual examples of the installer.)*
+![Installer Step 0: Language](docs/images/lang_selector.png)
+![Installer Step 1: Welcome Screen](docs/images/welcome.png)
+![Installer Step 2: License Agreement](docs/images/license.png)
+![Installer Step 3: Select Install Dir](docs/images/install_dir.png)
+![Installer Step 4: Shortcuts](docs/images/shortcuts.png)
+![Installer Step 5: Review](docs/images/review.png)
+![Installer Step 6: Installing](docs/images/installing.png)
+![Installer Step 7: Installed](docs/images/installed.png)
 
 ## 📜 License
 

@@ -81,7 +81,14 @@ Kérjük, olvassa el a [Hozzájárulási útmutatót](https://github.com/Tavstal
 
 ## 📸 Képernyőképek
 
-*(Még nincsenek képernyőképek. Ez a rész hamarosan frissül a telepítő vizuális példáival.)*
+![Installer Step 0: Language](docs/images/lang_selector.png)
+![Installer Step 1: Welcome Screen](docs/images/welcome.png)
+![Installer Step 2: License Agreement](docs/images/license.png)
+![Installer Step 3: Select Install Dir](docs/images/install_dir.png)
+![Installer Step 4: Shortcuts](docs/images/shortcuts.png)
+![Installer Step 5: Review](docs/images/review.png)
+![Installer Step 6: Installing](docs/images/installing.png)
+![Installer Step 7: Installed](docs/images/installed.png)
 
 ## 📜 Licenc
 
