@@ -26,6 +26,17 @@ import java.util.function.Consumer;
  */
 public class SetupMacOsHelper extends FallbackLogger {
     /**
+     * Logs a message at the specified log level for this class.
+     * Delegates the logging to the `FallbackLogger` with the current class as the module.
+     *
+     * @param level   The log level (e.g., INFO, WARN, ERROR, DEBUG).
+     * @param message The message to be logged.
+     */
+    private static void log(Level level, String message) {
+        FallbackLogger.log(level, message, SetupMacOsHelper.class);
+    }
+
+    /**
      * Sets up the macOS-specific application environment by creating app bundles, shortcuts,
      * and an uninstaller. This method handles file creation, logging, and error handling.
      *
@@ -35,8 +46,6 @@ public class SetupMacOsHelper extends FallbackLogger {
      * @param logCallback  A callback function to log messages during the setup process.
      */
     public static void setup(File installDir, File startMenuDir, File jarFile, Consumer<String> logCallback) {
-        setLogger(SetupMacOsHelper.class);
-
         InstallerTranslator translator = InstallerApplication.getTranslator();
         String installDirAbPath = installDir.getAbsolutePath();
         Path installDirPath = installDir.toPath();

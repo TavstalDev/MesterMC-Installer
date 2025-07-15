@@ -15,11 +15,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class ScriptUtils extends FallbackLogger {
     /**
-     * Initializes the logger for the `ScriptUtils` class.
-     * This method sets up the logging mechanism by associating the logger with the `ScriptUtils` class.
+     * Logs a message at the specified log level for this class.
+     * Delegates the logging to the `FallbackLogger` with the current class as the module.
+     *
+     * @param level   The log level (e.g., INFO, WARN, ERROR, DEBUG).
+     * @param message The message to be logged.
      */
-    public static void init() {
-        setLogger(ScriptUtils.class);
+    private static void log(Level level, String message) {
+        FallbackLogger.log(level, message, ScriptUtils.class);
     }
 
     /**

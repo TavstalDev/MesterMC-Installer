@@ -53,10 +53,7 @@ public class InstallerApplication extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        _logger = new InstallerLogger(null ,null);
-        FileUtils.init();
-        YamlHelper.init();
-        ScriptUtils.init();
+        _logger = new InstallerLogger(this.getClass().getSimpleName(),null);
         ConfigLoader.init();
         InstallerState.setDebugMode(ConfigLoader.get().debug());
         _translator = new InstallerTranslator(new String[] {"eng", "hun"});

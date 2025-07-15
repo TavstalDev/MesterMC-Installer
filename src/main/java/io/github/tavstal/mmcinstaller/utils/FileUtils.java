@@ -2,6 +2,7 @@ package io.github.tavstal.mmcinstaller.utils;
 
 import io.github.tavstal.mmcinstaller.InstallerApplication;
 import io.github.tavstal.mmcinstaller.core.logging.FallbackLogger;
+import io.github.tavstal.mmcinstaller.core.platform.SetupWindowsHelper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.event.Level;
 
@@ -19,11 +20,14 @@ import java.security.MessageDigest;
  */
 public class FileUtils extends FallbackLogger {
     /**
-     * Initializes the logger for the `FileUtils` class.
-     * This method sets up the logging mechanism by associating the logger with the `FileUtils` class.
+     * Logs a message at the specified log level for this class.
+     * Delegates the logging to the `FallbackLogger` with the current class as the module.
+     *
+     * @param level   The log level (e.g., INFO, WARN, ERROR, DEBUG).
+     * @param message The message to be logged.
      */
-    public static void init() {
-        setLogger(FileUtils.class);
+    private static void log(Level level, String message) {
+        FallbackLogger.log(level, message, FileUtils.class);
     }
 
     /**

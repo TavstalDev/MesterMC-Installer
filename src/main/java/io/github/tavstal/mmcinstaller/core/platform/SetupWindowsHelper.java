@@ -25,6 +25,17 @@ import java.util.function.Consumer;
  */
 public class SetupWindowsHelper extends FallbackLogger {
     /**
+     * Logs a message at the specified log level for this class.
+     * Delegates the logging to the `FallbackLogger` with the current class as the module.
+     *
+     * @param level   The log level (e.g., INFO, WARN, ERROR, DEBUG).
+     * @param message The message to be logged.
+     */
+    private static void log(Level level, String message) {
+        FallbackLogger.log(level, message, SetupWindowsHelper.class);
+    }
+
+    /**
      * Sets up the Windows-specific application environment by creating shortcuts, copying resources,
      * and generating an uninstallation script. This method handles file operations, PowerShell script execution,
      * and error handling.
@@ -35,8 +46,6 @@ public class SetupWindowsHelper extends FallbackLogger {
      * @param logCallback   A callback function to log messages during the setup process.
      */
     public static void setup(File installDir, File startMenuDir, File icoFile, Consumer<String> logCallback) {
-        setLogger(SetupWindowsHelper.class);
-
         InstallerTranslator translator = InstallerApplication.getTranslator();
         String installDirAbPath = installDir.getAbsolutePath();
         var installConfig = ConfigLoader.get().install();

@@ -23,6 +23,16 @@ import java.util.function.Consumer;
  * This class includes methods for creating .desktop files, shortcuts, and uninstallation scripts.
  */
 public class SetupLinuxHelper extends FallbackLogger {
+    /**
+     * Logs a message at the specified log level for this class.
+     * Delegates the logging to the `FallbackLogger` with the current class as the module.
+     *
+     * @param level   The log level (e.g., INFO, WARN, ERROR, DEBUG).
+     * @param message The message to be logged.
+     */
+    private static void log(Level level, String message) {
+        FallbackLogger.log(level, message, SetupLinuxHelper.class);
+    }
 
     /**
      * Sets up the Linux-specific application environment by creating .desktop files, shortcuts,
@@ -34,8 +44,6 @@ public class SetupLinuxHelper extends FallbackLogger {
      * @param logCallback  A callback function to log messages during the setup process.
      */
     public static void setup(File installDir, File startMenuDir, File jarFile, Consumer<String> logCallback) {
-        setLogger(SetupLinuxHelper.class);
-
         InstallerTranslator translator = InstallerApplication.getTranslator();
         String installDirAbPath = installDir.getAbsolutePath();
         var installConfig = ConfigLoader.get().install();

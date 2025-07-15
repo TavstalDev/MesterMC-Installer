@@ -23,11 +23,14 @@ public class YamlHelper extends FallbackLogger {
     private static final Yaml _yaml = new Yaml(_dumperOptions); // YAML parser instance.
 
     /**
-     * Initializes the logger for the `YamlHelper` class.
-     * This method sets up the logging mechanism by associating the logger with the `YamlHelper` class.
+     * Logs a message at the specified log level for this class.
+     * Delegates the logging to the `FallbackLogger` with the current class as the module.
+     *
+     * @param level   The log level (e.g., INFO, WARN, ERROR, DEBUG).
+     * @param message The message to be logged.
      */
-    public static void init() {
-        setLogger(YamlHelper.class);
+    private static void log(Level level, String message) {
+        FallbackLogger.log(level, message, YamlHelper.class);
     }
 
     /**
