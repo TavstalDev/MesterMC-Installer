@@ -45,8 +45,8 @@ A MesterMC Telepítő futtatásához **JDK 21 vagy újabb** verzió szükséges 
     * * **AppImage:**
     * * * **A. Terminálból:**
     ```bash
-    chmod +x MesterMC-Installer-x86_64.AppImage
-    ./MesterMC-Installer-x86_64.AppImage
+    chmod +x MesterMC-Installer-v1.0.0-linux.AppImage
+    ./MesterMC-Installer-v1.0.0-linux.AppImage
     ```
     * * * **B. Fájlkezelőből:** Kattintson jobb gombbal a ``.AppImage`` fájlra, válassza a „Tulajdonságok” menüpontot, majd a „Jogosultságok” fülön jelölje be az „Engedélyezés futtatásra programként” lehetőséget. Ezután dupla kattintással indítsa el a fájlt.
     * * * **C. AppImageLauncher használatával:** Ha telepítve van az AppImageLauncher, egyszerűen dupla kattintással futtathatja az ``.AppImage`` fájlt, amely ezt kezeli helyetted.

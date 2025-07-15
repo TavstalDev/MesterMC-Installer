@@ -45,8 +45,8 @@ To run the MesterMC Installer, you need to have **JDK 21 or higher** installed o
     * * **AppImage:**
     * * * **A. via Terminal:**
     ```bash
-    chmod +x MesterMC-Installer-x86_64.AppImage
-    ./MesterMC-Installer-x86_64.AppImage
+    chmod +x MesterMC-Installer-v1.0.0-linux.AppImage
+    ./MesterMC-Installer-v1.0.0-linux.AppImage
     ```
     * * * **B. via File Manager:** Right-click the `.AppImage` file, select "Properties", go to the "Permissions" tab, and check "Allow executing file as program". Then double-click the file to run it.
     * * * **C. via AppImageLauncher:** If you have AppImageLauncher installed, you can simply double-click the `.AppImage` file, and it will handle for you.
