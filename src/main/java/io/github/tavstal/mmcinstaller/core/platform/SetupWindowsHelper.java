@@ -35,6 +35,8 @@ public class SetupWindowsHelper extends FallbackLogger {
      * @param logCallback   A callback function to log messages during the setup process.
      */
     public static void setup(File installDir, File startMenuDir, File icoFile, Consumer<String> logCallback) {
+        setLogger(SetupWindowsHelper.class);
+
         InstallerTranslator translator = InstallerApplication.getTranslator();
         String installDirAbPath = installDir.getAbsolutePath();
         var installConfig = ConfigLoader.get().install();
@@ -55,7 +57,7 @@ public class SetupWindowsHelper extends FallbackLogger {
         var exeResourcePath = installConfig.exe().resourcePath();
         File exeFile = FileUtils.copyResource(installDirAbPath, exeResourcePath, exeFileName);
         if (exeFile == null) {
-            Log(Level.ERROR, "Executable file not found: " + exeFileName);
+            log(Level.ERROR, "Executable file not found: " + exeFileName);
             logCallback.accept(translator.Localize("IO.File.CopyError", Map.of(
                     "source", exeResourcePath,
                     "destination",  exeResourcePath + File.separator +  exeFileName,
@@ -83,7 +85,7 @@ public class SetupWindowsHelper extends FallbackLogger {
             // Execute the PowerShell script
             Process process = new ProcessBuilder("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", ps1AbPath).start();
             int exitCode = process.waitFor();
-            Log(Level.DEBUG,"PowerShell script executed with exit code: " + exitCode);
+            log(Level.DEBUG,"PowerShell script executed with exit code: " + exitCode);
             logCallback.accept(translator.Localize("Process.Success", Map.of(
                     "processName", "PowerShell",
                     "exitCode", String.valueOf(exitCode)
@@ -91,7 +93,7 @@ public class SetupWindowsHelper extends FallbackLogger {
 
             // Clean up the temporary script file
             if (!ps1File.delete()) {
-                Log(Level.WARN, "Failed to delete temporary PowerShell script: " + ps1AbPath);
+                log(Level.WARN, "Failed to delete temporary PowerShell script: " + ps1AbPath);
                 logCallback.accept(translator.Localize("IO.File.DeleteError", Map.of(
                         "path", ps1AbPath,
                         "error", "?"
@@ -99,7 +101,7 @@ public class SetupWindowsHelper extends FallbackLogger {
             }
         } catch (IOException | InterruptedException e) {
             // Log an error if the PowerShell script execution fails
-            Log(Level.ERROR,"Failed to create Windows shortcut: " + e.getMessage());
+            log(Level.ERROR,"Failed to create Windows shortcut: " + e.getMessage());
             logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
                     "path", shortcutAbPath,
                     "error", e.getMessage()
@@ -121,7 +123,7 @@ public class SetupWindowsHelper extends FallbackLogger {
         try {
             // Check if a desktop shortcut should be created
             if (InstallerState.shouldCreateDesktopShortcut()) {
-                Log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutAbPath);
+                log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutAbPath);
                 // Copy the shortcut file to the desktop directory
                 Files.copy(shortcutPath, desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
@@ -132,7 +134,7 @@ public class SetupWindowsHelper extends FallbackLogger {
 
             // Check if a start menu shortcut should be created
             if (InstallerState.shouldCreateStartMenuShortcut()) {
-                Log(Level.DEBUG,"Creating start menu shortcut: " + startMenuShortcutAbPath);
+                log(Level.DEBUG,"Creating start menu shortcut: " + startMenuShortcutAbPath);
                 // Copy the shortcut file to the start menu directory
                 Files.copy(shortcutPath, startMenuShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
@@ -144,11 +146,11 @@ public class SetupWindowsHelper extends FallbackLogger {
             // Delete the original shortcut file in the installation directory
             // This is done to avoid cluttering the installation directory with the shortcut file
             if (shortcutFile.exists() && !shortcutFile.delete()) {
-                Log(Level.WARN,"Failed to delete original shortcut file: " + shortcutAbPath);
+                log(Level.WARN,"Failed to delete original shortcut file: " + shortcutAbPath);
             }
         } catch (IOException e) {
             // Log an error if copying the shortcut files fails
-            Log(Level.ERROR,"Failed to copy shortcut files: " + e.getMessage());
+            log(Level.ERROR,"Failed to copy shortcut files: " + e.getMessage());
             logCallback.accept(translator.Localize("IO.File.CopyError", Map.of(
                     "source", shortcutAbPath,
                     "destination", desktopShortcutAbPath + " or " + startMenuShortcutAbPath,

@@ -23,6 +23,14 @@ public class YamlHelper extends FallbackLogger {
     private static final Yaml _yaml = new Yaml(_dumperOptions); // YAML parser instance.
 
     /**
+     * Initializes the logger for the `YamlHelper` class.
+     * This method sets up the logging mechanism by associating the logger with the `YamlHelper` class.
+     */
+    public static void init() {
+        setLogger(YamlHelper.class);
+    }
+
+    /**
      * Reads a YAML file from the specified resource path and converts it into a Map.
      *
      * @param resourcePath The path to the resource file.
@@ -32,33 +40,33 @@ public class YamlHelper extends FallbackLogger {
     public static Map<String, Object> readFromResource(String resourcePath, Class<?> clazz) {
         InputStream inputStream;
         try {
-            Log(Level.DEBUG, String.format("Reading resource file: %s%n", resourcePath));
+            log(Level.DEBUG, String.format("Reading resource file: %s%n", resourcePath));
             inputStream = clazz.getResourceAsStream(resourcePath);
         } catch (NullPointerException ex) {
-            Log(Level.ERROR, String.format("Failed to get resource file. Path: %s%n", resourcePath));
+            log(Level.ERROR, String.format("Failed to get resource file. Path: %s%n", resourcePath));
             return null;
         } catch (Exception ex) {
-            Log(Level.ERROR,"Unknown error happened while reading resource file.");
-            Log(Level.ERROR,ex.getMessage());
+            log(Level.ERROR,"Unknown error happened while reading resource file.");
+            log(Level.ERROR,ex.getMessage());
             return null;
         }
 
-        Log(Level.DEBUG,"Loading yaml file...");
+        log(Level.DEBUG,"Loading yaml file...");
         Object yamlObject = _yaml.load(inputStream);
-        Log(Level.DEBUG,"Checking if the yamlObject is a Map...");
+        log(Level.DEBUG,"Checking if the yamlObject is a Map...");
         if (!(yamlObject instanceof Map)) {
             System.out.println("The yamlObject is not a Map. Aborting...");
             return null;
         }
 
         try {
-            Log(Level.DEBUG,"Casting yamlObject to Map<String, Object>...");
+            log(Level.DEBUG,"Casting yamlObject to Map<String, Object>...");
             @SuppressWarnings("unchecked")
             Map<String, Object> localValue = (Map<String, Object>) yamlObject;
             return localValue;
         } catch (Exception ex) {
-            Log(Level.ERROR,"Failed to cast the yamlObject to Map<String, Object>");
-            Log(Level.ERROR,ex.getMessage());
+            log(Level.ERROR,"Failed to cast the yamlObject to Map<String, Object>");
+            log(Level.ERROR,ex.getMessage());
             return null;
         }
     }
@@ -81,15 +89,15 @@ public class YamlHelper extends FallbackLogger {
                 if (value instanceof Map) {
                     value = ((Map<?, ?>) value).get(k);
                 } else {
-                    Log(Level.WARN, String.format("Failed to get the object value of the '%s' key.%n", key));
+                    log(Level.WARN, String.format("Failed to get the object value of the '%s' key.%n", key));
                     return defaultValue;
                 }
             }
 
             return value;
         } catch (Exception ex) {
-            Log(Level.ERROR, String.format("Unknown error happened while getting the object value of the '%s' key.%n", key));
-            Log(Level.ERROR,ex.getMessage());
+            log(Level.ERROR, String.format("Unknown error happened while getting the object value of the '%s' key.%n", key));
+            log(Level.ERROR,ex.getMessage());
             return defaultValue;
         }
     }
@@ -119,13 +127,13 @@ public class YamlHelper extends FallbackLogger {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                Log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
+                log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return result.toString();
         } catch (Exception ex) {
-            Log(Level.ERROR, String.format("Unknown error happened while getting the string value of the '%s' key.%n", key));
-            Log(Level.ERROR, ex.getMessage());
+            log(Level.ERROR, String.format("Unknown error happened while getting the string value of the '%s' key.%n", key));
+            log(Level.ERROR, ex.getMessage());
             return defaultValue;
         }
     }
@@ -154,13 +162,13 @@ public class YamlHelper extends FallbackLogger {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                Log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
+                log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return Boolean.parseBoolean(result.toString());
         } catch (Exception ex) {
-            Log(Level.ERROR, String.format("Unknown error happened while getting the boolean value of the '%s' key.%n", key));
-            Log(Level.ERROR,ex.getMessage());
+            log(Level.ERROR, String.format("Unknown error happened while getting the boolean value of the '%s' key.%n", key));
+            log(Level.ERROR,ex.getMessage());
             return defaultValue;
         }
     }
@@ -190,13 +198,13 @@ public class YamlHelper extends FallbackLogger {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                Log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
+                log(Level.WARN, String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
-            Log(Level.ERROR, String.format("Unknown error happened while getting the integer value of the '%s' key.%n", key));
-            Log(Level.ERROR,ex.getMessage());
+            log(Level.ERROR, String.format("Unknown error happened while getting the integer value of the '%s' key.%n", key));
+            log(Level.ERROR,ex.getMessage());
             return defaultValue;
         }
     }
@@ -226,13 +234,13 @@ public class YamlHelper extends FallbackLogger {
         try {
             Object result = getObject(map, key, defaultValue);
             if (result == null) {
-                Log(Level.WARN,String.format("The value of the '%s' key is null.%n", key));
+                log(Level.WARN,String.format("The value of the '%s' key is null.%n", key));
                 return defaultValue;
             }
             return Double.parseDouble(result.toString());
         } catch (Exception ex) {
-            Log(Level.ERROR, String.format("Unknown error happened while getting the double value of the '%s' key.%n", key));
-            Log(Level.ERROR, ex.getMessage());
+            log(Level.ERROR, String.format("Unknown error happened while getting the double value of the '%s' key.%n", key));
+            log(Level.ERROR, ex.getMessage());
             return defaultValue;
         }
     }

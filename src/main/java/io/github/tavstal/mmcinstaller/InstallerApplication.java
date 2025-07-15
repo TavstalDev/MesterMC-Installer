@@ -5,9 +5,7 @@ import io.github.tavstal.mmcinstaller.config.InstallerState;
 import io.github.tavstal.mmcinstaller.core.Constants;
 import io.github.tavstal.mmcinstaller.core.logging.InstallerLogger;
 import io.github.tavstal.mmcinstaller.core.InstallerTranslator;
-import io.github.tavstal.mmcinstaller.utils.PathUtils;
-import io.github.tavstal.mmcinstaller.utils.SceneManager;
-import io.github.tavstal.mmcinstaller.utils.YamlHelper;
+import io.github.tavstal.mmcinstaller.utils.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -56,6 +54,9 @@ public class InstallerApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         _logger = new InstallerLogger(null ,null);
+        FileUtils.init();
+        YamlHelper.init();
+        ScriptUtils.init();
         ConfigLoader.init();
         InstallerState.setDebugMode(ConfigLoader.get().debug());
         _translator = new InstallerTranslator(new String[] {"eng", "hun"});

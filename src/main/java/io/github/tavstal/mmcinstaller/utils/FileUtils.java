@@ -18,6 +18,13 @@ import java.security.MessageDigest;
  * deleting directories, and computing file checksums.
  */
 public class FileUtils extends FallbackLogger {
+    /**
+     * Initializes the logger for the `FileUtils` class.
+     * This method sets up the logging mechanism by associating the logger with the `FileUtils` class.
+     */
+    public static void init() {
+        setLogger(FileUtils.class);
+    }
 
     /**
      * Copies the contents of a source directory to a target directory.
@@ -146,14 +153,14 @@ public class FileUtils extends FallbackLogger {
         try (InputStream resourceStream = InstallerApplication.class.getResourceAsStream(resourcePath)) {
             // Check if the resource exists
             if (resourceStream == null) {
-                Log(Level.ERROR, "Resource not found: " + resourcePath);
+                log(Level.ERROR, "Resource not found: " + resourcePath);
                 return null;
             }
             // Copy the resource to the target file
             Files.copy(resourceStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             // Log an error if the copy operation fails
-            Log(Level.ERROR, String.format("Failed to copy %s: %s", targetFileName, e.getMessage()));
+            log(Level.ERROR, String.format("Failed to copy %s: %s", targetFileName, e.getMessage()));
         }
         return targetFile;
     }

@@ -34,6 +34,8 @@ public class SetupLinuxHelper extends FallbackLogger {
      * @param logCallback  A callback function to log messages during the setup process.
      */
     public static void setup(File installDir, File startMenuDir, File jarFile, Consumer<String> logCallback) {
+        setLogger(SetupLinuxHelper.class);
+
         InstallerTranslator translator = InstallerApplication.getTranslator();
         String installDirAbPath = installDir.getAbsolutePath();
         var installConfig = ConfigLoader.get().install();
@@ -63,7 +65,7 @@ public class SetupLinuxHelper extends FallbackLogger {
 
         try {
             // Log the creation of the .desktop file
-            Log(Level.DEBUG, "Creating .desktop file: " + launchFileAbPath);
+            log(Level.DEBUG, "Creating .desktop file: " + launchFileAbPath);
             // Write the content to the .desktop file
             Files.writeString(launchFilePath, desktopFileContent);
             logCallback.accept(translator.Localize("IO.File.Created", Map.of(
@@ -72,7 +74,7 @@ public class SetupLinuxHelper extends FallbackLogger {
 
             // Check if a desktop shortcut should be created
             if (InstallerState.shouldCreateDesktopShortcut()) {
-                Log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutAbPath);
+                log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutAbPath);
                 // Copy the .desktop file to the desktop directory
                 Files.copy(launchFilePath, desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
@@ -83,7 +85,7 @@ public class SetupLinuxHelper extends FallbackLogger {
 
             // Check if a start menu shortcut should be created
             if (InstallerState.shouldCreateStartMenuShortcut()) {
-                Log(Level.DEBUG,"Creating start menu shortcut: " + startMenuAbPath);
+                log(Level.DEBUG,"Creating start menu shortcut: " + startMenuAbPath);
                 // Copy the .desktop file to the start menu directory
                 Files.copy(launchFilePath, startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
@@ -93,7 +95,7 @@ public class SetupLinuxHelper extends FallbackLogger {
             }
         } catch (IOException e) {
             // Log an error if the .desktop file creation or shortcut creation fails
-            Log(Level.ERROR,"Failed to write .desktop file: " + e.getMessage());
+            log(Level.ERROR,"Failed to write .desktop file: " + e.getMessage());
             logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
                     "path", launchFileAbPath,
                     "error", e.getMessage()

@@ -35,6 +35,8 @@ public class SetupMacOsHelper extends FallbackLogger {
      * @param logCallback  A callback function to log messages during the setup process.
      */
     public static void setup(File installDir, File startMenuDir, File jarFile, Consumer<String> logCallback) {
+        setLogger(SetupMacOsHelper.class);
+
         InstallerTranslator translator = InstallerApplication.getTranslator();
         String installDirAbPath = installDir.getAbsolutePath();
         Path installDirPath = installDir.toPath();
@@ -74,7 +76,7 @@ public class SetupMacOsHelper extends FallbackLogger {
 
         try {
             // Log the creation of the macOS app bundle
-            Log(Level.DEBUG, "Creating macOS app bundle: " + desktopFileName);
+            log(Level.DEBUG, "Creating macOS app bundle: " + desktopFileName);
             String launcherScriptContent = installConfig.macApp().script()
                     .replaceAll("%dirPath%", installDirAbPath)
                     .replaceAll("%jarPath%", jarFile.getAbsolutePath());
@@ -87,12 +89,12 @@ public class SetupMacOsHelper extends FallbackLogger {
             );
             if (launchAppBundlePath != null) {
                 // Log the successful creation of the macOS app bundle
-                Log(Level.DEBUG, "Created macOS app bundle at: " + launchAppBundlePath.toAbsolutePath());
+                log(Level.DEBUG, "Created macOS app bundle at: " + launchAppBundlePath.toAbsolutePath());
                 InstallerState.setApplicationToLaunch(launchAppBundlePath.toFile().getAbsolutePath());
 
                 // Check if a desktop shortcut should be created
                 if (InstallerState.shouldCreateDesktopShortcut()) {
-                    Log(Level.DEBUG, "Creating desktop shortcut: " + desktopShortcutAbPath);
+                    log(Level.DEBUG, "Creating desktop shortcut: " + desktopShortcutAbPath);
                     // Create a copy of the original .app bundle
                     FileUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), desktopShortcutFile.toPath().toAbsolutePath());
                     logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
@@ -103,7 +105,7 @@ public class SetupMacOsHelper extends FallbackLogger {
 
                 // Check if a start menu shortcut should be created
                 if (InstallerState.shouldCreateStartMenuShortcut()) {
-                    Log(Level.DEBUG, "Creating start menu shortcut: " + startMenuFileAbPath);
+                    log(Level.DEBUG, "Creating start menu shortcut: " + startMenuFileAbPath);
                     // Create a copy of the original .app bundle
                     FileUtils.copyDirectory(launchAppBundlePath.toAbsolutePath(), startMenuFile.toPath().toAbsolutePath());
                     logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
@@ -114,7 +116,7 @@ public class SetupMacOsHelper extends FallbackLogger {
             }
             else {
                 // Log an error if the app bundle creation failed
-                Log(Level.ERROR, "Failed to create macOS app bundle.");
+                log(Level.ERROR, "Failed to create macOS app bundle.");
                 logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
                         "path", desktopFileName,
                         "error", "?"
@@ -134,7 +136,7 @@ public class SetupMacOsHelper extends FallbackLogger {
             );
             if (uninstallAppBundlePath == null) {
                 // Log an error if the uninstaller app bundle creation failed
-                Log(Level.ERROR, "Failed to create macOS uninstaller app bundle.");
+                log(Level.ERROR, "Failed to create macOS uninstaller app bundle.");
                 logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
                         "path", installDirPath + File.separator + uninstallConfig.zsh().fileName(),
                         "error", "?"
@@ -143,7 +145,7 @@ public class SetupMacOsHelper extends FallbackLogger {
             } else {
                 String uninstallAppBundleAbPath = uninstallAppBundlePath.toAbsolutePath().toString();
                 // Log the successful creation of the uninstaller app bundle
-                Log(Level.DEBUG, "Created macOS uninstaller app bundle at: " + uninstallAppBundleAbPath);
+                log(Level.DEBUG, "Created macOS uninstaller app bundle at: " + uninstallAppBundleAbPath);
                 logCallback.accept(translator.Localize("IO.File.Created", Map.of(
                         "path", uninstallAppBundleAbPath
                 )));
@@ -151,7 +153,7 @@ public class SetupMacOsHelper extends FallbackLogger {
         }
         catch (Exception ex) {
             // Log an error if the macOS app bundle creation fails
-            Log(Level.ERROR, "Failed to create macOS app bundle: " + ex.getMessage());
+            log(Level.ERROR, "Failed to create macOS app bundle: " + ex.getMessage());
             logCallback.accept(ex.getLocalizedMessage());
         }
     }
@@ -203,7 +205,7 @@ public class SetupMacOsHelper extends FallbackLogger {
                 infoPlistContent = infoPlistContent.replaceAll("%iconPath%", icnsFileName);
             } else {
                 // Log a warning if the icon file is not found
-                Log(Level.WARN, "No icon file found for macOS app bundle.");
+                log(Level.WARN, "No icon file found for macOS app bundle.");
             }
 
             // Write the Info.plist content to the Contents directory
@@ -234,7 +236,7 @@ public class SetupMacOsHelper extends FallbackLogger {
         }
         catch (IOException ex) {
             // Log an error if the app bundle creation fails
-            Log(Level.ERROR, "Failed to create macOS app bundle: " + ex.getMessage());
+            log(Level.ERROR, "Failed to create macOS app bundle: " + ex.getMessage());
             return null;
         }
         return appBundlePath;

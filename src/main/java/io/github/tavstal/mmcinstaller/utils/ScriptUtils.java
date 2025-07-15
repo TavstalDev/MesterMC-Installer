@@ -15,6 +15,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class ScriptUtils extends FallbackLogger {
     /**
+     * Initializes the logger for the `ScriptUtils` class.
+     * This method sets up the logging mechanism by associating the logger with the `ScriptUtils` class.
+     */
+    public static void init() {
+        setLogger(ScriptUtils.class);
+    }
+
+    /**
      * Creates a script file with the specified content in the given directory.
      * If the operating system is Linux or macOS, the script is made executable.
      *
@@ -29,7 +37,7 @@ public class ScriptUtils extends FallbackLogger {
         try {
             // Write the content to the script file
             Files.writeString(scriptFile.toPath(), content);
-            Log(Level.DEBUG, "Created script: " + scriptFile.getAbsolutePath());
+            log(Level.DEBUG, "Created script: " + scriptFile.getAbsolutePath());
 
             // If the OS is Linux or macOS, make the script executable
             if (Constants.OS_NAME.contains("linux") || Constants.OS_NAME.contains("mac")) {
@@ -37,7 +45,7 @@ public class ScriptUtils extends FallbackLogger {
             }
         } catch (IOException e) {
             // Log an error if the script file creation fails
-            Log(Level.ERROR, "Failed to write scripts: " + e.getMessage());
+            log(Level.ERROR, "Failed to write scripts: " + e.getMessage());
         }
         return scriptFile;
     }
@@ -51,7 +59,7 @@ public class ScriptUtils extends FallbackLogger {
     public static void makeExecutable(File scriptFile) {
         try {
             // Log the start of the process
-            Log(Level.DEBUG, "Attempting to make script executable: " + scriptFile.getAbsolutePath());
+            log(Level.DEBUG, "Attempting to make script executable: " + scriptFile.getAbsolutePath());
 
             // Create a ProcessBuilder to execute the chmod command
             ProcessBuilder pb = new ProcessBuilder("chmod", "+x", scriptFile.getAbsolutePath());
@@ -64,20 +72,20 @@ public class ScriptUtils extends FallbackLogger {
                 int exitCode = p.exitValue(); // Get the exit code of the process
                 if (exitCode == 0) {
                     // Log success if chmod executed successfully
-                    Log(Level.DEBUG, "Script made executable: " + scriptFile.getAbsolutePath());
+                    log(Level.DEBUG, "Script made executable: " + scriptFile.getAbsolutePath());
                 } else {
                     // Read and log the error stream if chmod failed
                     String error = new String(p.getErrorStream().readAllBytes());
-                    Log(Level.ERROR, "chmod failed with exit code " + exitCode + ": " + error);
+                    log(Level.ERROR, "chmod failed with exit code " + exitCode + ": " + error);
                 }
             } else {
                 // Log a timeout error if the process did not finish within the timeout
-                Log(Level.ERROR, "chmod process timed out.");
+                log(Level.ERROR, "chmod process timed out.");
                 p.destroyForcibly(); // Forcefully terminate the process
             }
         } catch (IOException | InterruptedException e) {
             // Log any exceptions that occur during the process
-            Log(Level.ERROR, "Exception while making script executable: " + e.getMessage());
+            log(Level.ERROR, "Exception while making script executable: " + e.getMessage());
         }
     }
 }
