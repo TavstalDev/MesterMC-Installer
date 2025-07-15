@@ -12,6 +12,7 @@ import org.slf4j.event.Level;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,70 +35,79 @@ public class SetupLinuxHelper extends FallbackLogger {
      */
     public static void setup(File installDir, File startMenuDir, File jarFile, Consumer<String> logCallback) {
         InstallerTranslator translator = InstallerApplication.getTranslator();
+        String installDirAbPath = installDir.getAbsolutePath();
+        var installConfig = ConfigLoader.get().install();
+        var uninstallConfig = ConfigLoader.get().uninstall();
+
         // Get the name and content of the .desktop file from the configuration
-        String desktopFileName = ConfigLoader.get().install().linuxDesktop().fileName();
-        String desktopFileContent = ConfigLoader.get().install().linuxDesktop().content()
-                .replaceAll("%dirPath%", installDir.getAbsolutePath()) // Replace placeholder with the installation path
+        String desktopFileName = installConfig.linuxDesktop().fileName();
+        String desktopFileContent = installConfig.linuxDesktop().content()
+                .replaceAll("%dirPath%", installDirAbPath) // Replace placeholder with the installation path
                 .replaceAll("%jarPath%", jarFile.getAbsolutePath()); // Replace placeholder with the JAR file path
         File desktopDir = PathUtils.getUserDesktopDirectory();
 
         // Define the .desktop file in the installation directory
-        File linuxLaunchFile = new File(installDir, desktopFileName);
+        File launchFile = new File(installDir, desktopFileName);
+        Path launchFilePath = launchFile.toPath();
+        String launchFileAbPath = launchFile.getAbsolutePath();
 
         // Define the desktop shortcut file
         File desktopShortcutFile = new File(desktopDir, desktopFileName);
-        InstallerState.setShortcutPath(desktopShortcutFile.getAbsolutePath());
+        String desktopShortcutAbPath = desktopShortcutFile.getAbsolutePath();
+        InstallerState.setShortcutPath(desktopShortcutAbPath);
+
         // Define the start menu shortcut file
         File startMenuFile = new File(startMenuDir, desktopFileName);
-        InstallerState.setStartMenuShortcutPath(startMenuFile.getAbsolutePath());
+        String startMenuAbPath = startMenuFile.getAbsolutePath();
+        InstallerState.setStartMenuShortcutPath(startMenuAbPath);
 
         try {
             // Log the creation of the .desktop file
-            Log(Level.DEBUG, "Creating .desktop file: " + linuxLaunchFile.getAbsolutePath());
+            Log(Level.DEBUG, "Creating .desktop file: " + launchFileAbPath);
             // Write the content to the .desktop file
-            Files.writeString(linuxLaunchFile.toPath(), desktopFileContent);
+            Files.writeString(launchFilePath, desktopFileContent);
             logCallback.accept(translator.Localize("IO.File.Created", Map.of(
-                    "path", linuxLaunchFile.getAbsolutePath()
+                    "path", launchFileAbPath
             )));
 
             // Check if a desktop shortcut should be created
             if (InstallerState.shouldCreateDesktopShortcut()) {
-                Log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutFile.getAbsolutePath());
+                Log(Level.DEBUG,"Creating desktop shortcut: " + desktopShortcutAbPath);
                 // Copy the .desktop file to the desktop directory
-                Files.copy(linuxLaunchFile.toPath(), desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(launchFilePath, desktopShortcutFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
-                        "source", linuxLaunchFile.getAbsolutePath(),
-                        "destination", desktopShortcutFile.getAbsolutePath()
+                        "source", launchFileAbPath,
+                        "destination", desktopShortcutAbPath
                 )));
             }
 
             // Check if a start menu shortcut should be created
             if (InstallerState.shouldCreateStartMenuShortcut()) {
-                Log(Level.DEBUG,"Creating start menu shortcut: " + startMenuFile.getAbsolutePath());
+                Log(Level.DEBUG,"Creating start menu shortcut: " + startMenuAbPath);
                 // Copy the .desktop file to the start menu directory
-                Files.copy(linuxLaunchFile.toPath(), startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(launchFilePath, startMenuFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logCallback.accept(translator.Localize("IO.File.Copied", Map.of(
-                        "source", linuxLaunchFile.getAbsolutePath(),
-                        "destination", startMenuFile.getAbsolutePath()
+                        "source", launchFileAbPath,
+                        "destination", startMenuAbPath
                 )));
             }
         } catch (IOException e) {
             // Log an error if the .desktop file creation or shortcut creation fails
             Log(Level.ERROR,"Failed to write .desktop file: " + e.getMessage());
             logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
-                    "path", linuxLaunchFile.getAbsolutePath(),
+                    "path", launchFileAbPath,
                     "error", e.getMessage()
             )));
         }
 
         // Create the uninstallation script file
         ScriptUtils.createFile(
-                installDir.getAbsolutePath(),
-                ConfigLoader.get().uninstall().bash().fileName(),
-                ConfigLoader.get().uninstall().bash().content()
-                        .replaceAll("%installDir%", installDir.getAbsolutePath())
-                        .replaceAll("%desktopShortcut%", desktopShortcutFile.getAbsolutePath())
-                        .replaceAll("%startmenuShortcut%", startMenuFile.getAbsolutePath())
+                installDirAbPath,
+                uninstallConfig.bash().fileName(),
+                uninstallConfig.bash().content()
+                        .replaceAll("%installDir%", installDirAbPath)
+                        .replaceAll("%desktopShortcut%", desktopShortcutAbPath)
+                        .replaceAll("%startmenuShortcut%", startMenuAbPath)
         );
     }
 }

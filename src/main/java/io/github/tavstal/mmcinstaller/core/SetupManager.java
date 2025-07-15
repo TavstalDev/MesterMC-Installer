@@ -58,16 +58,18 @@ public class SetupManager {
      * It also creates an uninstaller configuration file and sets the active scene to "Install Complete".
      */
     public void setup() {
-        String installPath = _installDir.getAbsolutePath();
+        String installDirAbPath = _installDir.getAbsolutePath();
+        String jarFileAbPath = _jarFile.getAbsolutePath();
+        String startMenuDirAbPath = _startMenuDir.getAbsolutePath();
 
         try {
             // Ensure the shortcut directory exists
-            if (_startMenuDir != null && !_startMenuDir.exists()) {
+            if (!_startMenuDir.exists()) {
                 if (!_startMenuDir.mkdirs()) {
                     // Log and notify if the start menu directory creation fails
-                    _logger.Error("Failed to create start menu directory: " + _startMenuDir.getAbsolutePath());
+                    _logger.Error("Failed to create start menu directory: " + startMenuDirAbPath);
                     _logCallback.accept(_translator.Localize("IO.Directory.CreateError", Map.of(
-                            "path", _startMenuDir.getAbsolutePath(),
+                            "path", startMenuDirAbPath,
                             "error", "?"
                     )));
                     return;
@@ -77,30 +79,30 @@ public class SetupManager {
             // Copy common resources
             // Moved icons to their own OS-specific setup methods
             // to avoid unnecessary copying and bloating the installation directory
-            File infoTextFile = FileUtils.copyResource(_installDir.getAbsolutePath(),"info.txt", "info.txt");
+            File infoTextFile = FileUtils.copyResource(installDirAbPath,"info.txt", "info.txt");
             if (infoTextFile == null) {
                 _logCallback.accept(_translator.Localize("IO.File.CopyError", Map.of(
                         "source", "resources/info.txt",
-                        "destination", _installDir.getAbsolutePath(),
+                        "destination", installDirAbPath,
                         "error", "?"
                 )));
             }
             _logCallback.accept(_translator.Localize("IO.File.Copied", Map.of(
                     "source", "resources/info.txt",
-                    "destination", _installDir.getAbsolutePath()
+                    "destination", installDirAbPath
             )));
 
             // Perform OS-specific setup
             if (_os.contains("win")) { // WINDOWS
-                File icoFile = FileUtils.copyResource(_installDir.getAbsolutePath(),"assets/favicon.ico", "icon.ico");
+                File icoFile = FileUtils.copyResource(installDirAbPath,"assets/favicon.ico", "icon.ico");
                 _logCallback.accept(_translator.Localize("Common.DetectedOS", Map.of("os", "Windows")));
                 // Create the batch script file
                 File bashScriptFile = ScriptUtils.createFile(
-                        _installDir.getAbsolutePath(),
+                        installDirAbPath,
                         ConfigLoader.get().install().batch().fileName(),
                         ConfigLoader.get().install().batch().content()
-                                .replaceAll("%dirPath%", installPath.replace("\\", "\\\\"))
-                                .replaceAll("%jarPath%", _jarFile.getAbsolutePath().replace("\\", "\\\\"))
+                                .replaceAll("%dirPath%", installDirAbPath.replace("\\", "\\\\"))
+                                .replaceAll("%jarPath%", jarFileAbPath.replace("\\", "\\\\"))
                 );
                 _logCallback.accept(_translator.Localize("IO.File.Created", Map.of(
                         "path", bashScriptFile.getAbsolutePath()
@@ -117,34 +119,35 @@ public class SetupManager {
                 else
                     _logCallback.accept(_translator.Localize("Common.UnsupportedOS", Map.of("os", _os)));
 
-                File linuxIconFile = FileUtils.copyResource(_installDir.getAbsolutePath(),"assets/icon.png", "icon.png");
+                File linuxIconFile = FileUtils.copyResource(installDirAbPath,"assets/icon.png", "icon.png");
                 if (linuxIconFile == null) {
                     _logCallback.accept(_translator.Localize("IO.File.CopyError", Map.of(
                             "source", "resources/assets/icon.png",
-                            "destination", _installDir.getAbsolutePath(),
+                            "destination", installDirAbPath,
                             "error", "?"
                     )));
                 } else {
                     _logCallback.accept(_translator.Localize("IO.File.Copied", Map.of(
                             "source", "resources/assets/icon.png",
-                            "destination", _installDir.getAbsolutePath()
+                            "destination", installDirAbPath
                     )));
                 }
 
                 // Create the bash script file
                 File scriptFile = ScriptUtils.createFile(
-                        _installDir.getAbsolutePath(),
+                        installDirAbPath,
                         ConfigLoader.get().install().bash().fileName(),
                         ConfigLoader.get().install().bash().content()
-                                .replaceAll("%dirPath%", installPath)
-                                .replaceAll("%jarPath%", _jarFile.getAbsolutePath())
+                                .replaceAll("%dirPath%", installDirAbPath)
+                                .replaceAll("%jarPath%", jarFileAbPath)
                 );
+                String scriptFileAbPath = scriptFile.getAbsolutePath();
                 _logCallback.accept(_translator.Localize("IO.File.Created", Map.of(
-                        "path", scriptFile.getAbsolutePath()
+                        "path", scriptFileAbPath
                 )));
 
                 // Set the application launch path
-                InstallerState.setApplicationToLaunch(scriptFile.getAbsolutePath());
+                InstallerState.setApplicationToLaunch(scriptFileAbPath);
                 // Setup Linux-specific configurations
                 SetupLinuxHelper.setup(_installDir, _startMenuDir, _jarFile, _logCallback);
             }

@@ -50,113 +50,118 @@ public class UninstallManager {
 
         // Delete desktop shortcut.
         File desktopShortcut = new File(InstallerState.getShortcutPath());
+        String desktopShortcutAbPath = desktopShortcut.getAbsolutePath();
         if (desktopShortcut.exists()) {
-            if (desktopShortcut.isDirectory() && desktopShortcut.getAbsolutePath().endsWith(".app")) {
+            if (desktopShortcut.isDirectory() && desktopShortcutAbPath.endsWith(".app")) {
                 try {
                     FileUtils.deleteDirectory(desktopShortcut.toPath());
-                    _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", desktopShortcut.getAbsolutePath())));
+                    _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", desktopShortcutAbPath)));
                 }
                 catch (IOException ex) {
                     _logger.Error("Failed to delete desktop shortcut: " + ex.getMessage());
                     _logCallback.accept(_translator.Localize("IO.Directory.DeleteError", Map.of(
-                            "path", desktopShortcut.getAbsolutePath(),
+                            "path", desktopShortcutAbPath,
                             "error", ex.getMessage()
                     )));
                 }
             } else {
                 if (desktopShortcut.delete()) {
-                    _logCallback.accept(_translator.Localize("IO.File.Deleted", Map.of("path", desktopShortcut.getAbsolutePath())));
+                    _logCallback.accept(_translator.Localize("IO.File.Deleted", Map.of("path", desktopShortcutAbPath)));
                 } else {
                     _logCallback.accept(_translator.Localize("IO.File.DeleteError", Map.of(
-                            "path", desktopShortcut.getAbsolutePath(),
+                            "path", desktopShortcutAbPath,
                             "error", "?" // Placeholder for actual error message, since we don't have a way to get the actual error in this context
                     )));
                 }
             }
         } else {
-            _logCallback.accept(_translator.Localize("IO.File.NotFound", Map.of("path",desktopShortcut.getAbsolutePath())));
+            _logCallback.accept(_translator.Localize("IO.File.NotFound", Map.of("path", desktopShortcutAbPath)));
         }
         _progressCallback.accept(1.0 / steps);
 
         // Delete start menu shortcut.
         File startMenuShortcut = new File(InstallerState.getStartMenuShortcutPath());
+        String startMenuShortcutAbPath = startMenuShortcut.getAbsolutePath();
         if (startMenuShortcut.exists()) {
-            if (startMenuShortcut.isDirectory() && startMenuShortcut.getAbsolutePath().endsWith(".app")) {
+            if (startMenuShortcut.isDirectory() && startMenuShortcutAbPath.endsWith(".app")) {
                 try {
                     FileUtils.deleteDirectory(startMenuShortcut.toPath());
-                    _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", startMenuShortcut.getAbsolutePath())));
+                    _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", startMenuShortcutAbPath)));
                 }
                 catch (IOException ex) {
                     _logger.Error("Failed to delete desktop shortcut: " + ex.getMessage());
                     _logCallback.accept(_translator.Localize("IO.Directory.DeleteError", Map.of(
-                            "path", startMenuShortcut.getAbsolutePath(),
+                            "path", startMenuShortcutAbPath,
                             "error", ex.getMessage()
                     )));
                 }
             } else {
                 if (startMenuShortcut.delete()) {
-                    _logCallback.accept(_translator.Localize("IO.File.Deleted", Map.of("path", startMenuShortcut.getAbsolutePath())));
+                    _logCallback.accept(_translator.Localize("IO.File.Deleted", Map.of("path", startMenuShortcutAbPath)));
                 } else {
                     _logCallback.accept(_translator.Localize("IO.File.DeleteError", Map.of(
-                            "path", startMenuShortcut.getAbsolutePath(),
+                            "path", startMenuShortcutAbPath,
                             "error", "?" // Placeholder for actual error message, since we don't have a way to get the actual error in this context
                     )));
                 }
             }
         } else {
-            _logCallback.accept(_translator.Localize("IO.File.NotFound", Map.of("path", startMenuShortcut.getAbsolutePath())));
+            _logCallback.accept(_translator.Localize("IO.File.NotFound", Map.of("path", startMenuShortcutAbPath)));
         }
         _progressCallback.accept(2.0 / steps);
 
         // Delete start menu directory.
         File startMenuDir = new File(InstallerState.getStartMenuPath());
+        String startMenuDirAbPath = startMenuDir.getAbsolutePath();
         if (startMenuDir.exists()) {
             if (InstallerState.getStartMenuPath().equals(PathUtils.getStartMenuDirectory("").getAbsolutePath())) {
-                _logCallback.accept(_translator.Localize("IO.Directory.NotWritable", Map.of("path", startMenuDir.getAbsolutePath())));
+                _logCallback.accept(_translator.Localize("IO.Directory.NotWritable", Map.of("path", startMenuDirAbPath)));
             } else if (startMenuDir.delete()) {
-                _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", startMenuDir.getAbsolutePath())));
+                _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", startMenuDirAbPath)));
             } else {
                 _logCallback.accept(_translator.Localize("IO.Directory.DeleteError", Map.of(
-                        "path", startMenuDir.getAbsolutePath(),
+                        "path", startMenuDirAbPath,
                         "error", "?" // Placeholder for actual error message, since we don't have a way to get the actual error in this context
                 )));
             }
         } else {
-            _logCallback.accept(_translator.Localize("IO.Directory.NotFound", Map.of("path", startMenuDir.getAbsolutePath())));
+            _logCallback.accept(_translator.Localize("IO.Directory.NotFound", Map.of("path", startMenuDirAbPath)));
         }
         _progressCallback.accept(3.0 / steps);
 
         // Delete installation directory.
         File installDir = new File(InstallerState.getCurrentPath());
+        String installDirAbPath = installDir.getAbsolutePath();
         if (installDir.exists()) {
             try {
                 FileUtils.deleteDirectory(installDir.toPath());
-                _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", installDir.getAbsolutePath())));
+                _logCallback.accept(_translator.Localize("IO.Directory.Deleted", Map.of("path", installDirAbPath)));
             } catch (IOException e) {
                 _logger.Error("Failed to delete installation directory: " + e.getMessage());
                 _logCallback.accept(_translator.Localize("IO.Directory.DeleteError", Map.of(
-                        "path", installDir.getAbsolutePath(),
+                        "path", installDirAbPath,
                         "error", e.getMessage()
                 )));
             }
         } else {
-            _logCallback.accept(_translator.Localize("IO.Directory.NotFound", Map.of("path", installDir.getAbsolutePath())));
+            _logCallback.accept(_translator.Localize("IO.Directory.NotFound", Map.of("path", installDirAbPath)));
         }
         _progressCallback.accept(4.0 / steps);
 
         // Delete the uninstaller config file.
         File configFile = PathUtils.getUninstallerConfigFile();
+        String configFileAbPath = configFile.getAbsolutePath();
         if (configFile.exists()) {
             if (configFile.delete()) {
-                _logCallback.accept(_translator.Localize("IO.File.Deleted", Map.of("path", configFile.getAbsolutePath())));
+                _logCallback.accept(_translator.Localize("IO.File.Deleted", Map.of("path", configFileAbPath)));
             } else {
                 _logCallback.accept(_translator.Localize("IO.File.DeleteError", Map.of(
-                        "path", configFile.getAbsolutePath(),
+                        "path", configFileAbPath,
                         "error", "?" // Placeholder for actual error message, since we don't have a way to get the actual error in this context
                 )));
             }
         } else {
-            _logCallback.accept(_translator.Localize("IO.File.NotFound", Map.of("path", configFile.getAbsolutePath())));
+            _logCallback.accept(_translator.Localize("IO.File.NotFound", Map.of("path", configFileAbPath)));
         }
 
         Platform.runLater(() -> { // Small delay to ensure UI is ready.

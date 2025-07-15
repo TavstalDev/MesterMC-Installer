@@ -113,12 +113,14 @@ public class DownloadManager {
         String outputChecksum = "";
         boolean checksumContinue;
 
+        String outputFileAbPath = outputFile.getAbsolutePath();
+
         try {
             // Calculate the checksum of the downloaded file.
-            outputChecksum = FileUtils.getFileChecksum(outputFile.getAbsolutePath());
+            outputChecksum = FileUtils.getFileChecksum(outputFileAbPath);
             if (outputChecksum.isEmpty()) {
                 // Log an error if the checksum is empty and show an error alert.
-                _logger.Error("Checksum is null or empty for file: " + outputFile.getAbsolutePath());
+                _logger.Error("Checksum is null or empty for file: " + outputFileAbPath);
                 checksumContinue = AlertUtils.show(errorTitle, errorHeader, errorContent, yesButtonText, noButtonText, Alert.AlertType.ERROR);
             } else {
                 checksumContinue = true;
