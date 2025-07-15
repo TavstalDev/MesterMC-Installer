@@ -82,7 +82,7 @@ public class SetupWindowsHelper extends FallbackLogger {
         try {
             // Generate the PowerShell script content
             String powershellScript = installConfig.exe().powershell()
-                    .replace("%shortcutFile%", shortcutAbPath.replace("\\", "\\\\"))
+                    .replace("%shortcutPath%", shortcutAbPath.replace("\\", "\\\\"))
                     .replace("%exePath%", exeAbPath.replace("\\", "\\\\"))
                     .replace("%iconPath%", icoFile.getAbsolutePath().replace("\\", "\\\\"));
 
@@ -110,7 +110,7 @@ public class SetupWindowsHelper extends FallbackLogger {
             }
         } catch (IOException | InterruptedException e) {
             // Log an error if the PowerShell script execution fails
-            log(Level.ERROR,"Failed to create Windows shortcut: " + e.getMessage());
+            log(Level.ERROR,"Failed to create Windows shortcut: " + e);
             logCallback.accept(translator.Localize("IO.File.CreateError", Map.of(
                     "path", shortcutAbPath,
                     "error", e.getMessage()
@@ -159,7 +159,7 @@ public class SetupWindowsHelper extends FallbackLogger {
             }
         } catch (IOException e) {
             // Log an error if copying the shortcut files fails
-            log(Level.ERROR,"Failed to copy shortcut files: " + e.getMessage());
+            log(Level.ERROR,"Failed to copy shortcut files: " + e);
             logCallback.accept(translator.Localize("IO.File.CopyError", Map.of(
                     "source", shortcutAbPath,
                     "destination", desktopShortcutAbPath + " or " + startMenuShortcutAbPath,
