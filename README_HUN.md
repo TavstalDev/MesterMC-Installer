@@ -39,9 +39,9 @@ A MesterMC Telepítő futtatásához **JDK 21 vagy újabb** verzió szükséges 
 ### Telepítés és Használat
 
 1.  **Töltse le a Telepítőt:**
-    * **Windows:** Töltse le a `.zip` fájlt. Bontsa ki, és futtassa a `MesterMC_Installer.exe` végrehajtható fájlt.
-    * **MacOS:** Töltse le a ``.app`` fájlt. Dupla kattintással indítsa el a fájlt.
-    * **Linux:**  Töltse le a ``.tar.gz`` vagy a ``.AppImage`` fájlt.
+    * **Windows:** Töltse le a `MesterMC-Installer-v1.0.0-win.zip` fájlt. Bontsa ki, és futtassa a `MesterMC-Installer.exe` végrehajtható fájlt.
+    * **MacOS:** Töltse le a ``MesterMC-Installer-v1.0.0-macos.zip`` fájlt. Bontsa ki, és futtassa a `MesterMC-Installer.app` végrehajtható fájlt.
+    * **Linux:**  Töltse le a ``MesterMC-Installer-v1.0.0-linux.tar.gz`` vagy a ``MesterMC-Installer-v1.0.0-linux.AppImage`` fájlt.
     * * **AppImage:**
     * * * **A. Terminálból:**
     ```bash

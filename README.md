@@ -39,9 +39,9 @@ To run the MesterMC Installer, you need to have **JDK 21 or higher** installed o
 ### Installation & Usage
 
 1.  **Download the Installer:**
-    * **Windows:** Download the `.zip` file. Extract it, and run the `MesterMC_Installer.exe` executable.
-    * **MacOS:** Download the `.app` file. Double-click on the file to run it.
-    * **Linux:** Download the `.tar.gz` or the `.AppImage` file.
+    * **Windows:** Download the `MesterMC-Installer-v1.0.0-win.zip` file. Extract it, and run the `MesterMC-Installer.exe` executable.
+    * **MacOS:** Download the `MesterMC-Installer-v1.0.0-macos.zip` file. Extract it, and run the `MesterMC-Installer.app` app image.
+    * **Linux:** Download the `MesterMC-Installer-v1.0.0-linux.tar.gz` or the `MesterMC-Installer-v1.0.0-linux.AppImage` file.
     * * **AppImage:**
     * * * **A. via Terminal:**
     ```bash
