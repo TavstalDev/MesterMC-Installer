@@ -6,6 +6,7 @@
 ![JDK 21+](https://img.shields.io/badge/JDK-21%2B%20Required-orange?logo=openjdk)
 ![License](https://img.shields.io/github/license/TavstalDev/MesterMC-Installer)
 ![GitHub issues](https://img.shields.io/github/issues/TavstalDev/MesterMC-Installer)
+[![Github All Releases](https://img.shields.io/github/downloads/TavstalDev/MesterMC-Installer/total.svg)]()
 
 The **MesterMC Installer** is a cross-platform solution designed to simplify the installation of the MesterMC launcher on various operating systems. While the original MesterMC installer primarily supports Windows, this installer extends compatibility to Linux and macOS, ensuring a broader user base can easily set up their game client.
 

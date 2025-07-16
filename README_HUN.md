@@ -6,6 +6,7 @@
 ![JDK 21+](https://img.shields.io/badge/JDK-21%2B%20Required-orange?logo=openjdk)
 ![Licenc](https://img.shields.io/github/license/TavstalDev/MesterMC-Installer)
 ![GitHub Problémák](https://img.shields.io/github/issues/TavstalDev/MesterMC-Installer)
+[![Github All Releases](https://img.shields.io/github/downloads/TavstalDev/MesterMC-Installer/total.svg)]()
 
 A **MesterMC Telepítő** egy többplatformos megoldás, amelyet a MesterMC indítóprogramjának telepítésének egyszerűsítésére terveztek különböző operációs rendszereken. Míg az eredeti MesterMC telepítő elsősorban Windowst támogatja, ez a telepítő kiterjeszti a kompatibilitást Linuxra és macOS-re is, biztosítva, hogy a szélesebb felhasználói bázis könnyedén beállíthassa játék kliensét.
 
